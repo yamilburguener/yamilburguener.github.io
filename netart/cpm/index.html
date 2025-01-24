@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+    content="height=600, initial-scale=1.0, minimum-scale=0.5, maximum-scale=1.0, user-scalable=yes">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <meta property="og:title" content="Colinas Punto Muerto - Net Art" />
+  <meta property="og:description"
+    content="Basada en el concepto de «zero waste» de vida sustentable desde la reutilización de residuos, la pieza de net.art traslada este accionar a una situación de hyperlinks bajo una dinámica de videojuego." />
+  <meta property="og:image" content="http://www.yamilburguener.com.ar/cpm/assets/cpm_imagen.jpg" />
+  <meta property="og:url" content="http://www.yamilburguener.com.ar/cpm" />
+
+  <title>colinas punto muerto - net.art</title>
+  <script src="libraries/p5.js" type="text/javascript"></script>
+
+  <script src="libraries/p5.dom.js" type="text/javascript"></script>
+  <script src="libraries/p5.sound.js" type="text/javascript"></script>
+
+  <script src="sketch.js" type="text/javascript"></script>
+  <script src="montania.js" type="text/javascript"></script>
+
+  <style>
+    html {
+      overflow-y: hidden;
+      overflow-x: scroll;
+      background-color: #000000;
+    }
+
+    body {
+      padding: 0;
+      margin: auto;
+      position: absolute;
+      top: 50%;
+      margin-top: -300px;
+      background-color: #000000;
+    }
+
+    aa:link {
+      color: #000000;
+      /*text-decoration: none;*/
+    }
+
+    aa:visited {
+      color: #1184a9;
+      /*text-decoration: none;*/
+    }
+
+    aa:hover {
+      color: #ffca4e;
+      /*text-decoration: none;*/
+      cursor: pointer;
+    }
+
+    aa:active {
+      color: #36c7f7;
+      /*text-decoration: none;*/
+    }
+
+    #panelGral {
+      background-color: rgba(200, 200, 200, 0.3);
+      position: fixed;
+      left: 50%;
+      margin-left: -140px;
+      border-radius: 4px;
+      width: 280px;
+      display: flex;
+      z-index: 200;
+    }
+
+    #panelIntro {
+      background-color: rgba(255, 255, 255, 0.7);
+      position: fixed;
+      top: 20%;
+      left: 50%;
+      margin-left: -200px;
+      border-radius: 8px;
+      border: 2px solid #888888;
+      padding: 15px;
+      width: 400px;
+      /*box-shadow: 0px 0px 20px #DDDDDD;*/
+      z-index: 200;
+      font: 15px TitilliumB;
+    }
+
+    #centrado {
+      position: fixed;
+      z-index: 200;
+      /*left: 50%;*/
+      top: 20%;
+      width: 100%;
+      text-align: center;
+    }
+
+    #titulo22 {
+      position: fixed;
+      z-index: 200;
+      /*left: 50%;*/
+      top: 20%;
+      width: 50%;
+      text-align: center;
+    }
+
+    /*#centro {
+      position: fixed;
+      margin-top: 50%;
+      left: 50%;
+    }*/
+
+    bb {
+      /*color: #33cbfd;*/
+      color: #dddddd;
+      font: 13px TitilliumL;
+    }
+
+    bb:hover {
+      /*color: #95e2fb;*/
+      color: #33cbfd;
+      cursor: pointer;
+    }
+
+    bb:active {
+      color: #cbeffb;
+    }
+
+    @font-face {
+      font-family: 'TitilliumL';
+      src: url('assets/TitilliumWeb-ExtraLight.ttf');
+    }
+
+    @font-face {
+      font-family: 'TitilliumB';
+      src: url('assets/TitilliumWeb-SemiBold.ttf');
+    }
+
+    .btn {
+      /*-webkit-border-radius: 8;*/
+      /*-moz-border-radius: 8;*/
+      border-radius: 8px;
+      font-family: TitilliumL;
+      color: #ffffff;
+      font-size: 14px;
+      background: #3c7ca6;
+      padding: 3px 3px 3px 3px;
+      width: 50px;
+      text-decoration: none;
+    }
+
+    .btn:hover {
+      background: #3cb0fd;
+      text-decoration: none;
+    }
+  </style>
+</head>
+
+<body>
+  <span id="centrado"></span>
+</body>
+
+</html>
