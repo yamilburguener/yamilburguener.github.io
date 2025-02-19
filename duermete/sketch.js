@@ -56,7 +56,7 @@ function setup() {
 function draw() {
   //background(80);
   fill(colH, 50, 50);
-  rect(0, 0, displayWidth, displayHeight);
+  rect(0, 0, width, height)// displayWidth, displayHeight);
   if (seccion == "juego") {
     for (let i = 0; i < notas.length; i++) {
       notas[i].dibuja();
