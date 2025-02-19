@@ -40,10 +40,11 @@ function preload() {
 
 
 function setup() {
-  const cv = createCanvas(2160, 2160)
+  createCanvas(displayWidth, displayHeight)
+ /*  const cv = createCanvas(2160, 2160)
   cv.parent("cv")
   cv.id("---")
-  cv.class("---")
+  cv.class("---") */
   pixelDensity(1);
   stroke(100)
   colorMode(HSB);
@@ -56,7 +57,7 @@ function setup() {
 function draw() {
   //background(80);
   fill(colH, 50, 50);
-  rect(0, 0, width, height)// displayWidth, displayHeight);
+  rect(0, 0, displayWidth, displayHeight);
   if (seccion == "juego") {
     for (let i = 0; i < notas.length; i++) {
       notas[i].dibuja();
