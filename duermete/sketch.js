@@ -40,18 +40,22 @@ function preload() {
 
 
 function setup() {
-  createCanvas(windowWidth, windowHeight);
+  const cv = createCanvas(windowWidth, windowHeight)
+  cv.parent("cv")
+  cv.id("---")
+  cv.class("---")
   pixelDensity(1);
   stroke(100)
   colorMode(HSB);
   colH = random(360);
 
   startTone()
+  windowResized()
 }
 
 
 function draw() {
-  background(80);
+  //background(80);
   fill(colH, 50, 50);
   rect(0, 0, displayWidth, displayHeight);
   if (seccion == "juego") {
@@ -151,7 +155,7 @@ class Nota {
     this.x = _x;
     this.y = _y;
     this.vida = 100;
-this.r = 30
+    this.r = 30
   }
 
   nota_stop() {
@@ -163,7 +167,7 @@ this.r = 30
     noFill()
     stroke(100, this.vida * 0.005);
     circle(this.x, this.y, this.r);
-    this.vida--, this.r+= 2
+    this.vida--, this.r += 2
   }
 
   final() {
