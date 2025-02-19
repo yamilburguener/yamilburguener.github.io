@@ -66,8 +66,8 @@ function draw() {
 
 
 async function startTone() {
-  await Tone.start();
-  console.log("Tone started");
+  //await Tone.start();
+  //console.log("Tone started");
   midi = await Midi.fromUrl("duermeteQ.mid");//("midi-facil.mid");
   print(midi)
   //print(midi.tracks[0].notes[1].ticks)
