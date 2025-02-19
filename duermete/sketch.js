@@ -4,7 +4,6 @@ let _ac = 0, _next = 1
 let seccion = "cargando"
 let notas = []
 let colH
-let cv
 const notas_c = [
   "C0", "C#0", "D0", "D#0", "E0", "F0", "F#0", "G0", "G#0", "A0", "A#0", "B0",
   "C1", "C#1", "D1", "D#1", "E1", "F1", "F#1", "G1", "G#1", "A1", "A#1", "B1",
@@ -41,7 +40,7 @@ function preload() {
 
 
 function setup() {
-  cv = createCanvas(windowWidth, windowHeight)
+  const cv = createCanvas(2160, 2160)
   cv.parent("cv")
   cv.id("---")
   cv.class("---")
@@ -80,9 +79,9 @@ async function startTone() {
 
 
 
- function windowResized() {
-  cv = resizeCanvas(windowWidth, windowHeight);
-} 
+/*  function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+}  */
 
 function touchStarted() {
   if (seccion == "cargando") {
