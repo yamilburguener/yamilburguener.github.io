@@ -90,9 +90,8 @@ function touchStarted() {
     fullscreen(!fs);
     seccion = "juego";
   }
-
+  midiPiano()
   for (let touch of touches) {
-    midiPiano()
     circulo(touch.id, touch.x, touch.y);
   }
 }
