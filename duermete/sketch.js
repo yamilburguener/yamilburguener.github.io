@@ -1,9 +1,11 @@
-let midi, sampler
+let seccion = "cargando"
+let colH
+
+let midi, sampler = [], sampler_loaded = [false, false]
 let count = -1
 let _ac = 0, _next = 1
-let seccion = "cargando"
 let notas = []
-let colH
+let vol // intensidad
 const notas_c = [
   "C0", "C#0", "D0", "D#0", "E0", "F0", "F#0", "G0", "G#0", "A0", "A#0", "B0",
   "C1", "C#1", "D1", "D#1", "E1", "F1", "F#1", "G1", "G#1", "A1", "A#1", "B1",
@@ -23,7 +25,7 @@ function preload() {
     ratio: 12, threshold: -20, release: 0.25, attack: 0.003, knee: 3
   })
 
-  sampler = new Tone.Sampler({
+  sampler[0] = new Tone.Sampler({
     C1: 'piano_c1.mp3',
     C2: 'piano_c2.mp3',
     C3: 'piano_c3.mp3',
@@ -32,22 +34,39 @@ function preload() {
     C6: 'piano_c6.mp3'
   }, {
     baseUrl: './assets/',
-    onload: () => { sampler_loaded = true; }
+    onload: () => { sampler_loaded[0] = true; }
   })
-  sampler.chain(reverb, channel)
+  sampler[0].chain(reverb, channel)
+
+  sampler[1] = new Tone.Sampler({
+    C1: 'piano_c1-p.mp3',
+    C2: 'piano_c2-p.mp3',
+    C3: 'piano_c3-p.mp3',
+    C4: 'piano_c4-p.mp3',
+    C5: 'piano_c5-p.mp3',
+    C6: 'piano_c6-p.mp3'
+  }, {
+    baseUrl: './assets/',
+    onload: () => { sampler_loaded[1] = true; }
+  })
+  sampler[1].chain(reverb, channel)
+
   channel.chain(comp, Tone.Destination);
 }
 
 
 function setup() {
+  
   createCanvas(displayWidth, displayHeight)
- /*  const cv = createCanvas(2160, 2160)
-  cv.parent("cv")
-  cv.id("---")
-  cv.class("---") */
-  pixelDensity(1);
+  /*  const cv = createCanvas(2160, 2160)
+   cv.parent("cv")
+   cv.id("---")
+   cv.class("---") */
+  //pixelDensity(1);
   stroke(100)
   colorMode(HSB);
+  textAlign(CENTER);
+  textSize(20);
   colH = random(360);
 
   startTone()
@@ -55,10 +74,22 @@ function setup() {
 
 
 function draw() {
-  //background(80);
-  fill(colH, 50, 50);
-  rect(0, 0, displayWidth, displayHeight);
-  if (seccion == "juego") {
+
+  if (seccion == "cargando") {
+    background(80);
+    text("cargando...", width / 2, height / 2);
+    if (sampler_loaded[0] && sampler_loaded[1]) seccion = "listo"
+  }
+  else if (seccion == "listo") {
+    background(80);
+    text("clic para empezar", width / 2, height / 2);
+  }
+  else if (seccion == "juego") {
+    fill(colH, 30, 30);
+    rect(0, 0, displayWidth, displayHeight);
+    fill(colH, 50, 50);
+    rect(0, 0, displayWidth, displayHeight * 0.5);
+
     for (let i = 0; i < notas.length; i++) {
       notas[i].dibuja();
       if (notas[i].final()) {
@@ -85,40 +116,47 @@ async function startTone() {
 }  */
 
 function touchStarted() {
-  if (seccion == "cargando") {
-    let fs = fullscreen();
-    fullscreen(!fs);
-    seccion = "juego";
+  if (seccion == "listo") {
+    // let fs = fullscreen()
+    // fullscreen(!fs)
+    seccion = "juego"
   }
-  midiPiano()
-  for (let touch of touches) {
-    circulo(touch.id, touch.x, touch.y);
+  if (seccion == "juego") {
+
+    for (let touch of touches) {
+      vol = map(touch.y, 0, windowHeight, 1, 0)
+      circulo(touch.id, touch.x, touch.y);
+    }
+    midiPiano()
   }
 }
 
-function touchEnded() {
+/* function touchEnded() {
   for (let i = 0; i < notas.length; i++) {
 
     //notas[i].nota_stop();
   }
-}
+} */
 
 function mousePressed() {
-  if (seccion == "cargando") {
+  if (seccion == "listo") {
     //let fs = fullscreen()
     fullscreen();
     seccion = "juego";
   }
-  midiPiano()
-  circulo(0, mouseX, mouseY);
+  if (seccion == "juego") {
+    vol = map(mouseY, 0, windowHeight, 1, 0)
+    midiPiano()
+    circulo(0, mouseX, mouseY);
+  }
 }
 
-function mouseReleased() {
+/* function mouseReleased() {
   for (let i = 0; i < notas.length; i++) {
     //if (notas[i].mi_id() == 0)
     //notas[i].nota_stop();
   }
-}
+} */
 
 function circulo(_id, _x, _y) {
   notas.push(new Nota(_id, _x, _y));
@@ -144,7 +182,15 @@ function midiPiano() {
 
 function suenaPiano(_c, _st) {
   const _no = midi.tracks[0].notes[_c].midi
-  sampler.triggerAttackRelease(notas_c[_no - 24], 2, _st, 1);
+
+  let _sa, _v;
+  if (vol < 0.5) { // suave
+    _sa = 1; _v = vol * 2.5
+  } else { // fuerte
+    _sa = 0; _v = vol
+  }
+  // _v puede tirar n negativo. ojo
+  sampler[_sa].triggerAttackRelease(notas_c[_no - 24], 2, _st, _v);
   //print(count, _no)
 }
 
@@ -158,7 +204,7 @@ class Nota {
   }
 
   nota_stop() {
-    //sampler.triggerRelease(this.frec, Tone.now());
+    //sampler[0].triggerRelease(this.frec, Tone.now());
     //this.vida = 0;
   }
 
