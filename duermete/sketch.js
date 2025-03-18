@@ -198,9 +198,16 @@ function suenaPiano(_c, _st) {
 
 
 function fullS() {
-  var elem = document.getElementById("cv");
+  var elem = document.documentElement//getElementById("cv");
+  if (elem.requestFullscreen) {
+    elem.requestFullscreen();
+  } else if (elem.webkitRequestFullscreen) { /* Safari */
+    elem.webkitRequestFullscreen();
+  } else if (elem.msRequestFullscreen) { /* IE11 */
+    elem.msRequestFullscreen();
+  }
  // if (elem.requestFullscreen) {
-    elem.requestFullscreen() || elem.webkitRequestFullscreen() || elem.mozRequestFullscreen();
+  //  elem.requestFullscreen() || elem.webkitRequestFullscreen() || elem.mozRequestFullscreen();
  // }
 }
 
