@@ -82,7 +82,7 @@ function draw() {
   }
   else if (seccion == "listo") {
     background(80);
-    text("clic para empezar", width / 2, height / 2);
+    text("clic para empezar!", width / 2, height / 2);
   }
   else if (seccion == "juego") {
     fill(colH, 30, 30);
@@ -142,7 +142,7 @@ function touchStarted() {
 function mousePressed() {
   if (seccion == "listo") {
     //let fs = fullscreen()
-    //fullscreen(!fs);
+    //fullscreen(!fs)
     fullS()
     seccion = "juego";
   }
@@ -199,9 +199,9 @@ function suenaPiano(_c, _st) {
 
 function fullS() {
   var elem = document.getElementById("cv");
-  if (elem.requestFullscreen) {
-    elem.requestFullscreen();
-  }
+ // if (elem.requestFullscreen) {
+    elem.requestFullscreen() || elem.webkitRequestFullscreen() || elem.mozRequestFullscreen();
+ // }
 }
 
 
