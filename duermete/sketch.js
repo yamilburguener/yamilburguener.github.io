@@ -57,7 +57,7 @@ function preload() {
 
 function setup() {
   
-  const cv = createCanvas(displayWidth, displayHeight)
+  createCanvas(500, 500)
   
   /*  const cv = createCanvas(2160, 2160)
     cv.parent("cv")
@@ -83,7 +83,7 @@ function draw() {
   }
   else if (seccion == "listo") {
     background(80);
-    text("clic para empezar!!", width / 2, height / 2);
+    text("clic para empezar!", width / 2, height / 2);
   }
   else if (seccion == "juego") {
     fill(colH, 30, 30);
