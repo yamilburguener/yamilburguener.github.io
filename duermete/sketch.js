@@ -58,10 +58,11 @@ function preload() {
 function setup() {
   
   const cv = createCanvas(displayWidth, displayHeight)
-  //  const cv = createCanvas(2160, 2160)
-   cv.parent("cv")
+  
+  /*  const cv = createCanvas(2160, 2160)
+    cv.parent("cv")
    cv.id("---")
-   cv.class("---") 
+   cv.class("---")  */
   //pixelDensity(1);
   stroke(100)
   colorMode(HSB);
@@ -82,7 +83,7 @@ function draw() {
   }
   else if (seccion == "listo") {
     background(80);
-    text("clic para empezar!!!", width / 2, height / 2);
+    text("clic para empezar!!", width / 2, height / 2);
   }
   else if (seccion == "juego") {
     fill(colH, 30, 30);
