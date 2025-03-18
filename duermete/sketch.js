@@ -57,11 +57,11 @@ function preload() {
 
 function setup() {
   
-  createCanvas(displayWidth, displayHeight)
-  /*  const cv = createCanvas(2160, 2160)
+  const cv = createCanvas(displayWidth, displayHeight)
+  //  const cv = createCanvas(2160, 2160)
    cv.parent("cv")
    cv.id("---")
-   cv.class("---") */
+   cv.class("---") 
   //pixelDensity(1);
   stroke(100)
   colorMode(HSB);
@@ -119,6 +119,7 @@ function touchStarted() {
   if (seccion == "listo") {
     // let fs = fullscreen()
     // fullscreen(!fs)
+    fullS()
     seccion = "juego"
   }
   if (seccion == "juego") {
@@ -141,7 +142,8 @@ function touchStarted() {
 function mousePressed() {
   if (seccion == "listo") {
     //let fs = fullscreen()
-    fullscreen();
+    //fullscreen(!fs);
+    fullS()
     seccion = "juego";
   }
   if (seccion == "juego") {
@@ -193,6 +195,17 @@ function suenaPiano(_c, _st) {
   sampler[_sa].triggerAttackRelease(notas_c[_no - 24], 2, _st, _v);
   //print(count, _no)
 }
+
+
+function fullS() {
+  var elem = document.getElementById("cv");
+  if (elem.requestFullscreen) {
+    elem.requestFullscreen();
+  }
+}
+
+
+
 
 class Nota {
   constructor(_id, _x, _y) {
