@@ -82,7 +82,7 @@ function draw() {
   }
   else if (seccion == "listo") {
     background(80);
-    text("clic para empezar!!", width / 2, height / 2);
+    text("clic para empezar!", width / 2, height / 2);
   }
   else if (seccion == "juego") {
     fill(colH, 30, 30);
@@ -196,16 +196,28 @@ function suenaPiano(_c, _st) {
   //print(count, _no)
 }
 
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+}
+/* prevents the mobile browser from processing some default
+ * touch events, like swiping left for "back" or scrolling the page.
+ */
+document.ontouchmove = function(event) {
+  event.preventDefault();
+};
 
 function fullS() {
-  var elem = document.documentElement//getElementById("cv");
+  if (!fullscreen()) {
+    fullscreen(true);
+  }
+/*   var elem = document.documentElement//getElementById("cv");
   if (elem.requestFullscreen) {
     elem.requestFullscreen();
-  } else if (elem.webkitRequestFullscreen) { /* Safari */
+  } else if (elem.webkitRequestFullscreen) { // Safari 
     elem.webkitRequestFullscreen();
-  } else if (elem.msRequestFullscreen) { /* IE11 */
+  } else if (elem.msRequestFullscreen) { // IE11 
     elem.msRequestFullscreen();
-  }
+  } */
  // if (elem.requestFullscreen) {
   //  elem.requestFullscreen() || elem.webkitRequestFullscreen() || elem.mozRequestFullscreen();
  // }
