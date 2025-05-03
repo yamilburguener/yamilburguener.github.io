@@ -1,5 +1,11 @@
 let seccion = "cargando"
-let colH
+let modo = "sueño"
+let clickCount = 0;
+let startTime, duermeTime = 500;
+
+let pg_background, fondo_noise = 0;
+
+let colH, alfa = 0, fuente;
 
 let midi, sampler = [], sampler_loaded = [false, false]
 let count = -1
@@ -56,9 +62,9 @@ function preload() {
 
 
 function setup() {
-  
-  createCanvas(500, 500)
-  
+
+  createCanvas(displayWidth, displayHeight)
+
   /*  const cv = createCanvas(2160, 2160)
     cv.parent("cv")
    cv.id("---")
@@ -68,9 +74,15 @@ function setup() {
   colorMode(HSB);
   textAlign(CENTER);
   textSize(20);
-  colH = random(360);
+  colH = random(160, 280);
+  fuente = loadFont('./assets/ChopinScript.ttf')
+  print((displayWidth+displayHeight) * 0.01)
+  textFont(fuente)
+  textSize ((displayWidth+displayHeight) * 0.02)
 
   startTone()
+  fondo()
+  startTime = millis();
 }
 
 
@@ -78,19 +90,57 @@ function draw() {
 
   if (seccion == "cargando") {
     background(80);
-    text("cargando...", width / 2, height / 2);
+    text("cargando...", windowWidth / 2, windowHeight / 2);
     if (sampler_loaded[0] && sampler_loaded[1]) seccion = "listo"
   }
   else if (seccion == "listo") {
-    background(80);
-    text("clic para empezar!", width / 2, height / 2);
+    image(pg_background, 0, 0)//background(80);
+    noStroke(); fill(0, 0.7);
+    text("clic para empezar!", windowWidth / 2, windowHeight / 2);
   }
   else if (seccion == "juego") {
-    fill(colH, 30, 30);
+    /* fill(colH, 30, 30, 1);
     rect(0, 0, displayWidth, displayHeight);
-    fill(colH, 50, 50);
-    rect(0, 0, displayWidth, displayHeight * 0.5);
+    fill(colH, 50, 50, 1);
+    rect(0, 0, displayWidth, displayHeight * 0.5); */
 
+
+    image(pg_background, 0, 0)//, windowWidth, windowHeight)
+    duermeTime--;
+
+    if (duermeTime < 0) {
+      let _a = map(duermeTime,0, -80, 0 ,0.7)
+      _a = constrain(_a, 0, 0.7);
+      noStroke(); fill(0, _a);
+      text("f f f", windowWidth / 2, windowHeight * 0.1);
+      text("clic para seguir", windowWidth / 2, windowHeight / 2);
+      text("ppp", windowWidth / 2, windowHeight * 0.9);
+    }
+
+
+    if (modo == "sueño") alfa -= 0.01; else alfa += 0.02;
+    alfa = constrain(alfa, 0, 0.7);
+    fill(0, 0, 0, alfa); noStroke()
+    rect(0, 0, displayWidth, displayHeight);
+
+
+    // verifica modo
+    let elapsed = millis() - startTime;
+    text(int(elapsed), 200, 100); // bug prov
+    text(clickCount, 200, 150); // bug prov
+
+
+    if (elapsed > 5000) {
+
+
+      if (modo == "sueño") {
+        if (clickCount > 15) modo = "pesadilla";
+      } else {
+        if (clickCount < 12) modo = "sueño";
+      }
+      clickCount = 0;
+      startTime = millis();
+    }
     for (let i = 0; i < notas.length; i++) {
       notas[i].dibuja();
       if (notas[i].final()) {
@@ -104,7 +154,7 @@ function draw() {
 async function startTone() {
   //await Tone.start();
   //console.log("Tone started");
-  midi = await Midi.fromUrl("duermeteQ.mid");//("midi-facil.mid");
+  midi = await Midi.fromUrl("./assets/duermeteQ.mid");
   print(midi)
   //print(midi.tracks[0].notes[1].ticks)
 
@@ -124,7 +174,8 @@ function touchStarted() {
     seccion = "juego"
   }
   if (seccion == "juego") {
-
+    clickCount++;
+    duermeTime = 500
     for (let touch of touches) {
       vol = map(touch.y, 0, windowHeight, 1, 0)
       circulo(touch.id, touch.x, touch.y);
@@ -148,6 +199,8 @@ function mousePressed() {
     seccion = "juego";
   }
   if (seccion == "juego") {
+    clickCount++;
+    duermeTime = 500
     vol = map(mouseY, 0, windowHeight, 1, 0)
     midiPiano()
     circulo(0, mouseX, mouseY);
@@ -177,24 +230,53 @@ function midiPiano() {
     count++
     let _t = str("+" + _ti)
     suenaPiano(count, _t)
-    if (count == 161) count = -1
+    if (count >= 771) count = -1 // antes: 161
     _next = midi.tracks[0].notes[count + 1].ticks
     _ti += random(0.1)
   }
 }
 
 function suenaPiano(_c, _st) {
-  const _no = midi.tracks[0].notes[_c].midi
-
+  let _alt, _dur;
+  let _no = midi.tracks[0].notes[_c].midi - 24
+  if (modo == "sueño") {
+    _alt = notas_c[_no]
+    _dur = 2
+  } else {
+    _dur = random(0.05, 0.8)
+    _no = abs((_no + random([-36, 24, 0, 24, 36])) % 120)
+    if (random() < 0.35) _alt = desafina(_no); else _alt = notas_c[_no]
+  }
   let _sa, _v;
   if (vol < 0.5) { // suave
     _sa = 1; _v = vol * 2.5
+
   } else { // fuerte
     _sa = 0; _v = vol
   }
-  // _v puede tirar n negativo. ojo
-  sampler[_sa].triggerAttackRelease(notas_c[_no - 24], 2, _st, _v);
-  //print(count, _no)
+  _v = constrain(_v, 0, 1) // _v puede tirar n negativo. ojo
+
+  ////print(count, _no)
+  sampler[_sa].triggerAttackRelease(_alt, _dur, _st, _v);
+  if (modo == "pesadilla" && random() < 0.3) { // repetición
+    let _tie = random(0.05, 0.2)
+    let _ti = _tie
+    const _f = random([4, 5, 6, 7, 10])
+    const _arp = random([0.85, 0.9, 1, 1, 1.1, 1.15])
+    for (let i = 0; i < _f; i++) {
+      _ti += _tie
+      let _t = str("+" + _ti)
+      if ((typeof _alt) == "number") _alt *= _arp
+      sampler[_sa].triggerAttackRelease(_alt, _dur, _t, _v);
+    }
+    if (random() < 0.7) midiPiano()
+  }
+}
+
+function desafina(_nA) { // nota afinada
+  const _hertz = Tone.Frequency(_nA, "midi").toFrequency()
+  _nD = _hertz * (0.975 + random(0.05))
+  return _nD
 }
 
 function windowResized() {
@@ -203,7 +285,7 @@ function windowResized() {
 /* prevents the mobile browser from processing some default
  * touch events, like swiping left for "back" or scrolling the page.
  */
-document.ontouchmove = function(event) {
+document.ontouchmove = function (event) {
   event.preventDefault();
 };
 
@@ -211,20 +293,74 @@ function fullS() {
   if (!fullscreen()) {
     fullscreen(true);
   }
-/*   var elem = document.documentElement//getElementById("cv");
-  if (elem.requestFullscreen) {
-    elem.requestFullscreen();
-  } else if (elem.webkitRequestFullscreen) { // Safari 
-    elem.webkitRequestFullscreen();
-  } else if (elem.msRequestFullscreen) { // IE11 
-    elem.msRequestFullscreen();
-  } */
- // if (elem.requestFullscreen) {
+  /*   var elem = document.documentElement//getElementById("cv");
+    if (elem.requestFullscreen) {
+      elem.requestFullscreen();
+    } else if (elem.webkitRequestFullscreen) { // Safari 
+      elem.webkitRequestFullscreen();
+    } else if (elem.msRequestFullscreen) { // IE11 
+      elem.msRequestFullscreen();
+    } */
+  // if (elem.requestFullscreen) {
   //  elem.requestFullscreen() || elem.webkitRequestFullscreen() || elem.mozRequestFullscreen();
- // }
+  // }
 }
 
 
+function fondo() {
+
+  pg_background = createGraphics(displayWidth, displayHeight)//windowWidth, windowHeight)
+  pg_background.colorMode(HSB)
+  //pg_background.rectMode(CENTER)
+  pg_background.ellipseMode(CENTER)
+  //pg_background.angleMode(DEGREES)
+  pg_background.pixelDensity(1)
+
+
+
+  pg_background.background(0)
+  pg_background.strokeWeight(1)
+  let c1, c2, newc, _d = 0
+  if (random() < 0.5) _d = 1
+  c1 = color(colH, 70, 70)
+  c2 = color(colH, 30, 30)
+  for (let y = 0; y < displayHeight; y++) {
+    const n = map(y, 0, displayHeight, 0, 1);
+    if (_d == 0) newc = lerpColor(c1, c2, n); else newc = lerpColor(c2, c1, n)
+    pg_background.stroke(newc);
+    pg_background.line(0, y, displayWidth, y);
+  }
+  c1 = color(colH, 70, 70, 0.5)
+  c2 = color(colH, 30, 30, 0.5)
+  let viento_dir = 1// random([-1, 0, 1])
+  let _onda = random(-20, 20); if (viento_dir != 0) _onda * 1.3
+  for (let y = 0; y < displayHeight; y += int(random(15, 20))) {
+    let to_y = 1
+    for (let x = 0; x < displayWidth; x += int(random(15, 20))) {
+      let _n = noise(fondo_noise) * _onda
+      fondo_noise += 0.2
+      if (random() < 0.85) {
+        let _y1 = (y + to_y) % displayHeight
+        if (_y1 < 0) _y1 = displayHeight + _y1
+        const n = map(_y1, 0, displayHeight, 1, 0);
+        if (_d == 0) newc = lerpColor(c1, c2, n); else newc = lerpColor(c2, c1, n)
+        pg_background.stroke(newc)
+        pg_background.noFill()
+        to_y += _n
+        let y1 = (y + to_y) % displayHeight, y2 = (y + to_y + random(-5, 5)) % displayHeight
+        if (y1 < 0) y1 = displayHeight + y1; if (y2 < 0) y2 = displayHeight + y2
+        if (random() < 0.7) {
+          if (abs(y1 - y2) < 50) {
+            // pg_background.line(x, y1, x + random(5, 15), y2)
+            pg_background.bezier(x, y1, x + random(-5, 5), y2, x + random(10, 15), y2, x + random(10, 20), y1)
+          }
+        }
+        else { pg_background.circle(x + random(-5, 5), y1, 3) }
+      }
+    }
+    fondo_noise = 0
+  }
+}
 
 
 class Nota {
@@ -232,8 +368,11 @@ class Nota {
     this.id = _id;
     this.x = _x;
     this.y = _y;
-    this.vida = 100;
-    this.r = 30
+    const _vi = map(_y, 0, windowHeight, 100, 150)
+    this.vida = _vi; // 100
+    const _ra = map(_y, 0, windowHeight, 50, 15)
+    this.r = _ra // 30
+    this.velR = map(_y, 0, windowHeight, 3, 0.5)
   }
 
   nota_stop() {
@@ -244,8 +383,8 @@ class Nota {
   dibuja() {
     noFill()
     stroke(100, this.vida * 0.005);
-    circle(this.x, this.y, this.r);
-    this.vida--, this.r += 2
+    ellipse(this.x, this.y, this.r + random(-6, 6), this.r + random(-6, 6));
+    this.vida--, this.r += this.velR//2
   }
 
   final() {
