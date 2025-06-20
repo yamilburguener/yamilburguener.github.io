@@ -1,3 +1,9 @@
+/*
+Créditos:
+Pieza original: DUÉRMETE MI NENA de Rosa Farsac, compuesta en 1944 
+Fuente de texto: Chopin Script Font
+*/
+
 let seccion = "cargando"
 let modo = "sueño"
 let clickCount = 0;
@@ -64,7 +70,6 @@ function preload() {
 function setup() {
 
   createCanvas(displayWidth, displayHeight)
-
   /*  const cv = createCanvas(2160, 2160)
     cv.parent("cv")
    cv.id("---")
@@ -73,12 +78,11 @@ function setup() {
   stroke(100)
   colorMode(HSB);
   textAlign(CENTER);
-  textSize(20);
+  //textSize(20);
   colH = random(160, 280);
   fuente = loadFont('./assets/ChopinScript.ttf')
-  print((displayWidth+displayHeight) * 0.01)
   textFont(fuente)
-  textSize ((displayWidth+displayHeight) * 0.02)
+  textSize((displayWidth + displayHeight) * 0.02)
 
   startTone()
   fondo()
@@ -94,26 +98,25 @@ function draw() {
     if (sampler_loaded[0] && sampler_loaded[1]) seccion = "listo"
   }
   else if (seccion == "listo") {
-    image(pg_background, 0, 0)//background(80);
+    image(pg_background, 0, 0);
     noStroke(); fill(0, 0.7);
-    text("clic para empezar!", windowWidth / 2, windowHeight / 2);
+    textSize((displayWidth + displayHeight) * 0.025)
+    text("Duérmete mi niña", windowWidth / 2, windowHeight / 2 - 120);
+    text("Rosa Farsac", windowWidth / 2, windowHeight / 2 - 60);
+    textSize((displayWidth + displayHeight) * 0.02)
+   if (frameCount % 60 < 30) text("clic para empezar", windowWidth / 2, windowHeight / 2 + 20);
   }
   else if (seccion == "juego") {
-    /* fill(colH, 30, 30, 1);
-    rect(0, 0, displayWidth, displayHeight);
-    fill(colH, 50, 50, 1);
-    rect(0, 0, displayWidth, displayHeight * 0.5); */
-
-
+ 
     image(pg_background, 0, 0)//, windowWidth, windowHeight)
     duermeTime--;
 
     if (duermeTime < 0) {
-      let _a = map(duermeTime,0, -80, 0 ,0.7)
+      let _a = map(duermeTime, 0, -80, 0, 0.7)
       _a = constrain(_a, 0, 0.7);
       noStroke(); fill(0, _a);
       text("f f f", windowWidth / 2, windowHeight * 0.1);
-      text("clic para seguir", windowWidth / 2, windowHeight / 2);
+      if (frameCount % 60 < 30)  text("clic para continuar", windowWidth / 2, windowHeight / 2);
       text("ppp", windowWidth / 2, windowHeight * 0.9);
     }
 
@@ -123,16 +126,12 @@ function draw() {
     fill(0, 0, 0, alfa); noStroke()
     rect(0, 0, displayWidth, displayHeight);
 
-
     // verifica modo
     let elapsed = millis() - startTime;
-    text(int(elapsed), 200, 100); // bug prov
-    text(clickCount, 200, 150); // bug prov
-
+    //text(int(elapsed), 200, 100); // bug prov
+    //text(clickCount, 200, 150); // bug prov
 
     if (elapsed > 5000) {
-
-
       if (modo == "sueño") {
         if (clickCount > 15) modo = "pesadilla";
       } else {
@@ -155,9 +154,8 @@ async function startTone() {
   //await Tone.start();
   //console.log("Tone started");
   midi = await Midi.fromUrl("./assets/duermeteQ.mid");
-  print(midi)
+  //print(midi)
   //print(midi.tracks[0].notes[1].ticks)
-
 }
 
 
@@ -193,8 +191,6 @@ function touchStarted() {
 
 function mousePressed() {
   if (seccion == "listo") {
-    //let fs = fullscreen()
-    //fullscreen(!fs)
     fullS()
     seccion = "juego";
   }
@@ -207,20 +203,19 @@ function mousePressed() {
   }
 }
 
-/* function mouseReleased() {
-  for (let i = 0; i < notas.length; i++) {
-    //if (notas[i].mi_id() == 0)
-    //notas[i].nota_stop();
-  }
-} */
-
 function circulo(_id, _x, _y) {
   notas.push(new Nota(_id, _x, _y));
 }
 
 function midiPiano() {
 
-  if (_ac != _next) count++
+  if (_ac != _next) {
+    if (modo == "pesadilla") {
+      if (random() < 0.6) count++
+    } else {
+      count++
+    }
+  }
   suenaPiano(count, "+0")
   _ac = midi.tracks[0].notes[count].ticks // actual
   _next = midi.tracks[0].notes[count + 1].ticks
@@ -267,7 +262,8 @@ function suenaPiano(_c, _st) {
       _ti += _tie
       let _t = str("+" + _ti)
       if ((typeof _alt) == "number") _alt *= _arp
-      sampler[_sa].triggerAttackRelease(_alt, _dur, _t, _v);
+      const _int = ((i % 2) + 1) * 0.5
+      sampler[_sa].triggerAttackRelease(_alt, _dur, _t, _v * _int);
     }
     if (random() < 0.7) midiPiano()
   }
@@ -293,17 +289,6 @@ function fullS() {
   if (!fullscreen()) {
     fullscreen(true);
   }
-  /*   var elem = document.documentElement//getElementById("cv");
-    if (elem.requestFullscreen) {
-      elem.requestFullscreen();
-    } else if (elem.webkitRequestFullscreen) { // Safari 
-      elem.webkitRequestFullscreen();
-    } else if (elem.msRequestFullscreen) { // IE11 
-      elem.msRequestFullscreen();
-    } */
-  // if (elem.requestFullscreen) {
-  //  elem.requestFullscreen() || elem.webkitRequestFullscreen() || elem.mozRequestFullscreen();
-  // }
 }
 
 
@@ -311,13 +296,8 @@ function fondo() {
 
   pg_background = createGraphics(displayWidth, displayHeight)//windowWidth, windowHeight)
   pg_background.colorMode(HSB)
-  //pg_background.rectMode(CENTER)
   pg_background.ellipseMode(CENTER)
-  //pg_background.angleMode(DEGREES)
   pg_background.pixelDensity(1)
-
-
-
   pg_background.background(0)
   pg_background.strokeWeight(1)
   let c1, c2, newc, _d = 0
@@ -375,10 +355,10 @@ class Nota {
     this.velR = map(_y, 0, windowHeight, 3, 0.5)
   }
 
-  nota_stop() {
+  //nota_stop() {
     //sampler[0].triggerRelease(this.frec, Tone.now());
     //this.vida = 0;
-  }
+  //}
 
   dibuja() {
     noFill()
