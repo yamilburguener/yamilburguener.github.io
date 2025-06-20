@@ -102,9 +102,9 @@ function draw() {
     noStroke(); fill(0, 0.7);
     textSize((displayWidth + displayHeight) * 0.015)
     text("Interpreta\nDuérmete mi niña\nde Rosa Farsac", windowWidth / 2, windowHeight * 0.15);
-    textSize((displayWidth + displayHeight) * 0.02)
+    textSize((displayWidth + displayHeight) * 0.022)
     if (frameCount % 60 < 30) text("clic para empezar", windowWidth / 2, windowHeight / 2);
-    textSize((displayWidth + displayHeight) * 0.008)
+    textSize((displayWidth + displayHeight) * 0.01)
     text("(Obra: Duérmete de Yamil Burguener)", windowWidth / 2, windowHeight * 0.75);
   }
   else if (seccion == "juego") {
@@ -116,6 +116,7 @@ function draw() {
       let _a = map(duermeTime, 0, -80, 0, 0.7)
       _a = constrain(_a, 0, 0.7);
       noStroke(); fill(0, _a);
+      textSize((displayWidth + displayHeight) * 0.022)
       text("f f f", windowWidth / 2, windowHeight * 0.1);
       if (frameCount % 60 < 30) text("clic para continuar", windowWidth / 2, windowHeight / 2);
       text("ppp", windowWidth / 2, windowHeight * 0.9);
