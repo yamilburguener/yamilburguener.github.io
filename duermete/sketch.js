@@ -100,14 +100,15 @@ function draw() {
   else if (seccion == "listo") {
     image(pg_background, 0, 0);
     noStroke(); fill(0, 0.7);
-    textSize((displayWidth + displayHeight) * 0.025)
-    text("Duérmete mi niña", windowWidth / 2, windowHeight / 2 - 120);
-    text("Rosa Farsac", windowWidth / 2, windowHeight / 2 - 60);
+    textSize((displayWidth + displayHeight) * 0.015)
+    text("Interpreta\nDuérmete mi niña\nde Rosa Farsac", windowWidth / 2, windowHeight * 0.15);
     textSize((displayWidth + displayHeight) * 0.02)
-   if (frameCount % 60 < 30) text("clic para empezar", windowWidth / 2, windowHeight / 2 + 20);
+    if (frameCount % 60 < 30) text("clic para empezar", windowWidth / 2, windowHeight / 2);
+    textSize((displayWidth + displayHeight) * 0.008)
+    text("(Obra: Duérmete de Yamil Burguener)", windowWidth / 2, windowHeight * 0.75);
   }
   else if (seccion == "juego") {
- 
+
     image(pg_background, 0, 0)//, windowWidth, windowHeight)
     duermeTime--;
 
@@ -116,7 +117,7 @@ function draw() {
       _a = constrain(_a, 0, 0.7);
       noStroke(); fill(0, _a);
       text("f f f", windowWidth / 2, windowHeight * 0.1);
-      if (frameCount % 60 < 30)  text("clic para continuar", windowWidth / 2, windowHeight / 2);
+      if (frameCount % 60 < 30) text("clic para continuar", windowWidth / 2, windowHeight / 2);
       text("ppp", windowWidth / 2, windowHeight * 0.9);
     }
 
@@ -356,8 +357,8 @@ class Nota {
   }
 
   //nota_stop() {
-    //sampler[0].triggerRelease(this.frec, Tone.now());
-    //this.vida = 0;
+  //sampler[0].triggerRelease(this.frec, Tone.now());
+  //this.vida = 0;
   //}
 
   dibuja() {
