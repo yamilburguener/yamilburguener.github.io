@@ -7,7 +7,7 @@ Fuente de texto: Chopin Script Font
 let seccion = "cargando"
 let modo = "sueño"
 let clickCount = 0;
-let startTime, duermeTime = 500;
+let startTime, duermeTime = 500; touch_sig = true;
 
 let pg_background, fondo_noise = 0;
 
@@ -169,24 +169,25 @@ function touchStarted() {
     fullS()
     seccion = "juego"
   }
-  else if (seccion == "juego") {
+  else if (seccion == "juego" && touch_sig) {
     clickCount++;
     duermeTime = 500
     for (let touch of touches) {
       vol = map(touch.y, 0, windowHeight, 1, 0)
       circulo(touch.id, touch.x, touch.y);
-      if (touch.id == 0) midiPiano()
+      //if (touch.id == 0) midiPiano()
     }
-    // midiPiano()
+    midiPiano()
+    touch_sig = false;
   }
 }
 
-/* function touchEnded() {
-  for (let i = 0; i < notas.length; i++) {
-
+ function touchEnded() {
+  touch_sig = true;
+  //for (let i = 0; i < notas.length; i++) {
     //notas[i].nota_stop();
-  }
-} */
+  //}
+} 
 
 function mousePressed() {
   if (seccion == "listo") {
