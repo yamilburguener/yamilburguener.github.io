@@ -112,7 +112,7 @@ function draw() {
     text("(Obra: Duérmete de Yamil Burguener)", windowWidth / 2, windowHeight * 0.9);
   }
   else if (seccion == "juego") {
-background(100);
+background(0);
     //image(pg_background, 0, 0)//, windowWidth, windowHeight)
     duermeTime--;
 
@@ -169,7 +169,7 @@ function touchStarted() {
     fullS()
     seccion = "juego"
   }
-  if (seccion == "juego") {
+  else if (seccion == "juego") {
     clickCount++;
     duermeTime = 500
     for (let touch of touches) {
@@ -192,7 +192,7 @@ function mousePressed() {
     fullS()
     seccion = "juego";
   }
-  if (seccion == "juego") {
+  else if (seccion == "juego") {
     clickCount++;
     duermeTime = 500
     vol = map(mouseY, 0, windowHeight, 1, 0)
