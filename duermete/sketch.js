@@ -172,7 +172,7 @@ function touchStarted() {
     }
     seccion = "juego"
   }
-  else if (seccion == "juego") {// && touch_sig) {
+  else if (seccion == "  juego") {// && touch_sig) {
     clickCount++
     duermeTime = 500
     //print(touches[0].id    )
