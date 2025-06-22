@@ -69,7 +69,7 @@ function preload() {
 
 function setup() {
 
-  createCanvas(displayWidth, displayHeight)
+  createCanvas(windowWidth, windowHeight)
   /*  const cv = createCanvas(2160, 2160)
     cv.parent("cv")
    cv.id("---")
@@ -161,9 +161,6 @@ async function startTone() {
   midi = await Midi.fromUrl("./assets/duermeteQ.mid");
   //print(midi)
   //print(midi.tracks[0].notes[1].ticks)
-}
-function windowResized() {
-  resizeCanvas(windowWidth, windowHeight);
 }
 
 function touchStarted() {
