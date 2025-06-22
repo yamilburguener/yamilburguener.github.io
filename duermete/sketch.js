@@ -7,7 +7,7 @@ Fuente de texto: Chopin Script Font
 let seccion = "cargando"
 let modo = "sueño"
 let clickCount = 0;
-let startTime, duermeTime = 500; touch_sig = true;
+let startTime, duermeTime = 500;
 
 let pg_background, fondo_noise = 0;
 
@@ -113,7 +113,7 @@ function draw() {
   else if (seccion == "juego") {
 
     image(pg_background, 0, 0)
-    text(clickCount, 100, 100)
+    //text(clickCount, 100, 100)
     duermeTime--;
 
     if (duermeTime < 0) {
@@ -196,7 +196,7 @@ function touchEnded() {
   //}
 }
 
-/* function mousePressed() {
+ function mousePressed() {
   if (seccion == "listo") {
     //fullS()
 
@@ -209,7 +209,7 @@ function touchEnded() {
     midiPiano()
     circulo(0, mouseX, mouseY);
   }
-} */
+} 
 
 function circulo(_id, _x, _y) {
   notas.push(new Nota(_id, _x, _y));
