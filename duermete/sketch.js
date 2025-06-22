@@ -175,7 +175,7 @@ function touchStarted() {
   else if (seccion == "juego") {// && touch_sig) {
 
     duermeTime = 500
-    print(touches    )
+    //print(touches[0].id    )
     for (let touch of touches) {
       vol = map(touch.y, 0, windowHeight, 1, 0)
       circulo(touch.id, touch.x, touch.y);
