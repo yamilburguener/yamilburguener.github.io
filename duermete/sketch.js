@@ -64,6 +64,8 @@ function preload() {
   sampler[1].chain(reverb, channel)
 
   channel.chain(comp, Tone.Destination);
+
+  fuente = loadFont('./assets/ChopinScript.ttf')
 }
 
 
@@ -79,7 +81,6 @@ function setup() {
   colorMode(HSB);
   textAlign(CENTER);
   colH = random(160, 280);
-  fuente = loadFont('./assets/ChopinScript.ttf')
   textFont(fuente)
   textSize((displayWidth + displayHeight) * 0.025)
 
@@ -108,11 +109,11 @@ function draw() {
     textSize((displayWidth + displayHeight) * 0.025)
     if (frameCount % 60 < 40) text("clic para empezar", windowWidth / 2, windowHeight / 2);
     textSize((displayWidth + displayHeight) * 0.013)
-    text("(Obra: Duérmete de Yamil Burguener)", windowWidth / 2, windowHeight * 0.75);
+    text("(Obra: Duérmete de Yamil Burguener)", windowWidth / 2, windowHeight * 0.9);
   }
   else if (seccion == "juego") {
-
-    image(pg_background, 0, 0)//, windowWidth, windowHeight)
+background(100);
+    //image(pg_background, 0, 0)//, windowWidth, windowHeight)
     duermeTime--;
 
     if (duermeTime < 0) {
@@ -240,7 +241,6 @@ function suenaPiano(_c, _st) {
   let _sa, _v;
   if (vol < 0.5) { // suave
     _sa = 1; _v = vol * 2.5
-
   } else { // fuerte
     _sa = 0; _v = vol
   }
@@ -270,6 +270,12 @@ function desafina(_nA) { // nota afinada
   return _nD
 }
 
+function fullS() {
+  if (!fullscreen()) {
+    fullscreen(true);
+  }
+}
+
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
 }
@@ -279,13 +285,6 @@ function windowResized() {
 document.ontouchmove = function (event) {
   event.preventDefault();
 };
-
-function fullS() {
-  if (!fullscreen()) {
-    fullscreen(true);
-  }
-}
-
 
 function fondo() {
 
