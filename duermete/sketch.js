@@ -169,11 +169,10 @@ function touchStarted() {
     fullscreen(true);
   }
   if (seccion == "listo") {
-    //fullS()
-    
+    //fullS() 
     seccion = "juego"
   }
-  else if (seccion == "juego") {// && touch_sig) {
+  if (seccion == "juego") {// && touch_sig) {
     clickCount++
     duermeTime = 500
     //print(touches[0].id    )
