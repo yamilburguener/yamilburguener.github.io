@@ -195,9 +195,7 @@ function touchStarted() {
 function mousePressed() {
   if (seccion == "listo") {
     //fullS()
-    if (!fullscreen()) {
-      fullscreen(true);
-    }
+    
     seccion = "juego";
   }
   else if (seccion == "juego") {
@@ -299,7 +297,7 @@ function fondo() {
   pg_background = createGraphics(displayWidth, displayHeight)//windowWidth, windowHeight)
   pg_background.colorMode(HSB)
   pg_background.ellipseMode(CENTER)
-  pg_background.pixelDensity(1)
+  //pg_background.pixelDensity(1)
   pg_background.background(0)
   pg_background.strokeWeight(1)
   let c1, c2, newc, _d = 0
