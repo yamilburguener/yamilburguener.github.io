@@ -98,7 +98,7 @@ function draw() {
     if (sampler_loaded[0] && sampler_loaded[1]) seccion = "listo"
   }
   else if (seccion == "listo") {
-    image(pg_background, 0, 0); 
+    image(pg_background, 0, 0);
     duermeTime--
     let _a = map(duermeTime, 500, 300, 0, 0.7)
     _a = constrain(_a, 0, 0.7);
@@ -111,9 +111,9 @@ function draw() {
     text("(Obra: Duérmete de Yamil Burguener)", windowWidth / 2, windowHeight * 0.9);
   }
   else if (seccion == "juego") {
-   
+
     image(pg_background, 0, 0)
-    text(clickCount,100,100)
+    text(clickCount, 100, 100)
     duermeTime--;
 
     if (duermeTime < 0) {
@@ -172,30 +172,33 @@ function touchStarted() {
     }
     seccion = "juego"
   }
-  else if (seccion == "juego" && touch_sig) {
-    clickCount++;
+  else if (seccion == "juego") {// && touch_sig) {
+
     duermeTime = 500
+    print(touches)
     for (let touch of touches) {
       vol = map(touch.y, 0, windowHeight, 1, 0)
       circulo(touch.id, touch.x, touch.y);
+
       //if (touch.id == 0) midiPiano()
     }
-    midiPiano()
-    touch_sig = false;
+    if (touches.id == 0) { clickCount++; midiPiano() }
+    //touch_sig = false;
   }
 }
 
- function touchEnded() {
-  touch_sig = true;
+function touchEnded() {
+  //touch_sig = true;
+  //print("end")
   //for (let i = 0; i < notas.length; i++) {
-    //notas[i].nota_stop();
+  //notas[i].nota_stop();
   //}
-} 
+}
 
 function mousePressed() {
   if (seccion == "listo") {
     //fullS()
-    
+
     seccion = "juego";
   }
   else if (seccion == "juego") {
