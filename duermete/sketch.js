@@ -166,7 +166,10 @@ async function startTone() {
 
 function touchStarted() {
   if (seccion == "listo") {
-    fullS()
+    //fullS()
+    if (!fullscreen()) {
+      fullscreen(true);
+    }
     seccion = "juego"
   }
   else if (seccion == "juego" && touch_sig) {
@@ -191,7 +194,10 @@ function touchStarted() {
 
 function mousePressed() {
   if (seccion == "listo") {
-    fullS()
+    //fullS()
+    if (!fullscreen()) {
+      fullscreen(true);
+    }
     seccion = "juego";
   }
   else if (seccion == "juego") {
