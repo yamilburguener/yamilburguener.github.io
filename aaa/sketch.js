@@ -1,6 +1,6 @@
 function setup() {
   createCanvas(windowWidth, windowHeight);//360, 640);
-  colorMode(HSB);
+  //colorMode(HSB);
   textAlign(CENTER);
 }
 
