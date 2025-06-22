@@ -78,11 +78,10 @@ function setup() {
   stroke(100)
   colorMode(HSB);
   textAlign(CENTER);
-  //textSize(20);
   colH = random(160, 280);
   fuente = loadFont('./assets/ChopinScript.ttf')
   textFont(fuente)
-  textSize((displayWidth + displayHeight) * 0.02)
+  textSize((displayWidth + displayHeight) * 0.025)
 
   startTone()
   fondo()
@@ -99,12 +98,16 @@ function draw() {
   }
   else if (seccion == "listo") {
     image(pg_background, 0, 0);
-    noStroke(); fill(0, 0.7);
-    textSize((displayWidth + displayHeight) * 0.015)
+
+    duermeTime--
+    let _a = map(duermeTime, 500, 300, 0, 0.7)
+    _a = constrain(_a, 0, 0.7);
+    noStroke(); fill(0, _a);
+    textSize((displayWidth + displayHeight) * 0.017)
     text("Interpreta\nDuérmete mi niña\nde Rosa Farsac", windowWidth / 2, windowHeight * 0.15);
-    textSize((displayWidth + displayHeight) * 0.022)
-    if (frameCount % 60 < 30) text("clic para empezar", windowWidth / 2, windowHeight / 2);
-    textSize((displayWidth + displayHeight) * 0.01)
+    textSize((displayWidth + displayHeight) * 0.025)
+    if (frameCount % 60 < 40) text("clic para empezar", windowWidth / 2, windowHeight / 2);
+    textSize((displayWidth + displayHeight) * 0.013)
     text("(Obra: Duérmete de Yamil Burguener)", windowWidth / 2, windowHeight * 0.75);
   }
   else if (seccion == "juego") {
@@ -116,9 +119,9 @@ function draw() {
       let _a = map(duermeTime, 0, -80, 0, 0.7)
       _a = constrain(_a, 0, 0.7);
       noStroke(); fill(0, _a);
-      textSize((displayWidth + displayHeight) * 0.022)
+      textSize((displayWidth + displayHeight) * 0.025)
       text("f f f", windowWidth / 2, windowHeight * 0.1);
-      if (frameCount % 60 < 30) text("clic para continuar", windowWidth / 2, windowHeight / 2);
+      if (frameCount % 60 < 40) text("clic para continuar", windowWidth / 2, windowHeight / 2);
       text("ppp", windowWidth / 2, windowHeight * 0.9);
     }
 
@@ -159,17 +162,12 @@ async function startTone() {
   //print(midi)
   //print(midi.tracks[0].notes[1].ticks)
 }
-
-
-
-/*  function windowResized() {
+function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
-}  */
+}
 
 function touchStarted() {
   if (seccion == "listo") {
-    // let fs = fullscreen()
-    // fullscreen(!fs)
     fullS()
     seccion = "juego"
   }
@@ -213,10 +211,8 @@ function midiPiano() {
 
   if (_ac != _next) {
     if (modo == "pesadilla") {
-      if (random() < 0.6) count++
-    } else {
-      count++
-    }
+      if (random() < 0.7) count++
+    } else { count++ }
   }
   suenaPiano(count, "+0")
   _ac = midi.tracks[0].notes[count].ticks // actual
