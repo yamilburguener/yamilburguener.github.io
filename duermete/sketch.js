@@ -165,14 +165,15 @@ async function startTone() {
 }
 
 function touchStarted() {
+  if (!fullscreen()) {
+    fullscreen(true);
+  }
   if (seccion == "listo") {
     //fullS()
-    if (!fullscreen()) {
-      fullscreen(true);
-    }
+    
     seccion = "juego"
   }
-  else if (seccion == "  juego") {// && touch_sig) {
+  else if (seccion == "juego") {// && touch_sig) {
     clickCount++
     duermeTime = 500
     //print(touches[0].id    )
