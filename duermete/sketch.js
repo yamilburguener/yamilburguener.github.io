@@ -103,20 +103,22 @@ function draw() {
     let _a = map(duermeTime, 500, 300, 0, 0.7)
     _a = constrain(_a, 0, 0.7);
     noStroke(); fill(0, _a);
-    textSize((displayWidth + displayHeight) * 0.017)
-    text("Interpreta\nDuérmete mi niña\nde Rosa Farsac", windowWidth / 2, windowHeight * 0.15);
+    textSize((displayWidth + displayHeight) * 0.025)
+    text("Duérmete mi niña\nde Rosa Farsac", windowWidth / 2, windowHeight * 0.15);
     textSize((displayWidth + displayHeight) * 0.025)
     if (frameCount % 60 < 40) text("clic para empezar", windowWidth / 2, windowHeight / 2);
-    textSize((displayWidth + displayHeight) * 0.013)
-    text("(Obra: Duérmete de Yamil Burguener)", windowWidth / 2, windowHeight * 0.9);
+    textSize((displayWidth + displayHeight) * 0.012)
+    text("Interpreta la pieza\n haciendo clic en la pantalla.\n(Obra: Duérmete. Yamil Burguener)", windowWidth / 2, windowHeight * 0.853);
+   // text("(Obra: Duérmete de Yamil Burguener)", windowWidth / 2, windowHeight * 0.9);
   }
   else if (seccion == "juego") {
 
     //if (window.orientation === 0 || window.orientation === 180)
-    // if (screen.orientation.angle === 0 || screen.orientation.angle === 180)
-    if (screen.orientation.type === 'portrait-primary' || screen.orientation.type === 'portrait-secondary')
-      image(pg_background, 0, 0, windowWidth, windowHeight)
-    else image(pg_background, 0, 0)
+     if (screen.orientation.angle === 0 || screen.orientation.angle === 180) {
+    //if (screen.orientation.type === 'portrait-primary' || screen.orientation.type === 'portrait-secondary')
+    backgrund(50);
+    //  image(pg_background, 0, 0, windowWidth, windowHeight)
+    } else {image(pg_background, 0, 0)}
     //text(clickCount, 100, 100)
     duermeTime--;
 
