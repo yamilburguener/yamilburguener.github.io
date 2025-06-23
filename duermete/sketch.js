@@ -108,7 +108,7 @@ function draw() {
     textSize((displayWidth + displayHeight) * 0.025)
     if (frameCount % 60 < 40) text("clic para empezar", windowWidth / 2, windowHeight / 2);
     textSize((displayWidth + displayHeight) * 0.012)
-    text("Interpreta la pieza\n haciendo clic en la pantalla.\n(Obra: Duérmete. Yamil Burguener)", windowWidth / 2, windowHeight * 0.853);
+    text("Interpreta la pieza\n haciendo clic en la pantalla.\n(Duérmete. Yamil Burguener)", windowWidth / 2, windowHeight * 0.853);
    // text("(Obra: Duérmete de Yamil Burguener)", windowWidth / 2, windowHeight * 0.9);
   }
   else if (seccion == "juego") {
@@ -116,10 +116,11 @@ function draw() {
     //if (window.orientation === 0 || window.orientation === 180)
      if (screen.orientation.angle === 0 || screen.orientation.angle === 180) {
     //if (screen.orientation.type === 'portrait-primary' || screen.orientation.type === 'portrait-secondary')
-    backgrund(50);
+    background(50);
     //  image(pg_background, 0, 0, windowWidth, windowHeight)
     } else {image(pg_background, 0, 0)}
     //text(clickCount, 100, 100)
+    text (screen.orientation.angle, 200,200)
     duermeTime--;
 
     if (duermeTime < 0) {
