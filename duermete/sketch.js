@@ -98,7 +98,9 @@ function draw() {
     if (sampler_loaded[0] && sampler_loaded[1]) seccion = "listo"
   }
   else if (seccion == "listo") {
-    image(pg_background, 0, 0);
+    if (screen.orientation.angle === 90 || screen.orientation.angle === 270) {
+      image(pg_background, 0, 0, windowWidth, windowHeight)
+      } else {image(pg_background, 0, 0)}
     duermeTime--
     let _a = map(duermeTime, 500, 300, 0, 0.7)
     _a = constrain(_a, 0, 0.7);
@@ -112,15 +114,10 @@ function draw() {
    // text("(Obra: Duérmete de Yamil Burguener)", windowWidth / 2, windowHeight * 0.9);
   }
   else if (seccion == "juego") {
-
-    //if (window.orientation === 0 || window.orientation === 180)
      if (screen.orientation.angle === 90 || screen.orientation.angle === 270) {
-    //if (screen.orientation.type === 'portrait-primary' || screen.orientation.type === 'portrait-secondary')
-    //background(50);
     image(pg_background, 0, 0, windowWidth, windowHeight)
     } else {image(pg_background, 0, 0)}
-    //text(clickCount, 100, 100)
-    text (screen.orientation.angle, 200,200)
+    //text (screen.orientation.angle, 200,200)
     duermeTime--;
 
     if (duermeTime < 0) {
