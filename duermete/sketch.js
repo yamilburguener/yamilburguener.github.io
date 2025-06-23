@@ -112,7 +112,11 @@ function draw() {
   }
   else if (seccion == "juego") {
 
-    image(pg_background, 0, 0)
+    //if (window.orientation === 0 || window.orientation === 180)
+    // if (screen.orientation.angle === 0 || screen.orientation.angle === 180)
+    if (screen.orientation.type === 'portrait-primary' || screen.orientation.type === 'portrait-secondary')
+      image(pg_background, 0, 0, windowWidth, windowHeight)
+    else image(pg_background, 0, 0)
     //text(clickCount, 100, 100)
     duermeTime--;
 
@@ -169,17 +173,14 @@ function touchStarted() {
     fullscreen(true);
   }
   if (seccion == "listo") {
-    //fullS() 
     seccion = "juego"
   }
-  if (seccion == "juego") {// && touch_sig) {
+  else if (seccion == "juego") {
     clickCount++
     duermeTime = 500
-    //print(touches[0].id    )
     for (let touch of touches) {
       vol = map(touch.y, 0, windowHeight, 1, 0)
       circulo(touch.id, touch.x, touch.y);
-
       //if (touch.id == 0) 
       midiPiano()
     }
@@ -196,10 +197,11 @@ function touchEnded() {
   //}
 }
 
- function mousePressed() {
+function mousePressed() {
+  if (!fullscreen()) {
+    fullscreen(true);
+  }
   if (seccion == "listo") {
-    //fullS()
-
     seccion = "juego";
   }
   else if (seccion == "juego") {
@@ -209,7 +211,7 @@ function touchEnded() {
     midiPiano()
     circulo(0, mouseX, mouseY);
   }
-} 
+}
 
 function circulo(_id, _x, _y) {
   notas.push(new Nota(_id, _x, _y));
@@ -278,12 +280,6 @@ function desafina(_nA) { // nota afinada
   const _hertz = Tone.Frequency(_nA, "midi").toFrequency()
   _nD = _hertz * (0.975 + random(0.05))
   return _nD
-}
-
-function fullS() {
-  if (!fullscreen()) {
-    fullscreen(true);
-  }
 }
 
 function windowResized() {
