@@ -72,12 +72,7 @@ function preload() {
 function setup() {
 
   createCanvas(windowWidth, windowHeight)
-  /*  const cv = createCanvas(2160, 2160)
-    cv.parent("cv")
-   cv.id("---")
-   cv.class("---")  */
-  //pixelDensity(1);
-  stroke(100)
+  stroke(100);
   colorMode(HSB);
   textAlign(CENTER);
   colH = random(160, 280);
@@ -109,9 +104,8 @@ function draw() {
     text("Duérmete mi niña\nde Rosa Farsac", windowWidth / 2, windowHeight * 0.15);
     textSize((displayWidth + displayHeight) * 0.025)
     if (frameCount % 60 < 40) text("Clic para empezar", windowWidth / 2, windowHeight / 2);
-    textSize((displayWidth + displayHeight) * 0.013)
-    text("Interpreta la pieza\n haciendo clic en la pantalla.\n(Duérmete. Yamil Burguener)", windowWidth / 2, windowHeight * 0.853);
-    // text("(Obra: Duérmete de Yamil Burguener)", windowWidth / 2, windowHeight * 0.9);
+    textSize((displayWidth + displayHeight) * 0.016)
+    text("Interpreta la pieza\n haciendo clic en la pantalla.\n(Duérmete. Yamil Burguener)", windowWidth / 2, windowHeight * 0.85);
   }
   else if (seccion == "juego") {
     if (screen.orientation.angle === 90 || screen.orientation.angle === 270) {
@@ -173,22 +167,14 @@ function touchStarted() {
     clickCount++
     duermeTime = 500;
     for (let touch of touches) {
-      vol = map(touch.y, 0, windowHeight, 1, 0)
+      vol = map(touch.y, 0, windowHeight, 1, 0);
       circulo(touch.id, touch.x, touch.y);
-      //if (touch.id == 0) 
       midiPiano()
     }
-    //if (touches[0].id == 0) { clickCount++; midiPiano() }
-    //touch_sig = false;
   }
 }
 
 function touchEnded() {
-  //touch_sig = true;
-  //print("end")
-  //for (let i = 0; i < notas.length; i++) {
-  //notas[i].nota_stop();
-  //}
 }
 
 function mousePressed() {
@@ -250,9 +236,7 @@ function suenaPiano(_c, _st) {
   } else { // fuerte
     _sa = 0; _v = vol
   }
-  _v = constrain(_v, 0, 1) // _v puede tirar n negativo. ojo
-
-  ////print(count, _no)
+  _v = constrain(_v, 0, 1) 
   sampler[_sa].triggerAttackRelease(_alt, _dur, _st, _v);
   if (modo == "pesadilla" && random() < 0.3) { // repetición
     let _tie = random(0.05, 0.2)
@@ -279,9 +263,6 @@ function desafina(_nA) { // nota afinada
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
 }
-/* prevents the mobile browser from processing some default
- * touch events, like swiping left for "back" or scrolling the page.
- */
 document.ontouchmove = function (event) {
   event.preventDefault();
 };
@@ -306,7 +287,7 @@ function fondo() {
   }
   c1 = color(colH, 70, 70, 0.5)
   c2 = color(colH, 30, 30, 0.5)
-  let viento_dir = 1// random([-1, 0, 1])
+  let viento_dir = random([-1, 0, 1])
   let _onda = random(-20, 20); if (viento_dir != 0) _onda * 1.3
   for (let y = 0; y < displayHeight; y += int(random(15, 20))) {
     let to_y = 1
@@ -325,7 +306,6 @@ function fondo() {
         if (y1 < 0) y1 = displayHeight + y1; if (y2 < 0) y2 = displayHeight + y2
         if (random() < 0.7) {
           if (abs(y1 - y2) < 50) {
-            // pg_background.line(x, y1, x + random(5, 15), y2)
             pg_background.bezier(x, y1, x + random(-5, 5), y2, x + random(10, 15), y2, x + random(10, 20), y1)
           }
         }
@@ -348,11 +328,6 @@ class Nota {
     this.r = _ra // 30
     this.velR = map(_y, 0, windowHeight, 3, 0.5)
   }
-
-  //nota_stop() {
-  //sampler[0].triggerRelease(this.frec, Tone.now());
-  //this.vida = 0;
-  //}
 
   dibuja() {
     noFill()
