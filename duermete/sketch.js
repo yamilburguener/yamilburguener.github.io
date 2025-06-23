@@ -93,40 +93,39 @@ function setup() {
 function draw() {
 
   if (seccion == "cargando") {
-    background(80);
-    text("cargando...", windowWidth / 2, windowHeight / 2);
+    background(0);
+    text("...", windowWidth / 2, windowHeight / 2);
     if (sampler_loaded[0] && sampler_loaded[1]) seccion = "listo"
   }
   else if (seccion == "listo") {
     if (screen.orientation.angle === 90 || screen.orientation.angle === 270) {
       image(pg_background, 0, 0, windowWidth, windowHeight)
-      } else {image(pg_background, 0, 0)}
+    } else { image(pg_background, 0, 0) }
     duermeTime--
     let _a = map(duermeTime, 500, 300, 0, 0.7)
     _a = constrain(_a, 0, 0.7);
     noStroke(); fill(0, _a);
-    textSize((displayWidth + displayHeight) * 0.025)
+    textSize((displayWidth + displayHeight) * 0.028)
     text("Duérmete mi niña\nde Rosa Farsac", windowWidth / 2, windowHeight * 0.15);
     textSize((displayWidth + displayHeight) * 0.025)
-    if (frameCount % 60 < 40) text("clic para empezar", windowWidth / 2, windowHeight / 2);
-    textSize((displayWidth + displayHeight) * 0.012)
+    if (frameCount % 60 < 40) text("Clic para empezar", windowWidth / 2, windowHeight / 2);
+    textSize((displayWidth + displayHeight) * 0.013)
     text("Interpreta la pieza\n haciendo clic en la pantalla.\n(Duérmete. Yamil Burguener)", windowWidth / 2, windowHeight * 0.853);
-   // text("(Obra: Duérmete de Yamil Burguener)", windowWidth / 2, windowHeight * 0.9);
+    // text("(Obra: Duérmete de Yamil Burguener)", windowWidth / 2, windowHeight * 0.9);
   }
   else if (seccion == "juego") {
-     if (screen.orientation.angle === 90 || screen.orientation.angle === 270) {
-    image(pg_background, 0, 0, windowWidth, windowHeight)
-    } else {image(pg_background, 0, 0)}
-    //text (screen.orientation.angle, 200,200)
-    duermeTime--;
+    if (screen.orientation.angle === 90 || screen.orientation.angle === 270) {
+      image(pg_background, 0, 0, windowWidth, windowHeight)
+    } else { image(pg_background, 0, 0) }
 
+    duermeTime--;
     if (duermeTime < 0) {
       let _a = map(duermeTime, 0, -80, 0, 0.7)
       _a = constrain(_a, 0, 0.7);
       noStroke(); fill(0, _a);
       textSize((displayWidth + displayHeight) * 0.025)
       text("f f f", windowWidth / 2, windowHeight * 0.1);
-      if (frameCount % 60 < 40) text("clic para continuar", windowWidth / 2, windowHeight / 2);
+      if (frameCount % 60 < 40) text("Clic para continuar", windowWidth / 2, windowHeight / 2);
       text("ppp", windowWidth / 2, windowHeight * 0.9);
     }
 
