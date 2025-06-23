@@ -114,10 +114,10 @@ function draw() {
   else if (seccion == "juego") {
 
     //if (window.orientation === 0 || window.orientation === 180)
-     if (screen.orientation.angle === 0 || screen.orientation.angle === 180) {
+     if (screen.orientation.angle === 90 || screen.orientation.angle === 270) {
     //if (screen.orientation.type === 'portrait-primary' || screen.orientation.type === 'portrait-secondary')
-    background(50);
-    //  image(pg_background, 0, 0, windowWidth, windowHeight)
+    //background(50);
+    image(pg_background, 0, 0, windowWidth, windowHeight)
     } else {image(pg_background, 0, 0)}
     //text(clickCount, 100, 100)
     text (screen.orientation.angle, 200,200)
