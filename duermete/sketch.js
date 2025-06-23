@@ -135,12 +135,9 @@ function draw() {
     fill(0, 0, 0, alfa); noStroke()
     rect(0, 0, displayWidth, displayHeight);
 
-    // verifica modo
-    let elapsed = millis() - startTime;
-    //text(int(elapsed), 200, 100); // bug prov
-    //text(clickCount, 200, 150); // bug prov
 
-    if (elapsed > 5000) {
+    const elapsed = millis() - startTime;
+    if (elapsed > 5000) { // verifica modo
       if (modo == "sueño") {
         if (clickCount > 15) modo = "pesadilla";
       } else {
@@ -158,12 +155,9 @@ function draw() {
   }
 }
 
-
 async function startTone() {
-  //await Tone.start();
-  //console.log("Tone started");
+  //await Tone.start(); //console.log("Tone started");
   midi = await Midi.fromUrl("./assets/duermeteQ.mid");
-  //print(midi)
   //print(midi.tracks[0].notes[1].ticks)
 }
 
@@ -172,11 +166,12 @@ function touchStarted() {
     fullscreen(true);
   }
   if (seccion == "listo") {
-    seccion = "juego"
+    duermeTime = 500;
+    seccion = "juego";
   }
   else if (seccion == "juego") {
     clickCount++
-    duermeTime = 500
+    duermeTime = 500;
     for (let touch of touches) {
       vol = map(touch.y, 0, windowHeight, 1, 0)
       circulo(touch.id, touch.x, touch.y);
