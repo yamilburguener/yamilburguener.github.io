@@ -127,7 +127,7 @@ function draw() {
     if (modo == "sueño") alfa -= 0.01; else alfa += 0.02;
     alfa = constrain(alfa, 0, 0.7);
     fill(0, 0, 0, alfa); noStroke()
-    rect(0, 0, displayWidth, displayHeight);
+    rect(0, 0, windowWidth, windowHeight)
 
 
     const elapsed = millis() - startTime;
