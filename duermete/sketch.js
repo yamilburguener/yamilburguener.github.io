@@ -253,18 +253,21 @@ function suenaPiano(_c, _st) {
       if ((typeof _alt) == "number") _alt *= _arp
       const _int = ((i % 2) + 1) * 0.5
       sampler[_sa].triggerAttackRelease(_alt, _dur, _t, _v * _int);
-      if (vol > 0.8 && random() < 0.5) {
-        player[0].stop(), player[1].stop()
-        player[random([0, 1])].start()
-      }
-      else if (vol < 0.4 && random() < 0.5) {
-        let to = int (random(10,20))
-        for (let i = 1; i < to; i++) {
-          let _t = str("+" + i * vol * 0.5)
-          sampler[_sa].triggerAttackRelease(_alt, _dur * 0.05, _t, vol);
-        }
+      
+    }
+    
+    if (vol > 0.8 && random() < 0.5) {
+      player[0].stop(), player[1].stop()
+      player[random([0, 1])].start()
+    }
+    else if (vol < 0.4 && random() < 0.5) {
+      let to = int (random(6,12))
+      for (let i = 1; i < to; i++) {
+        let _t = str("+" + i * vol * 0.5)
+        sampler[_sa].triggerAttackRelease(_alt, _dur * 0.05, _t, vol * 4);
       }
     }
+
     if (random() < 0.7) midiPiano()
   }
 }
