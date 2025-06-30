@@ -14,6 +14,7 @@ let pg_background, fondo_noise = 0;
 let colH, alfa = 0, fuente;
 
 let midi, sampler = [], sampler_loaded = [false, false]
+let player = []
 let count = -1
 let _ac = 0, _next = 1
 let notas = []
@@ -62,7 +63,10 @@ function preload() {
     onload: () => { sampler_loaded[1] = true; }
   })
   sampler[1].chain(reverb, channel)
-
+  player[0] = new Tone.Player(
+    './assets/pedal0.mp3').chain(channel)
+  player[1] = new Tone.Player(
+    './assets/pedal1.mp3').chain(channel)
   channel.chain(comp, Tone.Destination);
 
   fuente = loadFont('./assets/ChopinScript.ttf')
@@ -90,7 +94,7 @@ function draw() {
   if (seccion == "cargando") {
     background(0);
     text("...", windowWidth / 2, windowHeight / 2);
-    if (sampler_loaded[0] && sampler_loaded[1]) seccion = "listo"
+    if (sampler_loaded[0] && sampler_loaded[1] && player[0].loaded && player[1].loaded) seccion = "listo"
   }
   else if (seccion == "listo") {
     if (screen.orientation.angle === 90 || screen.orientation.angle === 270) {
@@ -236,7 +240,7 @@ function suenaPiano(_c, _st) {
   } else { // fuerte
     _sa = 0; _v = vol
   }
-  _v = constrain(_v, 0, 1) 
+  _v = constrain(_v, 0, 1)
   sampler[_sa].triggerAttackRelease(_alt, _dur, _st, _v);
   if (modo == "pesadilla" && random() < 0.3) { // repetición
     let _tie = random(0.05, 0.2)
@@ -249,6 +253,17 @@ function suenaPiano(_c, _st) {
       if ((typeof _alt) == "number") _alt *= _arp
       const _int = ((i % 2) + 1) * 0.5
       sampler[_sa].triggerAttackRelease(_alt, _dur, _t, _v * _int);
+      if (vol > 0.8 && random() < 0.5) {
+        player[0].stop(), player[1].stop()
+        player[random([0, 1])].start()
+      }
+      else if (vol < 0.4 && random() < 0.5) {
+        let to = int (random(10,20))
+        for (let i = 1; i < to; i++) {
+          let _t = str("+" + i * vol * 0.5)
+          sampler[_sa].triggerAttackRelease(_alt, _dur * 0.05, _t, vol);
+        }
+      }
     }
     if (random() < 0.7) midiPiano()
   }
