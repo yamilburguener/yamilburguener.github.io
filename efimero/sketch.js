@@ -1,33 +1,29 @@
 let mi_seed;
-let b_trigger = false
+let b_trigger = false;
 let seres = [];
 let X_opciones = [[20, 10, 5, 0, 0, -10], [17, 8, 5, 0, 0, 0, 0, -5],
 [15, 10, 5, 0, 0, 0, -5], [10, 5, 5, 5, 5, 0, -5]] //  [10, 5, 5, 5, 5, 0, -5];
 let X_grilla = [];
 let memo_cont = 0, memoR = [];
-let ser_cont = 0
+let ser_cont;
 let barra_av = []
 let barras_notas = [3, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
   0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25,
   0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25,
-  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 let cg_clave = []
-let hojas = 1;
+let hojas, hojas_memo;
 let hojas_r = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
-let hojas_memo
 let col_back;
 let unis = [], unis_destinoY;
 let unis_sent = ["ini", "fin"];
-
 let curve_T; // 0 a 5
 let col_pent = []; // color pentagramas
 let valorY_rango; // 0.5 a 10
 let valorX_rango; // 0.0 a 2.0
-
 let notas = [];
 let notas_largo;
 let notas_gesto;
-
 let b_pausa = false;
 
 function setup() {
@@ -38,9 +34,8 @@ function setup() {
   cv.class("ttt");
   pixelDensity(1);
 
-  frameRate(30)
+  frameRate(60);
   colorMode(HSB);
-  //noFill();
   imageMode(CENTER)
 
   //mi_seed = Math.floor(9999999999 * random()); 
@@ -54,11 +49,12 @@ function setup() {
 }
 
 function prepara_sketch() {
-print("XXX prepara sketch")
+  print("---- prepara sketch")
 
+  hojas = 0, ser_cont = 0, memo_cont = 0;
   clear();
 
-    // image setting -------------------------------------
+  // image setting -------------------------------------
   // random(0.035) * 100;
   curve_T = map(m0, 0, 1, 0, 3.5); // slider 0
   curveTightness(curve_T); // 0 a 4 (en negativo se pasa de largo)
@@ -67,10 +63,10 @@ print("XXX prepara sketch")
   col_back = 60 + randomM0() * 35// random(60, 95);
   background(col_back);
   let _nl = [1, 5, 5, 10, 10, 10];
-  notas_largo = _nl [int(randomM0()*_nl.length)]; // maxima duracion de diseño notas
+  notas_largo = _nl[int(randomM0() * _nl.length)]; // maxima duracion de diseño notas
   let _ng = ["asc", "desc", "random"];
-  notas_gesto = _ng[int(randomM0()*_ng.length)]; 
-  
+  notas_gesto = _ng[int(randomM0() * _ng.length)];
+
   //m1 = random(0.2) * 10; 
   valorX_rango = m1 * 2; // slider 1
   console.log("[1] Independencia de las lineas melodicas [0-2]: " + valorX_rango)
@@ -78,7 +74,7 @@ print("XXX prepara sketch")
   let _vy = [0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
   valorY_rango = _vy[int(m2 * _vy.length)] // slider 2
   console.log("[2] Movimientos verticales [0.5-10]: " + valorY_rango)
-  
+
   // tipos de barra
   let _r = m3, _bt = ""
   if (_r < 0.2) {
@@ -113,7 +109,7 @@ print("XXX prepara sketch")
     memoR[i] = randomM1();
   }
 
-  let _op = int(randomM0()*4);
+  let _op = int(randomM0() * 4);
   for (let h = 0; h < 20; h++) {
     X_grilla[h] = []; // 1 por cada hoja, 20 en total
     for (let i = 0; i < 50; i++) {
@@ -128,7 +124,7 @@ print("XXX prepara sketch")
   }
   let _un = [false, false, false, true]
   for (let i = 0; i < 50; i++) {
-    for (let j = 0; j < 20; j++) unis[i][j] = _un[int(randomM0()*_un.length)]
+    for (let j = 0; j < 20; j++) unis[i][j] = _un[int(randomM0() * _un.length)]
     for (let k = 0; k < 4; k++) {
       if (i < 49) i++;
       for (let j = 0; j < 20; j++) unis[i][j] = unis[i - 1][j]
@@ -139,7 +135,7 @@ print("XXX prepara sketch")
   if (randomM0() < 0.9) for (let i = 0; i < 50; i++) { unis[i][4] = true; unis[i][4 + 7] = true; } // unisono total
 
 
-seres = [], notas = []; // reset
+  seres = [], notas = []; // reset
   let _s = 0;
   for (let _y = 0; _y < 100; _y++) {
     memo_cont = 0//_s; bug // reset
@@ -192,7 +188,7 @@ function draw() {
   text(int(hojas), width / 2, 50)
   if (frameRate() < 21) print(int("frameRate: " + frameRate()))*/
 
-  if (!b_trigger && int(hojas) == 2 && seres[0].barraUbic() > 40) {
+  if (!b_trigger && int(hojas) == 1 && seres[0].barraUbic() > 35) {
     b_trigger = true;
     triggerPreview();
     grabaImagen();
@@ -223,18 +219,18 @@ function claves(_i) {
       cg_clave[_i].beginShape();
       cg_clave[_i].curveVertex(_w - 5, _h); cg_clave[_i].curveVertex(_w - 5, _h)
 
-      cg_clave[_i].curveVertex(_w + 5 + (randomM0()*4 -2), _h + (randomM0()*4 -2)) //random(-2, 2)
-      cg_clave[_i].curveVertex(_w + 5 + (randomM0()*4 -2), _h + 10 + (randomM0()*4 -2))
-      cg_clave[_i].curveVertex(_w - 10 + (randomM0()*4 -2), _h + 10 + (randomM0()*4 -2))
-      cg_clave[_i].curveVertex(_w - 10 + (randomM0()*4 -2), _h - 10 + (randomM0()*4 -2))
+      cg_clave[_i].curveVertex(_w + 5 + (randomM0() * 4 - 2), _h + (randomM0() * 4 - 2)) //random(-2, 2)
+      cg_clave[_i].curveVertex(_w + 5 + (randomM0() * 4 - 2), _h + 10 + (randomM0() * 4 - 2))
+      cg_clave[_i].curveVertex(_w - 10 + (randomM0() * 4 - 2), _h + 10 + (randomM0() * 4 - 2))
+      cg_clave[_i].curveVertex(_w - 10 + (randomM0() * 4 - 2), _h - 10 + (randomM0() * 4 - 2))
 
-      cg_clave[_i].curveVertex(_w + 10 + (randomM0()*4 -2), _h - 10 + (randomM0()*4 -2))
+      cg_clave[_i].curveVertex(_w + 10 + (randomM0() * 4 - 2), _h - 10 + (randomM0() * 4 - 2))
 
-      cg_clave[_i].curveVertex(_w + 6 + (randomM0()*4 -2), _h - 27 + (randomM0()*4 -2))
+      cg_clave[_i].curveVertex(_w + 6 + (randomM0() * 4 - 2), _h - 27 + (randomM0() * 4 - 2))
 
-      cg_clave[_i].curveVertex(_w + 2 + (randomM0()*4 -2), _h - 30 + (randomM0()*4 -2))
-      cg_clave[_i].curveVertex(_w + (randomM0()*4 -2), _h - 3 + (randomM0()*4 -2))
-      cg_clave[_i].curveVertex(_w - 4 + (randomM0()*4 -2), _h + 30 + (randomM0()*4 -2))
+      cg_clave[_i].curveVertex(_w + 2 + (randomM0() * 4 - 2), _h - 30 + (randomM0() * 4 - 2))
+      cg_clave[_i].curveVertex(_w + (randomM0() * 4 - 2), _h - 3 + (randomM0() * 4 - 2))
+      cg_clave[_i].curveVertex(_w - 4 + (randomM0() * 4 - 2), _h + 30 + (randomM0() * 4 - 2))
 
       cg_clave[_i].curveVertex(_w - 15, _h + 27); cg_clave[_i].curveVertex(_w - 15, _h + 27)
       cg_clave[_i].endShape();
@@ -243,19 +239,19 @@ function claves(_i) {
       cg_clave[_i].beginShape();
       cg_clave[_i].curveVertex(_w + 5, _h - 4); cg_clave[_i].curveVertex(_w + 5, _h - 4);
 
-      cg_clave[_i].curveVertex(_w + 5 + (randomM0()*4 -2), _h + (randomM0()*4 -2));
-      cg_clave[_i].curveVertex(_w - 5 + (randomM0()*4 -2), _h + (randomM0()*4 -2))
-      cg_clave[_i].curveVertex(_w - 5 + (randomM0()*4 -2), _h - 10 + (randomM0()*4 -2))
-      cg_clave[_i].curveVertex(_w + 10 + (randomM0()*4 -2), _h - 10 + (randomM0()*4 -2))
-      cg_clave[_i].curveVertex(_w + 13 + (randomM0()*4 -2), _h + 8 + (randomM0()*4 -2))
+      cg_clave[_i].curveVertex(_w + 5 + (randomM0() * 4 - 2), _h + (randomM0() * 4 - 2));
+      cg_clave[_i].curveVertex(_w - 5 + (randomM0() * 4 - 2), _h + (randomM0() * 4 - 2))
+      cg_clave[_i].curveVertex(_w - 5 + (randomM0() * 4 - 2), _h - 10 + (randomM0() * 4 - 2))
+      cg_clave[_i].curveVertex(_w + 10 + (randomM0() * 4 - 2), _h - 10 + (randomM0() * 4 - 2))
+      cg_clave[_i].curveVertex(_w + 13 + (randomM0() * 4 - 2), _h + 8 + (randomM0() * 4 - 2))
 
       cg_clave[_i].curveVertex(_w, _h + 25); cg_clave[_i].curveVertex(_w, _h + 25)
       cg_clave[_i].endShape();
 
       cg_clave[_i].strokeWeight(2);
       cg_clave[_i].beginShape(POINTS);
-      cg_clave[_i].vertex(_w + 18 + (randomM0()*2 -1), _h - 4 + (randomM0()*2 -1)) //random(-1, 1)
-      cg_clave[_i].vertex(_w + 18 + (randomM0()*2 -1), _h + 3 + (randomM0()*2 -1))
+      cg_clave[_i].vertex(_w + 18 + (randomM0() * 2 - 1), _h - 4 + (randomM0() * 2 - 1)) //random(-1, 1)
+      cg_clave[_i].vertex(_w + 18 + (randomM0() * 2 - 1), _h + 3 + (randomM0() * 2 - 1))
       cg_clave[_i].endShape();
       cg_clave[_i].strokeWeight(1);
     }
