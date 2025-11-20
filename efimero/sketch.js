@@ -7,10 +7,11 @@ let X_grilla = [];
 let memo_cont = 0, memoR = [];
 let ser_cont;
 let barra_av = []
-let barras_notas = [3, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+const barra_dur = [3, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
   0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25,
   0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25,
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+let barra_notas = [];
 let cg_clave = []
 let hojas, hojas_memo;
 let hojas_r = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
@@ -49,9 +50,10 @@ function setup() {
 }
 
 function prepara_sketch() {
-  print("---- prepara sketch")
+  print("//// prepara sketch")
 
   hojas = 0, ser_cont = 0, memo_cont = 0;
+  seres = [], notas = []; // reset
   clear();
 
   // image setting -------------------------------------
@@ -76,24 +78,26 @@ function prepara_sketch() {
   console.log("[2] Movimientos verticales [0.5-10]: " + valorY_rango)
 
   // tipos de barra
+
   let _r = m3, _bt = ""
   if (_r < 0.2) {
     _bt = "bastante juntos"
     let _b = 0;
-    for (let i = 0; i < barras_notas.length; i++) {
-      _b += barras_notas[i]
+    for (let i = 0; i < barra_dur.length; i++) {
+      _b += barra_dur[i]
     }
-    _b = _b / barras_notas.length
-    barras_notas = [_b]
+    _b = _b / barra_dur.length
+    barra_notas = [_b]
 
   } else if (_r < 0.8) {
     _bt = "basico"
+    barra_notas = barra_dur;
   } else {
     _bt = "solapados" //independientes y solapados
-    let _l = barras_notas.length
+    let _l = barra_dur.length
     for (let j = 0; j < 100; j++) {
       for (let i = 0; i < _l; i++) {
-        barras_notas.push(barras_notas[i])
+        barra_notas.push(barra_dur[i])
       }
     }
   }
@@ -134,8 +138,6 @@ function prepara_sketch() {
   unis_destinoY = height / 2
   if (randomM0() < 0.9) for (let i = 0; i < 50; i++) { unis[i][4] = true; unis[i][4 + 7] = true; } // unisono total
 
-
-  seres = [], notas = []; // reset
   let _s = 0;
   for (let _y = 0; _y < 100; _y++) {
     memo_cont = 0//_s; bug // reset
@@ -152,6 +154,7 @@ function prepara_sketch() {
     cg_clave[i].noFill()
     claves(i);
   }
+  loop(), b_pausa = false;
 }
 
 function draw() {
@@ -301,7 +304,7 @@ class Ser {
     this.barra = 5 // donde arranca: 1 a 50 avanza; 51 a 60 no se imprime 
     this.barra_av = []
 
-    let _b = shuffle(barras_notas)
+    let _b = shuffle(barra_notas)
     for (let i = 0; i < _b.length; i++) {
       this.barra_av[i] = (_b[(i + _index) % _b.length] * 0.5) /// bug el 0.1
     }
