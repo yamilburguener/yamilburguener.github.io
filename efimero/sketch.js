@@ -54,7 +54,7 @@ function setup() {
 }
 
 function prepara_sketch() {
-print("-prepara sketch")
+print("XXX prepara sketch")
 
   clear();
 
@@ -80,7 +80,7 @@ print("-prepara sketch")
   console.log("[2] Movimientos verticales [0.5-10]: " + valorY_rango)
   
   // tipos de barra
-  let _r = randomM0(), _bt = ""
+  let _r = m3, _bt = ""
   if (_r < 0.2) {
     _bt = "bastante juntos"
     let _b = 0;
@@ -103,7 +103,7 @@ print("-prepara sketch")
   }
   console.log("[3] barra: " + _bt) // slider 3
 
-  col_pent[0] = randomM0() * 360
+  col_pent[0] = m4 * 360;
   console.log("[4] Score fill color: " + int(col_pent[0])); // slider 4 rango: sin color - color hug 360º - color negro
   if (col_pent[0] > 300) { col_pent[0] = map(col_pent[0], 300, 360, 0, 360), col_pent[1] = 0, col_pent[2] = 0.8 }
   else if (col_pent[0] < 5) { col_pent[0] = random(360), col_pent[1] = 0, col_pent[2] = 0 }
