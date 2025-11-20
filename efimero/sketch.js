@@ -52,14 +52,13 @@ function setup() {
   noiseSeed(mi_seed);
 
   prepara_sketch()
-
-
- 
+print(resetAnimation)
   //resetAnimation = false; // bug
 }
 
 function prepara_sketch() {
-
+print("prepara sketch")
+print(m0, randomM0())
   clear();
   // random(0.035) * 100;
   curve_T = map(m0, 0, 1, 0, 3.5); // slider 0
@@ -67,7 +66,7 @@ function prepara_sketch() {
   print("[0] curveTightnes [0-3.5] :" + curve_T)
 
   // image setting -------------------------------------
-  col_back = random(60, 95);
+  col_back = 60 + randomM0() * 35// random(60, 95);
   background(col_back);
   notas_largo = random([1, 5, 5, 10, 10, 10]) // maxima duracion de notas
   notas_gesto = random(["asc", "desc", "random"]); print(notas_gesto)
