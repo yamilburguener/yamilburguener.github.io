@@ -1,3 +1,6 @@
+// cambiar los random por randomM0
+// 
+// 
 let mi_seed;
 let b_trigger = false
 let seres = [];
@@ -48,7 +51,16 @@ function setup() {
   randomSeed(mi_seed);
   noiseSeed(mi_seed);
 
+  prepara_sketch()
 
+
+ 
+  //resetAnimation = false; // bug
+}
+
+function prepara_sketch() {
+
+  clear();
   // random(0.035) * 100;
   curve_T = map(m0, 0, 1, 0, 3.5); // slider 0
   curveTightness(curve_T) // 0 a 4 (en negativo se pasa de largo)
@@ -56,6 +68,7 @@ function setup() {
 
   // image setting -------------------------------------
   col_back = random(60, 95);
+  background(col_back);
   notas_largo = random([1, 5, 5, 10, 10, 10]) // maxima duracion de notas
   notas_gesto = random(["asc", "desc", "random"]); print(notas_gesto)
   //m1 = random(0.2) * 10; print("[1] Independencia de las lineas melodicas [0-2]: " + valorX_rango)
@@ -138,50 +151,47 @@ function setup() {
     cg_clave[i].noFill()
     claves(i);
   }
-
-  background(col_back);
-  resetAnimation = false; // bug
 }
 
 function draw() {
   if (resetAnimation) { // no entiendo
-        // Do necessary steps to reset the animation
-        resetAnimation = false;
-      }
-    fill(col_back, 0.2); noStroke();
-    rect(0, 0, width, height);
+    prepara_sketch();
+    resetAnimation = false;
+  }
+  fill(col_back, 0.2); noStroke();
+  rect(0, 0, width, height);
 
-    for (let i = 0; i < seres.length; i++) {//
-      stroke(0, 0.1); //0.3
-      strokeWeight(1);
-      noFill();
-      seres[i].dibuja();
-      seres[i].dibuja_barra();
-    }
+  for (let i = 0; i < seres.length; i++) {//
+    stroke(0, 0.1); //0.3
+    strokeWeight(1);
+    noFill();
+    seres[i].dibuja();
+    seres[i].dibuja_barra();
+  }
 
-    if (frameCount % 2 == 0) {
-      let _i;
-      if (notas_gesto == "desc") _i = int(frameCount * 0.5) % 50;
-      else if (notas_gesto == "asc") _i = 49 - int(frameCount * 0.5) % 50;
-      else _i = int(memo_random() * 50)
-      let _n = seres[_i].nota()
-      if (_n[0]) notas.push(new Nota(_n[1], _n[2], _n[3]))
-    }
-    for (let i = 0; i < notas.length; i++) {
-      notas[i].dibuja();
-      if (notas[i].final()) { notas.splice(i, 1); }
-    }
+  if (frameCount % 2 == 0) {
+    let _i;
+    if (notas_gesto == "desc") _i = int(frameCount * 0.5) % 50;
+    else if (notas_gesto == "asc") _i = 49 - int(frameCount * 0.5) % 50;
+    else _i = int(memo_random() * 50)
+    let _n = seres[_i].nota()
+    if (_n[0]) notas.push(new Nota(_n[1], _n[2], _n[3]))
+  }
+  for (let i = 0; i < notas.length; i++) {
+    notas[i].dibuja();
+    if (notas[i].final()) { notas.splice(i, 1); }
+  }
 
-    /*noStroke() bug
-    fill(0, 0.5)
-    text(int(hojas), width / 2, 50)
-    if (frameRate() < 21) print(int("frameRate: " + frameRate()))*/
+  /*noStroke() bug
+  fill(0, 0.5)
+  text(int(hojas), width / 2, 50)
+  if (frameRate() < 21) print(int("frameRate: " + frameRate()))*/
 
-    if (!b_trigger && int(hojas) == 2 && seres[0].barraUbic() > 40) {
-      b_trigger = true;
-      triggerPreview();
-      grabaImagen();
-    }
+  if (!b_trigger && int(hojas) == 2 && seres[0].barraUbic() > 40) {
+    b_trigger = true;
+    triggerPreview();
+    grabaImagen();
+  }
 }
 
 function memo_random() {
