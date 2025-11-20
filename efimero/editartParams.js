@@ -3,9 +3,11 @@
 
 parent.postMessage({ editArtTemplateVersion: 2 }, "*");
 
+let resetAnimation = false;
+
 window.capturePreview = false;
 function triggerPreview() {
-    if(!window.capturePreview) console.log('Trigger preview')
+    if (!window.capturePreview) console.log("Trigger preview");
     window.capturePreview = true;
     window.parent.postMessage({ type: "sketch-loaded" }, "*");
 }
@@ -21,13 +23,15 @@ let randomM1;
 let randomM2;
 let randomM3;
 let randomM4;
+let randomFull;
 
 const queryString = window.location.search;
 console.log(queryString);
 if (queryString) {
     getParams(queryString);
 }
-triggerDraw();
+
+seedRandomness();
 
 function getParam(urlParams, p) {
     const param = urlParams.get(p);
@@ -62,11 +66,15 @@ window.addEventListener("message", (e) => {
 
 function triggerDraw() {
     seedRandomness();
-    drawArt();
-    parent.postMessage("editArtSketchLoaded", "*");
+    resetAnimation = true;
+    if (!isLooping()) redraw();
 }
 
-window.addEventListener("resize", (e) => triggerDraw());
+function windowResized() {
+    seedRandomness();
+    resetAnimation = true;
+    windowResizedUser();
+}
 
 function getRNG(num) {
     return sfc32(...cyrb128(randomSeedEditArt + num.toString()));
@@ -78,6 +86,7 @@ function seedRandomness() {
     randomM2 = getRNG(m2);
     randomM3 = getRNG(m3);
     randomM4 = getRNG(m4);
+    randomFull = getRNG(`${m0}${m1}${m2}${m3}${m4}`);
 }
 
 function cyrb128(str) {
