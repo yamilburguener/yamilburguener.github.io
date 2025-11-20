@@ -35,7 +35,7 @@ function setup() {
   cv.class("ttt");
   pixelDensity(1);
 
-  frameRate(60);
+  frameRate(30);
   colorMode(HSB);
   imageMode(CENTER)
 
