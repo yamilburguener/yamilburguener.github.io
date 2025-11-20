@@ -1,6 +1,3 @@
-// cambiar los random por randomM0
-// 
-// 
 let mi_seed;
 let b_trigger = false
 let seres = [];
@@ -46,36 +43,44 @@ function setup() {
   //noFill();
   imageMode(CENTER)
 
-  mi_seed = Math.floor(9999999999 * random()); //220400118
-  print("seed: " + mi_seed);
-  randomSeed(mi_seed);
-  noiseSeed(mi_seed);
+  //mi_seed = Math.floor(9999999999 * random()); 
+  //print("seed: " + mi_seed);
+  //randomSeed(mi_seed);
+  //noiseSeed(mi_seed);
 
   prepara_sketch()
-//print(resetAnimation)
-  //resetAnimation = false; // bug
+
+  //resetAnimation = false; // da error
 }
 
 function prepara_sketch() {
 print("--prepara sketch")
-print(m0, randomM0())
+
   clear();
+
+    // image setting -------------------------------------
   // random(0.035) * 100;
   curve_T = map(m0, 0, 1, 0, 3.5); // slider 0
-  curveTightness(curve_T) // 0 a 4 (en negativo se pasa de largo)
-  print("[0] curveTightnes [0-3.5] :" + curve_T)
+  curveTightness(curve_T); // 0 a 4 (en negativo se pasa de largo)
+  console.log("[0] curveTightnes [0-3.5] :" + curve_T);
 
-  // image setting -------------------------------------
   col_back = 60 + randomM0() * 35// random(60, 95);
   background(col_back);
-  notas_largo = random([1, 5, 5, 10, 10, 10]) // maxima duracion de notas
-  notas_gesto = random(["asc", "desc", "random"]); print(notas_gesto)
-  //m1 = random(0.2) * 10; print("[1] Independencia de las lineas melodicas [0-2]: " + valorX_rango)
-  valorX_rango = m1; // slider 1
-  //m2 = random([0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]); print("[2] Movimientos verticales [0.5-10]: " + valorY_rango)
-  valorY_rango = m2; // slider 2
+  let _nl = [1, 5, 5, 10, 10, 10];
+  notas_largo = _nl [int(randomM0()*_nl.length)]; // maxima duracion de diseño notas
+  let _ng = ["asc", "desc", "random"];
+  notas_gesto = _ng[int(randomM0()*_ng.length)]; 
+  
+  //m1 = random(0.2) * 10; 
+  valorX_rango = m1 * 2; // slider 1
+  console.log("[1] Independencia de las lineas melodicas [0-2]: " + valorX_rango)
+
+  let _vy = [0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+  valorY_rango = _vy[int(m2 * _vy.length)] // slider 2
+  console.log("[2] Movimientos verticales [0.5-10]: " + valorY_rango)
+  
   // tipos de barra
-  let _r = random(), _bt = ""
+  let _r = randomM0(), _bt = ""
   if (_r < 0.2) {
     _bt = "bastante juntos"
     let _b = 0;
@@ -96,19 +101,19 @@ print(m0, randomM0())
       }
     }
   }
-  print("[3] barra: " + _bt)
+  console.log("[3] barra: " + _bt) // slider 3
 
-  col_pent[0] = random(360)
-  print("[4] Score fill color: " + col_pent[0]); // rango: sin color - color hug 360º - color negro
+  col_pent[0] = randomM0() * 360
+  console.log("[4] Score fill color: " + int(col_pent[0])); // slider 4 rango: sin color - color hug 360º - color negro
   if (col_pent[0] > 300) { col_pent[0] = map(col_pent[0], 300, 360, 0, 360), col_pent[1] = 0, col_pent[2] = 0.8 }
   else if (col_pent[0] < 5) { col_pent[0] = random(360), col_pent[1] = 0, col_pent[2] = 0 }
   else { col_pent[1] = 90, col_pent[2] = 0.08 }
 
   for (let i = 0; i < 1000; i++) {
-    memoR[i] = random();
+    memoR[i] = randomM1();
   }
 
-  let _op = int(random(4))
+  let _op = int(randomM0()*4);
   for (let h = 0; h < 20; h++) {
     X_grilla[h] = []; // 1 por cada hoja, 20 en total
     for (let i = 0; i < 50; i++) {
@@ -121,8 +126,9 @@ print(m0, randomM0())
   for (let i = 0; i < 50; i++) {
     unis[i] = []
   }
+  let _un = [false, false, false, true]
   for (let i = 0; i < 50; i++) {
-    for (let j = 0; j < 20; j++) unis[i][j] = random([false, false, false, true])
+    for (let j = 0; j < 20; j++) unis[i][j] = _un[int(randomM0()*_un.length)]
     for (let k = 0; k < 4; k++) {
       if (i < 49) i++;
       for (let j = 0; j < 20; j++) unis[i][j] = unis[i - 1][j]
@@ -130,14 +136,14 @@ print(m0, randomM0())
   }
 
   unis_destinoY = height / 2
-  if (random() < 0.9) for (let i = 0; i < 50; i++) { unis[i][4] = true; unis[i][4 + 7] = true; } // unisono total
+  if (randomM0() < 0.9) for (let i = 0; i < 50; i++) { unis[i][4] = true; unis[i][4 + 7] = true; } // unisono total
 
 
 
   let _s = 0;
   for (let _y = 0; _y < 100; _y++) {
     memo_cont = 0//_s; bug // reset
-    seres.push(new Ser(_s, 50, 180 + _y * 8)); // aca!
+    seres.push(new Ser(_s, 50, 164 + _y * 8)); // aca! antes 180
     if (_y % 5 == 4) _y += 5
     _s += 1;
   }
@@ -217,18 +223,18 @@ function claves(_i) {
       cg_clave[_i].beginShape();
       cg_clave[_i].curveVertex(_w - 5, _h); cg_clave[_i].curveVertex(_w - 5, _h)
 
-      cg_clave[_i].curveVertex(_w + 5 + random(-2, 2), _h + random(-2, 2))
-      cg_clave[_i].curveVertex(_w + 5 + random(-2, 2), _h + 10 + random(-2, 2))
-      cg_clave[_i].curveVertex(_w - 10 + random(-2, 2), _h + 10 + random(-2, 2))
-      cg_clave[_i].curveVertex(_w - 10 + random(-2, 2), _h - 10 + random(-2, 2))
+      cg_clave[_i].curveVertex(_w + 5 + (randomM0()*4 -2), _h + (randomM0()*4 -2)) //random(-2, 2)
+      cg_clave[_i].curveVertex(_w + 5 + (randomM0()*4 -2), _h + 10 + (randomM0()*4 -2))
+      cg_clave[_i].curveVertex(_w - 10 + (randomM0()*4 -2), _h + 10 + (randomM0()*4 -2))
+      cg_clave[_i].curveVertex(_w - 10 + (randomM0()*4 -2), _h - 10 + (randomM0()*4 -2))
 
-      cg_clave[_i].curveVertex(_w + 10 + random(-2, 2), _h - 10 + random(-2, 2))
+      cg_clave[_i].curveVertex(_w + 10 + (randomM0()*4 -2), _h - 10 + (randomM0()*4 -2))
 
-      cg_clave[_i].curveVertex(_w + 6 + random(-2, 2), _h - 27 + random(-2, 2))
+      cg_clave[_i].curveVertex(_w + 6 + (randomM0()*4 -2), _h - 27 + (randomM0()*4 -2))
 
-      cg_clave[_i].curveVertex(_w + 2 + random(-2, 2), _h - 30 + random(-2, 2))
-      cg_clave[_i].curveVertex(_w + random(-2, 2), _h - 3 + random(-2, 2))
-      cg_clave[_i].curveVertex(_w - 4 + random(-2, 2), _h + 30 + random(-2, 2))
+      cg_clave[_i].curveVertex(_w + 2 + (randomM0()*4 -2), _h - 30 + (randomM0()*4 -2))
+      cg_clave[_i].curveVertex(_w + (randomM0()*4 -2), _h - 3 + (randomM0()*4 -2))
+      cg_clave[_i].curveVertex(_w - 4 + (randomM0()*4 -2), _h + 30 + (randomM0()*4 -2))
 
       cg_clave[_i].curveVertex(_w - 15, _h + 27); cg_clave[_i].curveVertex(_w - 15, _h + 27)
       cg_clave[_i].endShape();
@@ -237,19 +243,19 @@ function claves(_i) {
       cg_clave[_i].beginShape();
       cg_clave[_i].curveVertex(_w + 5, _h - 4); cg_clave[_i].curveVertex(_w + 5, _h - 4);
 
-      cg_clave[_i].curveVertex(_w + 5 + random(-2, 2), _h + random(-2, 2));
-      cg_clave[_i].curveVertex(_w - 5 + random(-2, 2), _h + random(-2, 2))
-      cg_clave[_i].curveVertex(_w - 5 + random(-2, 2), _h - 10 + random(-2, 2))
-      cg_clave[_i].curveVertex(_w + 10 + random(-2, 2), _h - 10 + random(-2, 2))
-      cg_clave[_i].curveVertex(_w + 13 + random(-2, 2), _h + 8 + random(-2, 2))
+      cg_clave[_i].curveVertex(_w + 5 + (randomM0()*4 -2), _h + (randomM0()*4 -2));
+      cg_clave[_i].curveVertex(_w - 5 + (randomM0()*4 -2), _h + (randomM0()*4 -2))
+      cg_clave[_i].curveVertex(_w - 5 + (randomM0()*4 -2), _h - 10 + (randomM0()*4 -2))
+      cg_clave[_i].curveVertex(_w + 10 + (randomM0()*4 -2), _h - 10 + (randomM0()*4 -2))
+      cg_clave[_i].curveVertex(_w + 13 + (randomM0()*4 -2), _h + 8 + (randomM0()*4 -2))
 
       cg_clave[_i].curveVertex(_w, _h + 25); cg_clave[_i].curveVertex(_w, _h + 25)
       cg_clave[_i].endShape();
 
       cg_clave[_i].strokeWeight(2);
       cg_clave[_i].beginShape(POINTS);
-      cg_clave[_i].vertex(_w + 18 + random(-1, 1), _h - 4 + random(-1, 1))
-      cg_clave[_i].vertex(_w + 18 + random(-1, 1), _h + 3 + random(-1, 1))
+      cg_clave[_i].vertex(_w + 18 + (randomM0()*2 -1), _h - 4 + (randomM0()*2 -1)) //random(-1, 1)
+      cg_clave[_i].vertex(_w + 18 + (randomM0()*2 -1), _h + 3 + (randomM0()*2 -1))
       cg_clave[_i].endShape();
       cg_clave[_i].strokeWeight(1);
     }
@@ -363,7 +369,7 @@ class Ser {
 
       if (int(hojas) == hojas_memo + 1) {
         // cambio de hoja ---------------------------------------
-        unis_destinoY = 180 + (int(random(90)) * 8)// 90 para 1080
+        unis_destinoY = 164 + (int(randomM0() * 90) * 8)// 90 para 1080
       }
 
       hojas_memo = int(hojas)
@@ -466,14 +472,15 @@ class Nota {
 
   constructor(_x, _y, _i) {
     this.x = _x;
-    this.y = _y; if (random() < 0.2) this.y -= 4
+    this.y = _y; if (randomM0() < 0.2) this.y -= 4;
     this.index = _i;
-    let _v = map(_x, 0, width, 190, 50)
+    let _v = map(_x, 0, width, 190, 50);
     this.vida = _v;
-    this.largo = int(10 + int(random() * notas_largo) * 10)
-    this.alte = random([-1, -1, -1, -1, -1, 0, 1])
-    this.graf = []
-    if (random() < 0.3) this.grafico();
+    this.largo = int(10 + int(randomM0() * notas_largo) * 10);
+    let _al = [-1, -1, -1, -1, -1, 0, 1];
+    this.alte = _al[int(randomM0() * _al.length)]
+    this.graf = [];
+    if (randomM0() < 0.3) this.grafico();
   }
 
   dibuja() {
