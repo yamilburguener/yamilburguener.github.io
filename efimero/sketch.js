@@ -54,7 +54,7 @@ function setup() {
 }
 
 function prepara_sketch() {
-print("--prepara sketch")
+print("-prepara sketch")
 
   clear();
 
@@ -139,7 +139,7 @@ print("--prepara sketch")
   if (randomM0() < 0.9) for (let i = 0; i < 50; i++) { unis[i][4] = true; unis[i][4 + 7] = true; } // unisono total
 
 
-
+seres = [], notas = []; // reset
   let _s = 0;
   for (let _y = 0; _y < 100; _y++) {
     memo_cont = 0//_s; bug // reset
