@@ -52,12 +52,12 @@ function setup() {
   noiseSeed(mi_seed);
 
   prepara_sketch()
-print(resetAnimation)
+//print(resetAnimation)
   //resetAnimation = false; // bug
 }
 
 function prepara_sketch() {
-print("prepara sketch")
+print("--prepara sketch")
 print(m0, randomM0())
   clear();
   // random(0.035) * 100;
