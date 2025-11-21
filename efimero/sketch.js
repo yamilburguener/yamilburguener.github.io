@@ -1,7 +1,7 @@
 let mi_seed;
 let b_trigger = false;
 let seres = [];
-let X_opciones = [[20, 10, 5, 0, 0, -10], [17, 8, 5, 0, 0, 0, 0, -5],
+const X_opciones = [[20, 10, 5, 0, 0, -10], [17, 8, 5, 0, 0, 0, 0, -5],
 [15, 10, 5, 0, 0, 0, -5], [10, 5, 5, 5, 5, 0, -5]] //  [10, 5, 5, 5, 5, 0, -5];
 let X_grilla = [];
 let memo_cont = 0, memoR = [];
@@ -14,86 +14,75 @@ const barra_dur = [3, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 let barra_notas = [];
 let cg_clave = []
 let hojas, hojas_memo;
-let hojas_r = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
 let col_back;
 let unis = [], unis_destinoY;
-let unis_sent = ["ini", "fin"];
-let curve_T; // 0 a 5
-let col_pent = []; // color pentagramas
-let valorY_rango; // 0.5 a 10
-let valorX_rango; // 0.0 a 2.0
+const unis_sent = ["ini", "fin"];
+let curve_T;
+let col_pent = [];
+let valorY_rango;
+let valorX_rango;
 let notas = [];
 let notas_largo;
 let notas_gesto;
 let b_pausa = false;
+let graba_ho, graba_ba;
 
 function setup() {
 
   let cv = createCanvas(1080, 1080);
   cv.parent("cv");
-  cv.id("ttt");
-  cv.class("ttt");
+  cv.id("fu");
+  cv.class("fu");
   pixelDensity(1);
 
   frameRate(30);
   colorMode(HSB);
-  imageMode(CENTER)
-
-  //mi_seed = Math.floor(9999999999 * random()); 
-  //print("seed: " + mi_seed);
-  //randomSeed(mi_seed);
-  //noiseSeed(mi_seed);
-
-  prepara_sketch()
-
-  //resetAnimation = false; // da error
+  imageMode(CENTER);
+  // m0 = random(), m1 = random(), m2 = random(), m3 = random(), m4 = random(); bug
+  prepara_sketch();
 }
 
 function prepara_sketch() {
-  print("//// prepara sketch")
+  console.log("//// Fugax - Yamil Burguener 2025")
 
   hojas = 0, ser_cont = 0, memo_cont = 0;
-  seres = [], notas = []; // reset
+  seres = [], notas = [];
   clear();
 
   // image setting -------------------------------------
-  // random(0.035) * 100;
-  curve_T = map(m0, 0, 1, 0, 3.5); // slider 0
-  curveTightness(curve_T); // 0 a 4 (en negativo se pasa de largo)
-  console.log("[0] curveTightnes [0-3.5] :" + curve_T);
+  curve_T = map(m0, 0, 1, 0, 3.5); // slider 1
+  curveTightness(curve_T);
+  console.log("[1] Curve tightness of the graphs (0.0 - 3.5): " + curve_T.toFixed(2));
 
-  col_back = 60 + randomM0() * 35// random(60, 95);
+  col_back = 60 + randomM0() * 35
   background(col_back);
   let _nl = [1, 5, 5, 10, 10, 10];
-  notas_largo = _nl[int(randomM0() * _nl.length)]; // maxima duracion de diseño notas
+  notas_largo = _nl[int(randomM0() * _nl.length)];
   let _ng = ["asc", "desc", "random"];
   notas_gesto = _ng[int(randomM0() * _ng.length)];
 
-  //m1 = random(0.2) * 10; 
-  valorX_rango = m1 * 2; // slider 1
-  console.log("[1] Independencia de las lineas melodicas [0-2]: " + valorX_rango)
+  valorX_rango = m1 * 2; // slider 2
+  console.log("[2] Independence between melodic lines (0.0 - 2.0): " + valorX_rango.toFixed(2));
 
   let _vy = [0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-  valorY_rango = _vy[int(m2 * _vy.length)] // slider 2
-  console.log("[2] Movimientos verticales [0.5-10]: " + valorY_rango)
+  valorY_rango = _vy[int(m2 * _vy.length)]; // slider 3
+  console.log("[3] Vertical movements of the lines of the staves (0.5 - 10): " + valorY_rango);
 
   // tipos de barra
-
-  let _r = m3, _bt = ""
+  let _r = m3, _bt = "";
   if (_r < 0.2) {
-    _bt = "bastante juntos"
+    _bt = "together"
     let _b = 0;
     for (let i = 0; i < barra_dur.length; i++) {
-      _b += barra_dur[i]
+      _b += barra_dur[i];
     }
-    _b = _b / barra_dur.length
-    barra_notas = [_b]
-
+    _b = _b / barra_dur.length;
+    barra_notas = [_b];
   } else if (_r < 0.8) {
-    _bt = "basico"
+    _bt = "slightly separated"
     barra_notas = barra_dur;
   } else {
-    _bt = "solapados" //independientes y solapados
+    _bt = "very loose"
     let _l = barra_dur.length
     for (let j = 0; j < 100; j++) {
       for (let i = 0; i < _l; i++) {
@@ -101,13 +90,13 @@ function prepara_sketch() {
       }
     }
   }
-  console.log("[3] barra: " + _bt) // slider 3
+  console.log("[4] Musical scrollbar advance: " + _bt) // slider 4
 
-  col_pent[0] = m4 * 360;
-  console.log("[4] Score fill color: " + int(col_pent[0])); // slider 4 rango: sin color - color hug 360º - color negro
-  if (col_pent[0] > 300) { col_pent[0] = map(col_pent[0], 300, 360, 0, 360), col_pent[1] = 0, col_pent[2] = 0.8 }
-  else if (col_pent[0] < 5) { col_pent[0] = random(360), col_pent[1] = 0, col_pent[2] = 0 }
-  else { col_pent[1] = 90, col_pent[2] = 0.08 }
+  col_pent[0] = m4 * 360, _cp = "";
+  if (col_pent[0] > 300) { col_pent[0] = map(col_pent[0], 300, 360, 0, 360), col_pent[1] = 0, col_pent[2] = 0.8; _cp = "º & black color" }
+  else if (col_pent[0] < 5) { col_pent[0] = randomM0() * 360, col_pent[1] = 0, col_pent[2] = 0; _cp = "º & no color" }
+  else { col_pent[1] = 90, col_pent[2] = 0.08; _cp = "º" }
+  console.log("[5] Score fill color: " + int(col_pent[0])+_cp); // slider 5 
 
   for (let i = 0; i < 1000; i++) {
     memoR[i] = randomM1();
@@ -119,24 +108,24 @@ function prepara_sketch() {
     for (let i = 0; i < 50; i++) {
       X_grilla[h][i] = X_opciones[_op][i % X_opciones[_op].length];
     }
-    X_grilla[h] = shuffle(X_grilla[h])
+    X_grilla[h] = _shuffle(X_grilla[h]);
   }
 
   // unisonos
   for (let i = 0; i < 50; i++) {
-    unis[i] = []
+    unis[i] = [];
   }
-  let _un = [false, false, false, true]
+  let _un = [false, false, false, true];
   for (let i = 0; i < 50; i++) {
-    for (let j = 0; j < 20; j++) unis[i][j] = _un[int(randomM0() * _un.length)]
+    for (let j = 0; j < 20; j++) unis[i][j] = _un[int(randomM0() * _un.length)];
     for (let k = 0; k < 4; k++) {
       if (i < 49) i++;
       for (let j = 0; j < 20; j++) unis[i][j] = unis[i - 1][j]
     }
   }
 
-  unis_destinoY = height / 2
-  if (randomM0() < 0.9) for (let i = 0; i < 50; i++) { unis[i][4] = true; unis[i][4 + 7] = true; } // unisono total
+  unis_destinoY = height / 2;
+  if (randomM0() < 0.9) for (let i = 0; i < 50; i++) { unis[i][3] = true; unis[i][12] = true; } // unisono total
 
   let _s = 0;
   for (let _y = 0; _y < 100; _y++) {
@@ -154,19 +143,27 @@ function prepara_sketch() {
     cg_clave[i].noFill()
     claves(i);
   }
+
+  let _h = [0, 1, 1, 1, 2];
+  graba_ho = _h[int(randomM4() * _h.length)];
+  let _b = [26, 35, 35, 35, 43];
+  graba_ba = _b[int(randomM4() * _b.length)];
+  print(graba_ho, graba_ba) //bug
+
   loop(), b_pausa = false;
 }
 
 function draw() {
-  if (resetAnimation) { // no entiendo
+
+  if (resetAnimation) {
     prepara_sketch();
     resetAnimation = false;
   }
   fill(col_back, 0.2); noStroke();
   rect(0, 0, width, height);
 
-  for (let i = 0; i < seres.length; i++) {//
-    stroke(0, 0.1); //0.3
+  for (let i = 0; i < seres.length; i++) {
+    stroke(0, 0.1);
     strokeWeight(1);
     noFill();
     seres[i].dibuja();
@@ -186,30 +183,35 @@ function draw() {
     if (notas[i].final()) { notas.splice(i, 1); }
   }
 
-  /*noStroke() bug
-  fill(0, 0.5)
-  text(int(hojas), width / 2, 50)
-  if (frameRate() < 21) print(int("frameRate: " + frameRate()))*/
-
-  if (!b_trigger && int(hojas) == 1 && seres[0].barraUbic() > 35) {
+  if (!b_trigger && (int(hojas) == graba_ho && seres[0].barraUbic() > graba_ba || int(hojas) > graba_ho)) {
     b_trigger = true;
     triggerPreview();
     grabaImagen();
   }
+
+  fill(0, 0.5)
+  text(int(hojas), width / 2, 50)
 }
 
 function memo_random() {
-
-  /* memo_cont++;
-   let _m = constrain((sin(memo_cont * 0.001) * 0.5) + 0.5, 0, 0.9999);
-   if (memo_cont > hojas_r[int(hojas) % hojas_r.length]) memo_cont = 0;
-   return 0.5//bug*/
 
   memo_cont++;
   //if (memo_cont > 100) memo_cont = 0;
   return memoR[memo_cont];
 }
 
+function _shuffle(array) {
+
+  let currentIndex = array.length;
+
+  while (currentIndex != 0) {
+    let randomIndex = Math.floor(randomM2() * currentIndex);
+    currentIndex--;
+    [array[currentIndex], array[randomIndex]] = [
+      array[randomIndex], array[currentIndex]];
+  }
+  return array;
+}
 
 function claves(_i) {
 
@@ -222,7 +224,7 @@ function claves(_i) {
       cg_clave[_i].beginShape();
       cg_clave[_i].curveVertex(_w - 5, _h); cg_clave[_i].curveVertex(_w - 5, _h)
 
-      cg_clave[_i].curveVertex(_w + 5 + (randomM0() * 4 - 2), _h + (randomM0() * 4 - 2)) //random(-2, 2)
+      cg_clave[_i].curveVertex(_w + 5 + (randomM0() * 4 - 2), _h + (randomM0() * 4 - 2))
       cg_clave[_i].curveVertex(_w + 5 + (randomM0() * 4 - 2), _h + 10 + (randomM0() * 4 - 2))
       cg_clave[_i].curveVertex(_w - 10 + (randomM0() * 4 - 2), _h + 10 + (randomM0() * 4 - 2))
       cg_clave[_i].curveVertex(_w - 10 + (randomM0() * 4 - 2), _h - 10 + (randomM0() * 4 - 2))
@@ -253,7 +255,7 @@ function claves(_i) {
 
       cg_clave[_i].strokeWeight(2);
       cg_clave[_i].beginShape(POINTS);
-      cg_clave[_i].vertex(_w + 18 + (randomM0() * 2 - 1), _h - 4 + (randomM0() * 2 - 1)) //random(-1, 1)
+      cg_clave[_i].vertex(_w + 18 + (randomM0() * 2 - 1), _h - 4 + (randomM0() * 2 - 1))
       cg_clave[_i].vertex(_w + 18 + (randomM0() * 2 - 1), _h + 3 + (randomM0() * 2 - 1))
       cg_clave[_i].endShape();
       cg_clave[_i].strokeWeight(1);
@@ -264,17 +266,15 @@ function claves(_i) {
 function grabaImagen() {
 
   console.log("saving!")
-  saveCanvas("nnn" + mi_seed + ".png")
+  let now = new Date();
+  let seedName = `${now.getFullYear()}_${now.getMonth() + 1}_${now.getDate()}_${now.getHours()}_${now.getMinutes()}_${now.getSeconds()}`;
+  saveCanvas("Fugaz_" + seedName + ".png")
 }
 
 function keyReleased() {
 
   if (key == "s" || key == "S") {
     grabaImagen()
-  }
-  if (key == "f" || key == "F") {
-    let fs = fullscreen()
-    fullscreen(!fs)
   }
   if (key == "p" || key == "P") {
     b_pausa = !b_pausa;
@@ -304,7 +304,7 @@ class Ser {
     this.barra = 5 // donde arranca: 1 a 50 avanza; 51 a 60 no se imprime 
     this.barra_av = []
 
-    let _b = shuffle(barra_notas)
+    let _b = _shuffle(barra_notas)
     for (let i = 0; i < _b.length; i++) {
       this.barra_av[i] = (_b[(i + _index) % _b.length] * 0.5) /// bug el 0.1
     }
@@ -316,8 +316,8 @@ class Ser {
   dibuja() {
 
     beginShape();
-    let _limI = int(constrain(this.barra - 25, 0, 50)) //barra - 25
-    let _limF = constrain(this.barra + 10, 0, 50)
+    let _limI = int(constrain(this.barra - 25, 0, 50));
+    let _limF = constrain(this.barra + 10, 0, 50);
 
     for (let i = _limI; i < _limF; i++) {
       if (this.index % 5 == 0) {
@@ -357,18 +357,15 @@ class Ser {
 
     this.barra += _av //0.25// * (2 + cos(barra_cont++ * 0.001));
     if (this.barra > 59) {
-      if (hojas > hojas_r.length - 1) {
-        print("reset");
-        hojas = 0; memo_cont = 0;
-      }
-      else { memo_cont = 0 }// int(hojas) * 2 + this.index * 2 }
-
+      memo_cont = 0;
+      if (hojas > 17) hojas = 0;
+      
       seres[this.index].actualizar();
       hojas += 0.02 // es lo mismo que 1 / 50
 
       if (int(hojas) == hojas_memo + 1) {
         // cambio de hoja ---------------------------------------
-        unis_destinoY = 164 + (int(randomM0() * 90) * 8)// 90 para 1080
+        unis_destinoY = 164 + (int(randomM0() * 90) * 8);
       }
 
       hojas_memo = int(hojas)
@@ -386,8 +383,7 @@ class Ser {
     this.unisono = unis[this.index][int(hojas)]
 
     for (let i = 0; i < 50; i++) {
-      // let _c = int(constrain(map(hojas, 0, 4, 0, 30), 4, 30)) //5, 50  pocos random a muchos random
-      if (i > 0) this.co[i].x = this.co[i - 1].x + X_grilla[int(hojas)][(i + int(this.index * valorX_rango)) % X_grilla[int(hojas)].length] * 5 // [(i + this.index * int(hojas)) % _c] * 5  // new
+      if (i > 0) this.co[i].x = this.co[i - 1].x + X_grilla[int(hojas)][(i + int(this.index * valorX_rango)) % X_grilla[int(hojas)].length] * 5;
       else if (unis_sent[hojas_memo % 2] == "fin") this.co[i].y = this.ini.y;
 
       let _si = constrain((sin(ser_cont * 0.01) * 0.3), 0, 1) // 0 a 0.3
@@ -457,13 +453,12 @@ class Ser {
 
   valorY() {
 
-    let _yy = [-4, -2, 2, 4]// [-16,-12,-8,8,12,16]
-    let _r = int(memo_random() * 4)//let _r = int(memo_random() * 16)
+    let _yy = [-4, -2, 2, 4]
+    let _r = int(memo_random() * 4)
     ser_cont++;
 
     _yy[_r] *= 1 + (abs(sin(ser_cont * 0.005)) * valorY_rango)
-    //print(_yy[_r])
-    return _yy[_r]//random([2, 1, 0.5, -1, -2])
+    return _yy[_r]
   }
 }
 
