@@ -1,10 +1,9 @@
-let mi_seed;
 let b_trigger = false;
 let seres = [];
 const X_opciones = [[20, 10, 5, 0, 0, -10], [17, 8, 5, 0, 0, 0, 0, -5],
 [15, 10, 5, 0, 0, 0, -5], [10, 5, 5, 5, 5, 0, -5]] //  [10, 5, 5, 5, 5, 0, -5];
 let X_grilla = [];
-let memo_cont = 0, memoR = [];
+let memo_cont = 0, memoR = [], memo_lim;
 let ser_cont;
 let barra_av = []
 const barra_dur = [3, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -38,7 +37,13 @@ function setup() {
   frameRate(30);
   colorMode(HSB);
   imageMode(CENTER);
-  // m0 = random(), m1 = random(), m2 = random(), m3 = random(), m4 = random(); bug
+
+  /* let mi_seed = Math.floor(9999999999 * random()); // bug 1419041633
+  print("seed: " + mi_seed);
+  randomSeed(mi_seed);
+  m0 = random(), m1 = random(), m2 = random(), m3 = random(), m4 = random();
+   // bug */
+   seedRandomness();
   prepara_sketch();
 }
 
@@ -70,17 +75,21 @@ function prepara_sketch() {
 
   // tipos de barra
   let _r = m3, _bt = "";
-  if (_r < 0.2) {
+  if (_r < 0.3) {
     _bt = "together"
     let _b = 0;
     for (let i = 0; i < barra_dur.length; i++) {
       _b += barra_dur[i];
+      let _l = [1, 2, 3, 100]
+      memo_lim = _l[int(randomM0() * _l.length)];
     }
     _b = _b / barra_dur.length;
     barra_notas = [_b];
   } else if (_r < 0.8) {
     _bt = "slightly separated"
     barra_notas = barra_dur;
+    let _l = [10, 100, 100]
+    memo_lim = _l[int(randomM0() * _l.length)];
   } else {
     _bt = "very loose"
     let _l = barra_dur.length
@@ -89,16 +98,18 @@ function prepara_sketch() {
         barra_notas.push(barra_dur[i])
       }
     }
+    memo_lim = 100;
   }
   console.log("[4] Musical scrollbar advance: " + _bt) // slider 4
+  print(memo_lim) // bug
 
   col_pent[0] = m4 * 360, _cp = "";
-  if (col_pent[0] > 300) { col_pent[0] = map(col_pent[0], 300, 360, 0, 360), col_pent[1] = 0, col_pent[2] = 0.8; _cp = "º & black color" }
+  if (col_pent[0] > 320) { col_pent[0] = map(col_pent[0], 320, 360, 0, 360), col_pent[1] = 0, col_pent[2] = 0.8; _cp = "º & black color" }
   else if (col_pent[0] < 5) { col_pent[0] = randomM0() * 360, col_pent[1] = 0, col_pent[2] = 0; _cp = "º & no color" }
   else { col_pent[1] = 90, col_pent[2] = 0.08; _cp = "º" }
-  console.log("[5] Score fill color: " + int(col_pent[0])+_cp); // slider 5 
+  console.log("[5] Score fill color: " + int(col_pent[0]) + _cp); // slider 5 
 
-  for (let i = 0; i < 1000; i++) {
+  for (let i = 0; i < 200; i++) {
     memoR[i] = randomM1();
   }
 
@@ -186,17 +197,14 @@ function draw() {
   if (!b_trigger && (int(hojas) == graba_ho && seres[0].barraUbic() > graba_ba || int(hojas) > graba_ho)) {
     b_trigger = true;
     triggerPreview();
-    grabaImagen();
+    // grabaImagen(); bug
   }
-
-  fill(0, 0.5)
-  text(int(hojas), width / 2, 50)
 }
 
 function memo_random() {
 
   memo_cont++;
-  //if (memo_cont > 100) memo_cont = 0;
+  if (memo_cont > memo_lim) memo_cont = 0;
   return memoR[memo_cont];
 }
 
@@ -268,7 +276,7 @@ function grabaImagen() {
   console.log("saving!")
   let now = new Date();
   let seedName = `${now.getFullYear()}_${now.getMonth() + 1}_${now.getDate()}_${now.getHours()}_${now.getMinutes()}_${now.getSeconds()}`;
-  saveCanvas("Fugaz_" + seedName + ".png")
+  saveCanvas("Fugax_" + seedName + ".png")
 }
 
 function keyReleased() {
@@ -283,6 +291,10 @@ function keyReleased() {
     } else {
       noLoop();
     }
+  }
+  if (key == "f" || key == "F") { // bug
+    let fs = fullscreen()
+    fullscreen(!fs)
   }
 }
 
@@ -316,7 +328,8 @@ class Ser {
   dibuja() {
 
     beginShape();
-    let _limI = int(constrain(this.barra - 25, 0, 50));
+    const _tb = map(this.barra, 0, 50, 25, 15);
+    let _limI = int(constrain(this.barra - _tb, 0, 50));
     let _limF = constrain(this.barra + 10, 0, 50);
 
     for (let i = _limI; i < _limF; i++) {
@@ -359,7 +372,7 @@ class Ser {
     if (this.barra > 59) {
       memo_cont = 0;
       if (hojas > 17) hojas = 0;
-      
+
       seres[this.index].actualizar();
       hojas += 0.02 // es lo mismo que 1 / 50
 
@@ -456,7 +469,6 @@ class Ser {
     let _yy = [-4, -2, 2, 4]
     let _r = int(memo_random() * 4)
     ser_cont++;
-
     _yy[_r] *= 1 + (abs(sin(ser_cont * 0.005)) * valorY_rango)
     return _yy[_r]
   }
@@ -468,7 +480,7 @@ class Nota {
     this.x = _x;
     this.y = _y; if (randomM0() < 0.2) this.y -= 4;
     this.index = _i;
-    let _v = map(_x, 0, width, 190, 50);
+    let _v = map(_x, 0, width, 130, 70); // 190, 50 bug
     this.vida = _v;
     this.largo = int(10 + int(randomM0() * notas_largo) * 10);
     let _al = [-1, -1, -1, -1, -1, 0, 1];
