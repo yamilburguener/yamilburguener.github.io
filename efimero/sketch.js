@@ -1,7 +1,9 @@
 let b_trigger = false;
 let seres = [];
-const X_opciones = [[20, 10, 5, 0, 0, -10], [17, 8, 5, 0, 0, 0, 0, -5],
-[15, 10, 5, 0, 0, 0, -5], [10, 5, 5, 5, 5, 0, -5]] //  [10, 5, 5, 5, 5, 0, -5];
+//const X_opciones = [[20, 10, 5, 0, 0, -10], [17, 8, 5, 0, 0, 0, 0, -5],[15, 10, 5, 0, 0, 0, -5], [10, 5, 5, 5, 5, 0, -5]]  //  [10, 5, 5, 5, 5, 0, -5];const X_opciones = [[20, 10, 5, 0, 0, -10], [17, 8, 5, 0, 0, 0, 0, -5],[15, 10, 5, 0, 0, 0, -5], [10, 5, 5, 5, 5, 0, -5]] //  [10, 5, 5, 5, 5, 0, -5];
+//const X_opciones = [[16, 8, 4, 0, 0, -8], [14, 6, 4, 0, 0, 0, 0, -4],[12, 8, 4, 0, 0, 0, -4], [8, 4, 4, 4, 4, 0, -4]] //  [10, 5, 5, 5, 5, 0, -5];
+const X_opciones = [[18, 10, 5, 0, 0, -10], [15, 8, 5, 0, 0, 0, 0, -5],
+[13, 10, 5, 0, 0, 0, -5], [10, 5, 5, 5, 3, 0, -5]];
 let X_grilla = [];
 let memo_cont = 0, memoR = [], memo_lim;
 let ser_cont;
@@ -10,12 +12,13 @@ const barra_dur = [3, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
   0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25,
   0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25,
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-let barra_notas = [];
+let barra_notas = [], barra_tipo = "";
 let cg_clave = []
 let hojas, hojas_memo;
 let col_back;
 let unis = [], unis_destinoY;
 const unis_sent = ["ini", "fin"];
+let solo = 0, solo_ini = 0, solo_fin = 49, b_solo;
 let curve_T;
 let col_pent = [];
 let valorY_rango;
@@ -38,18 +41,21 @@ function setup() {
   colorMode(HSB);
   imageMode(CENTER);
 
-  /* let mi_seed = Math.floor(9999999999 * random()); // bug 1419041633
+/*    let mi_seed = 9749902258//Math.floor(9999999999 * random()); // bug 1419041633
   print("seed: " + mi_seed);
   randomSeed(mi_seed);
   m0 = random(), m1 = random(), m2 = random(), m3 = random(), m4 = random();
-   // bug */
-   seedRandomness();
+  seedRandomness();
+  print(m0, m1, m2, m3, m4)
+  print(randomM0(), randomM1(), randomM2(), randomM3(), randomM4()) */
+ 
+  //seedRandomness();
   prepara_sketch();
 }
 
 function prepara_sketch() {
-  console.log("//// Fugax - Yamil Burguener 2025")
-
+  console.log("::::: Fugax - Yamil Burguener 2025")
+print(m0,m1,m2,m3,m4)
   hojas = 0, ser_cont = 0, memo_cont = 0;
   seres = [], notas = [];
   clear();
@@ -74,9 +80,9 @@ function prepara_sketch() {
   console.log("[3] Vertical movements of the lines of the staves (0.5 - 10): " + valorY_rango);
 
   // tipos de barra
-  let _r = m3, _bt = "";
+  let _r = m3//, _bt = "";
   if (_r < 0.3) {
-    _bt = "together"
+    barra_tipo = "together"
     let _b = 0;
     for (let i = 0; i < barra_dur.length; i++) {
       _b += barra_dur[i];
@@ -86,12 +92,12 @@ function prepara_sketch() {
     _b = _b / barra_dur.length;
     barra_notas = [_b];
   } else if (_r < 0.8) {
-    _bt = "slightly separated"
+    barra_tipo = "slightly separated"
     barra_notas = barra_dur;
     let _l = [10, 100, 100]
     memo_lim = _l[int(randomM0() * _l.length)];
   } else {
-    _bt = "very loose"
+    barra_tipo = "very loose"
     let _l = barra_dur.length
     for (let j = 0; j < 100; j++) {
       for (let i = 0; i < _l; i++) {
@@ -100,11 +106,11 @@ function prepara_sketch() {
     }
     memo_lim = 100;
   }
-  console.log("[4] Musical scrollbar advance: " + _bt) // slider 4
+  console.log("[4] Musical scrollbar advance: " + barra_tipo) // slider 4
   print(memo_lim) // bug
 
   col_pent[0] = m4 * 360, _cp = "";
-  if (col_pent[0] > 320) { col_pent[0] = map(col_pent[0], 320, 360, 0, 360), col_pent[1] = 0, col_pent[2] = 0.8; _cp = "º & black color" }
+  if (col_pent[0] > 320) { col_pent[0] = map(col_pent[0], 320, 360, 0, 360), col_pent[1] = 0, col_pent[2] = 0.5; _cp = "º & black color" }
   else if (col_pent[0] < 5) { col_pent[0] = randomM0() * 360, col_pent[1] = 0, col_pent[2] = 0; _cp = "º & no color" }
   else { col_pent[1] = 90, col_pent[2] = 0.08; _cp = "º" }
   console.log("[5] Score fill color: " + int(col_pent[0]) + _cp); // slider 5 
@@ -141,10 +147,12 @@ function prepara_sketch() {
   let _s = 0;
   for (let _y = 0; _y < 100; _y++) {
     memo_cont = 0//_s; bug // reset
-    seres.push(new Ser(_s, 50, 164 + _y * 8)); // aca! antes 180
+    seres.push(new Ser(_s, 100, 164 + _y * 8)); // aca! antes, 50 180
     if (_y % 5 == 4) _y += 5
     _s += 1;
   }
+
+  elije_solo();
 
   for (let i = 0; i < 10; i++) {
     cg_clave[i] = createGraphics(100, 100);
@@ -155,18 +163,19 @@ function prepara_sketch() {
     claves(i);
   }
 
-  let _h = [0, 1, 1, 1, 2];
+  let _h = [0, 1, 1, 2, 4];
   graba_ho = _h[int(randomM4() * _h.length)];
-  let _b = [26, 35, 35, 35, 43];
+  graba_ho = 0;//bug
+  let _b = [24, 35, 35, 35, 43];
   graba_ba = _b[int(randomM4() * _b.length)];
-  print(graba_ho, graba_ba) //bug
 
-  loop(), b_pausa = false;
+  loop(), b_pausa = false, frameCount = 0;
 }
 
 function draw() {
 
   if (resetAnimation) {
+    print("resetAnimation") // bug
     prepara_sketch();
     resetAnimation = false;
   }
@@ -174,30 +183,44 @@ function draw() {
   rect(0, 0, width, height);
 
   for (let i = 0; i < seres.length; i++) {
-    stroke(0, 0.1);
-    strokeWeight(1);
-    noFill();
-    seres[i].dibuja();
-    seres[i].dibuja_barra();
+
+
+    if (i >= solo_ini && i <= solo_fin) {
+      stroke(0, 0.09);
+      strokeWeight(2);
+      noFill();
+      seres[i].dibuja();
+
+    }
+    seres[i].calcula_barra();
   }
 
-  if (frameCount % 2 == 0) {
+  /* if (frameCount % 2 == 0) {
     let _i;
     if (notas_gesto == "desc") _i = int(frameCount * 0.5) % 50;
     else if (notas_gesto == "asc") _i = 49 - int(frameCount * 0.5) % 50;
     else _i = int(memo_random() * 50)
+    _i = int(map(_i, 0, 49, solo_ini, solo_fin));
     let _n = seres[_i].nota()
     if (_n[0]) notas.push(new Nota(_n[1], _n[2], _n[3]))
   }
   for (let i = 0; i < notas.length; i++) {
     notas[i].dibuja();
     if (notas[i].final()) { notas.splice(i, 1); }
-  }
+  } */
 
   if (!b_trigger && (int(hojas) == graba_ho && seres[0].barraUbic() > graba_ba || int(hojas) > graba_ho)) {
     b_trigger = true;
     triggerPreview();
-    // grabaImagen(); bug
+    grabaImagen(); //bug
+  }
+}
+
+function elije_solo() {
+  if (barra_tipo == "together") {
+    b_solo = true;
+    solo = 4 + int(randomM3() * 8);
+    print("solo " + solo) // bug
   }
 }
 
@@ -320,7 +343,6 @@ class Ser {
     for (let i = 0; i < _b.length; i++) {
       this.barra_av[i] = (_b[(i + _index) % _b.length] * 0.5) /// bug el 0.1
     }
-
     this.unisono;
     this.actualizar();
   }
@@ -328,14 +350,13 @@ class Ser {
   dibuja() {
 
     beginShape();
-    const _tb = map(this.barra, 0, 50, 25, 15);
+    const _tb = map(this.barra, 0, 50, 35, 15);
     let _limI = int(constrain(this.barra - _tb, 0, 50));
-    let _limF = constrain(this.barra + 10, 0, 50);
+    let _limF = constrain(this.barra + 5, 0, 50);
 
     for (let i = _limI; i < _limF; i++) {
       if (this.index % 5 == 0) {
         if (abs(this.co[_limI].y - this.co[i].y) < 170) fill(col_pent[0], 90, col_pent[1], col_pent[2]) // 60, 0.08
-
         else noFill();
       }
       else if (this.index % 6 == 1) {
@@ -356,11 +377,9 @@ class Ser {
       else image(cg_clave[int((this.index - 4) / 5)], this.co[1].x + 20, this.co[0].y - 25)
     }
     endShape();
-  }
 
-  dibuja_barra() {
+    //// barra --------
 
-    let _av = this.barra_av[frameCount % this.barra_av.length]
     if (this.index % 2 == 0) fill((col_pent[0] + 170) % 360, 100, 90, 0.2); else fill(0, 0.15);
     //const _ba = constrain(int(this.barra), 0, 50)
     if (this.barra < 49) {
@@ -368,18 +387,40 @@ class Ser {
       rect(_ve.x - 3, _ve.y - 3, 6, 6);
     }
 
-    this.barra += _av //0.25// * (2 + cos(barra_cont++ * 0.001));
+
+  }
+
+  calcula_barra() {
+    let _av = this.barra_av[frameCount % this.barra_av.length]
+    this.barra += _av;
     if (this.barra > 59) {
       memo_cont = 0;
-      if (hojas > 17) hojas = 0;
+      if (hojas > 17) { 
+        hojas = 0;
+        elije_solo();
+      }
 
       seres[this.index].actualizar();
       hojas += 0.02 // es lo mismo que 1 / 50
-
+      ////print("if " + int(hojas), hojas_memo + 1)
       if (int(hojas) == hojas_memo + 1) {
         // cambio de hoja ---------------------------------------
         unis_destinoY = 164 + (int(randomM0() * 90) * 8);
+
+        ////print(int(hojas), solo) // bug
+        if (int(hojas) == solo && barra_tipo == "together") {
+          let _si = [10, 15, 20, 25, 30];
+          solo_ini = _si[int(randomM3() * _si.length)];
+          ////print("solo_ini " + solo_ini)
+          solo_fin = solo_ini + 9;
+          b_solo = true;
+        } else {
+          b_solo = false;
+          ////print("tutti") // bug
+          solo_ini = 0; solo_fin = 49;
+        }
       }
+
 
       hojas_memo = int(hojas)
 
@@ -429,7 +470,7 @@ class Ser {
           }
 
           //let _m = map(i, 0, 49, 0, 1)// 0, 1)//
-          let _m = abs(sin(i * 0.03))//let _m = abs(sin(i * 0.0075))// % 1.58)//
+          let _m = abs(sin(i * 0.033))//let _m = abs(sin(i * 0.03))
           if (unis_sent[hojas_memo % 2] == "ini") _m = map(_m, 0, 1, 1, 0)// solo para unisono comienzo
 
 
@@ -440,7 +481,7 @@ class Ser {
           this.co[i].y = y_memo;
         }
       }
-      this.co[i].x = constrain(this.co[i].x, 50, width - 50);
+      this.co[i].x = constrain(this.co[i].x, 100, width - 100); //50, width - 50);
       x_memo = this.co[i].x // new
       if (!this.unisono) y_memo = this.co[i].y // new
 
@@ -448,7 +489,7 @@ class Ser {
       if (this.co[i].y > height - 80) this.co[i].y -= height - 240;
       else if (this.co[i].y < 80) this.co[i].y += height - 240;
     }
-    this.co[49].x = width - 50;
+    this.co[49].x = width - 100; // -50
   }
 
   barraUbic() {
@@ -482,18 +523,24 @@ class Nota {
     this.index = _i;
     let _v = map(_x, 0, width, 130, 70); // 190, 50 bug
     this.vida = _v;
-    this.largo = int(10 + int(randomM0() * notas_largo) * 10);
+    if (_x > width - 200) this.largo = 10;
+    else this.largo = int(10 + int(randomM0() * notas_largo) * 10);
+
     let _al = [-1, -1, -1, -1, -1, 0, 1];
     this.alte = _al[int(randomM0() * _al.length)]
     this.graf = [];
     if (randomM0() < 0.3) this.grafico();
+    if (curve_T > 0.5 && curve_T < 1.5) this.tipo = "rect";
+    else if (curve_T > 2.5) this.tipo = "circle";
+    else if (randomM0() < 0.5) this.tipo = "rect"; else this.tipo = "circle";
   }
 
   dibuja() {
 
     this.vida--;
-    fill(0, 0.5);
-    circle(this.x, this.y, 5);
+    fill(0, 0.2);
+    if (this.tipo == "rect") rect(this.x - 3, this.y - 3, 6, 6);
+    else circle(this.x, this.y, 6);
     noFill(), stroke(0, 0.2), strokeWeight(2); //2
     beginShape();
     if (this.index < 25) {
