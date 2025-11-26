@@ -6,7 +6,7 @@ const X_opciones = [[18, 10, 5, 0, 0, -10], [15, 8, 5, 0, 0, 0, 0, -5],
 [13, 10, 5, 0, 0, 0, -5], [10, 5, 5, 5, 3, 0, -5]];
 let X_grilla = [];
 let memo_cont = 0, memoR = [], memo_lim;
-let ser_cont;
+let ser_cont, ser_dist, ser_lim;
 let barra_av = []
 const barra_dur = [3, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
   0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25,
@@ -14,7 +14,7 @@ const barra_dur = [3, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 let barra_notas = [], barra_tipo = "";
 let cg_clave = []
-let hojas, hojas_memo;
+let hojas = 0, hojas_memo;
 let col_back;
 let unis = [], unis_destinoY;
 const unis_sent = ["ini", "fin"];
@@ -41,21 +41,30 @@ function setup() {
   colorMode(HSB);
   imageMode(CENTER);
 
-/*    let mi_seed = 9749902258//Math.floor(9999999999 * random()); // bug 1419041633
+  //For testing purposes, if I activate this part of the code, the outputs work consistently.
+  /* let mi_seed = Math.floor(9999999999 * random()); //9749902258
   print("seed: " + mi_seed);
   randomSeed(mi_seed);
   m0 = random(), m1 = random(), m2 = random(), m3 = random(), m4 = random();
-  seedRandomness();
-  print(m0, m1, m2, m3, m4)
-  print(randomM0(), randomM1(), randomM2(), randomM3(), randomM4()) */
- 
-  //seedRandomness();
+  seedRandomness(); */
+
+  /* let mi_seed = m0*9999999;
+  randomSeed(mi_seed);
+  print("seed: " + mi_seed); */
+
+  for (let i = 0; i < 10; i++) {
+    cg_clave[i] = createGraphics(100, 100);
+    cg_clave[i].colorMode(HSB);
+    cg_clave[i].stroke(0);
+    cg_clave[i].noFill();
+  }
+
   prepara_sketch();
 }
 
 function prepara_sketch() {
   console.log("::::: Fugax - Yamil Burguener 2025")
-print(m0,m1,m2,m3,m4)
+  print(m0, m1, m2, m3, m4) // bug
   hojas = 0, ser_cont = 0, memo_cont = 0;
   seres = [], notas = [];
   clear();
@@ -80,9 +89,9 @@ print(m0,m1,m2,m3,m4)
   console.log("[3] Vertical movements of the lines of the staves (0.5 - 10): " + valorY_rango);
 
   // tipos de barra
-  let _r = m3//, _bt = "";
-  if (_r < 0.3) {
-    barra_tipo = "together"
+  let _r = randomM0();// m3
+  if (_r < 0.35) {
+    barra_tipo = "together";
     let _b = 0;
     for (let i = 0; i < barra_dur.length; i++) {
       _b += barra_dur[i];
@@ -92,12 +101,12 @@ print(m0,m1,m2,m3,m4)
     _b = _b / barra_dur.length;
     barra_notas = [_b];
   } else if (_r < 0.8) {
-    barra_tipo = "slightly separated"
+    barra_tipo = "slightly separated";
     barra_notas = barra_dur;
     let _l = [10, 100, 100]
     memo_lim = _l[int(randomM0() * _l.length)];
   } else {
-    barra_tipo = "very loose"
+    barra_tipo = "very loose";
     let _l = barra_dur.length
     for (let j = 0; j < 100; j++) {
       for (let i = 0; i < _l; i++) {
@@ -106,8 +115,11 @@ print(m0,m1,m2,m3,m4)
     }
     memo_lim = 100;
   }
-  console.log("[4] Musical scrollbar advance: " + barra_tipo) // slider 4
-  print(memo_lim) // bug
+  //console.log("[4] Musical scrollbar advance: " + barra_tipo)
+
+  ser_dist = int(constrain(map(m3, 0, 0.5, 1, 8), 1, 8));
+  ser_lim = map(ser_dist, 1, 8, 240, 80);
+  console.log("[4] Distance between lines (1 - 8) " + ser_dist); // slider 4
 
   col_pent[0] = m4 * 360, _cp = "";
   if (col_pent[0] > 320) { col_pent[0] = map(col_pent[0], 320, 360, 0, 360), col_pent[1] = 0, col_pent[2] = 0.5; _cp = "º & black color" }
@@ -144,32 +156,32 @@ print(m0,m1,m2,m3,m4)
   unis_destinoY = height / 2;
   if (randomM0() < 0.9) for (let i = 0; i < 50; i++) { unis[i][3] = true; unis[i][12] = true; } // unisono total
 
-  let _s = 0;
-  for (let _y = 0; _y < 100; _y++) {
-    memo_cont = 0//_s; bug // reset
-    seres.push(new Ser(_s, 100, 164 + _y * 8)); // aca! antes, 50 180
-    if (_y % 5 == 4) _y += 5
+  let _s = 0, _yy = 0;
+  ////let _desde = 164, _dist = 1;
+  let _desde = map(ser_dist, 8, 1, 164, height / 2 - 25);
+
+  for (let _y = 0; _y < 50; _y++) { //100
+    memo_cont = 0;
+    seres.push(new Ser(_s, 100, _desde + _yy * ser_dist)); //_s, 100, 164 + _y * 8
+    _yy++;
+    if (_y % 5 == 4) _yy += 5
     _s += 1;
   }
 
   elije_solo();
 
   for (let i = 0; i < 10; i++) {
-    cg_clave[i] = createGraphics(100, 100);
-    cg_clave[i].colorMode(HSB)
     cg_clave[i].curveTightness(curve_T)
-    cg_clave[i].stroke(0);
-    cg_clave[i].noFill()
     claves(i);
   }
 
   let _h = [0, 1, 1, 2, 4];
   graba_ho = _h[int(randomM4() * _h.length)];
-  graba_ho = 0;//bug
   let _b = [24, 35, 35, 35, 43];
   graba_ba = _b[int(randomM4() * _b.length)];
 
   loop(), b_pausa = false, frameCount = 0;
+  b_trigger = false // bug
 }
 
 function draw() {
@@ -179,12 +191,10 @@ function draw() {
     prepara_sketch();
     resetAnimation = false;
   }
-  fill(col_back, 0.2); noStroke();
+  const _a = 0.12 + ((sin(frameCount * 0.009) + 1) * 0.05); // 0.12 a 0.22
+  fill(col_back, _a); noStroke(); // 0.2
   rect(0, 0, width, height);
-
   for (let i = 0; i < seres.length; i++) {
-
-
     if (i >= solo_ini && i <= solo_fin) {
       stroke(0, 0.09);
       strokeWeight(2);
@@ -195,7 +205,7 @@ function draw() {
     seres[i].calcula_barra();
   }
 
-  /* if (frameCount % 2 == 0) {
+  if (frameCount % 2 == 0) {
     let _i;
     if (notas_gesto == "desc") _i = int(frameCount * 0.5) % 50;
     else if (notas_gesto == "asc") _i = 49 - int(frameCount * 0.5) % 50;
@@ -207,20 +217,20 @@ function draw() {
   for (let i = 0; i < notas.length; i++) {
     notas[i].dibuja();
     if (notas[i].final()) { notas.splice(i, 1); }
-  } */
+  }
 
   if (!b_trigger && (int(hojas) == graba_ho && seres[0].barraUbic() > graba_ba || int(hojas) > graba_ho)) {
     b_trigger = true;
     triggerPreview();
-    grabaImagen(); //bug
+    grabaImagen(); //Activate to verify the consistency of the outputs (bug)
   }
 }
 
 function elije_solo() {
   if (barra_tipo == "together") {
     b_solo = true;
-    solo = 4 + int(randomM3() * 8);
-    print("solo " + solo) // bug
+    solo = 5 + int(randomM3() * 7);
+    // print("solo " + solo) // bug
   }
 }
 
@@ -379,53 +389,45 @@ class Ser {
     endShape();
 
     //// barra --------
-
     if (this.index % 2 == 0) fill((col_pent[0] + 170) % 360, 100, 90, 0.2); else fill(0, 0.15);
     //const _ba = constrain(int(this.barra), 0, 50)
     if (this.barra < 49) {
       const _ve = p5.Vector.lerp(this.co[int(this.barra)], this.co[int(this.barra) + 1], this.barra % 1);
       rect(_ve.x - 3, _ve.y - 3, 6, 6);
     }
-
-
   }
 
   calcula_barra() {
+
     let _av = this.barra_av[frameCount % this.barra_av.length]
     this.barra += _av;
     if (this.barra > 59) {
       memo_cont = 0;
-      if (hojas > 17) { 
+      if (hojas > 17) {
         hojas = 0;
         elije_solo();
       }
-
       seres[this.index].actualizar();
-      hojas += 0.02 // es lo mismo que 1 / 50
-      ////print("if " + int(hojas), hojas_memo + 1)
+      hojas += 0.02;
+      hojas = round(hojas, 2);
+      //print("if " + hojas, hojas_memo + 1) // bug
       if (int(hojas) == hojas_memo + 1) {
         // cambio de hoja ---------------------------------------
         unis_destinoY = 164 + (int(randomM0() * 90) * 8);
 
-        ////print(int(hojas), solo) // bug
+        // print(int(hojas), solo) // bug
         if (int(hojas) == solo && barra_tipo == "together") {
           let _si = [10, 15, 20, 25, 30];
           solo_ini = _si[int(randomM3() * _si.length)];
-          ////print("solo_ini " + solo_ini)
           solo_fin = solo_ini + 9;
           b_solo = true;
         } else {
           b_solo = false;
-          ////print("tutti") // bug
           solo_ini = 0; solo_fin = 49;
         }
       }
-
-
       hojas_memo = int(hojas)
-
       if (this.index % 5 == 0) claves(int(this.index / 5));
-
       this.barra -= 43 + 10
     }
   }
@@ -481,15 +483,16 @@ class Ser {
           this.co[i].y = y_memo;
         }
       }
-      this.co[i].x = constrain(this.co[i].x, 100, width - 100); //50, width - 50);
+      this.co[i].x = constrain(this.co[i].x, 100, width - 100);
       x_memo = this.co[i].x // new
       if (!this.unisono) y_memo = this.co[i].y // new
 
       // limites
-      if (this.co[i].y > height - 80) this.co[i].y -= height - 240;
-      else if (this.co[i].y < 80) this.co[i].y += height - 240;
+
+      if (this.co[i].y > height - ser_lim) { this.co[i].y -= ser_lim * 3; } //240  ser_dist * _lim / 2
+      else if (this.co[i].y < ser_lim) { this.co[i].y += height - ser_lim * 3; } //240
     }
-    this.co[49].x = width - 100; // -50
+    this.co[49].x = width - 100;
   }
 
   barraUbic() {
