@@ -31,7 +31,7 @@ function setup() {
   cv.id("fu");
   cv.class("fu");
   pixelDensity(1);
-  frameRate(30);
+  //frameRate(30);
   colorMode(HSB);
   imageMode(CENTER);
   for (let i = 0; i < 10; i++) {
