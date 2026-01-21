@@ -206,16 +206,6 @@ function setup() {
   for (let i = 0; i < 17; i++) { marco[i + 17 * 2] = createVector(_plX, _plY); _plX -= 10; }
   for (let i = 0; i < 17; i++) { marco[i + 17 * 3] = createVector(_plX, _plY); _plY -= 10; }
 
-  let mi_seed = Math.floor(9999999999 * random());
-  // 6738271180 , 8815953958!! 6483520730,  new
-  // 249764199, 7930900029! 2878231690 new2
-  print("seed: " + mi_seed);
-  randomSeed(mi_seed);
-  m0 = random(), m1 = random(), m2 = random(), m3 = random(), m4 = random();
-  //  m0 = 0.5; m1 = 0.5, m2 = 0.5, m3 = 0.5, m4 = 0.5; // poner delay tipo 5
-  //m0 = 0.666666666//, 
-  //m2 = 0.8683887438382953// color lindo bug
-
   seedRandomness();
   prepara_sketch();
 }
