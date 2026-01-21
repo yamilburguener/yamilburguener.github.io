@@ -37,12 +37,10 @@ let vol_final = [], b_sound = false;
 const altura_var = [0.08, 0.16, 0.24, 0.3, 0.4]; //[0.05, 0.1, 0.15, 0.2]
 let altura_modo;
 let notas = [], notas_memo = [], notas_cont = 0, modulN = 0; // modul = 0, 
-let tiempo_ms;
-let tiempo_modo, tiempo_delay = 0;
+let tiempo_ms, tiempo_modo, tiempo_delay = 0;
 let soundR = [], sound_cont = 0
 let delayTimeLFO;
 
-//let tex;
 let myShader;
 let sh;
 const vert = `
@@ -108,7 +106,6 @@ function preload() {
   // poly synth & pluck synth
   sinte_pan[0] = new Tone.Panner(0); sinte_pan[1] = new Tone.Panner(0)
   reverb = new Tone.Reverb({ decay: 1.9, wet: 0.95 })
-  //const pingPong = new Tone.PingPongDelay(15, 0.25).toDestination();
   delay = new Tone.FeedbackDelay({ wet: 0 })//.toDestination();
 
   sinte[0] = new Tone.PolySynth()
@@ -215,7 +212,7 @@ function setup() {
   print("seed: " + mi_seed);
   randomSeed(mi_seed);
   m0 = random(), m1 = random(), m2 = random(), m3 = random(), m4 = random();
-    m0 = 0.5; m1 = 0.5, m2 = 0.5, m3 = 0.5, m4 = 0.5; // poner delay tipo 5
+  //  m0 = 0.5; m1 = 0.5, m2 = 0.5, m3 = 0.5, m4 = 0.5; // poner delay tipo 5
   //m0 = 0.666666666//, 
   //m2 = 0.8683887438382953// color lindo bug
 
