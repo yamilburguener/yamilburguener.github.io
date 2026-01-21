@@ -383,6 +383,7 @@ function prepara_sketch() {
   sinte_par = 0, subdiv = 0;
   cam.setPosition(0, 0, 300);
   clearInterval(interval_sin); interval_sin = null;
+  if (seccion == "jugando")Rep_sinte(tiempo_ms);
 }
 
 
