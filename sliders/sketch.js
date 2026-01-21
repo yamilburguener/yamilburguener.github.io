@@ -382,6 +382,7 @@ function prepara_sketch() {
   cont_mute = [false, false, false, false, false], bReset = false, cam_rotZ = 0;
   sinte_par = 0, subdiv = 0;
   cam.setPosition(0, 0, 300);
+  clearInterval(interval_sin); interval_sin = null;
 }
 
 
