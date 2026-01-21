@@ -381,6 +381,7 @@ function prepara_sketch() {
   intervalN = 0, notas_cont = 0, cont_cant = 0, cont_cE_n = 14, bCont_ini = true;
   cont_mute = [false, false, false, false, false], bReset = false, cam_rotZ = 0;
   sinte_par = 0, subdiv = 0;
+  cam.setPosition(0, 0, 300);
 }
 
 
