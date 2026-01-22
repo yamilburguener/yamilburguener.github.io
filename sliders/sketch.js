@@ -219,6 +219,7 @@ function prepara_sketch() {
   // sound setting -----------------------------------
   console.log("::: sound/visual setting")
   // slider1 , si aumenta tiempo, bajar del sinte release y duracion
+  cont_ini_memo = [45, 65, 85, 100, 115];
   if (mi_m[0] < 0.5) {
     tiempo_ms = int(map(mi_m[0], 0, 0.5, 5, 15)); //5, 15
     const _de = map(mi_m[0], 0, 0.5, 0.01, 1.9);
