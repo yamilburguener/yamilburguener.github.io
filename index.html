@@ -1,31 +1,33 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
   <meta charset="UTF-8">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="./favicon.png">
+
   <title>yamil burguener</title>
+
   <style>
     body {
       margin: 0;
-      font-family: 'Arial', sans-serif;
+      font-family: Arial, sans-serif;
       background: #f0f0f0;
       color: #333;
     }
 
-    /* Banner */
+    /* ===== Banner ===== */
     header {
       background-color: #111;
       color: white;
       display: flex;
-      flex-wrap: wrap;
       align-items: center;
       justify-content: space-between;
       padding: 30px 20px;
-      position: relative;
       gap: 20px;
+      flex-wrap: wrap;
     }
 
-    /* Imagen + título */
     .title-section {
       display: flex;
       align-items: center;
@@ -41,50 +43,41 @@
       object-fit: cover;
     }
 
-    .title-text {
-      display: flex;
-      flex-direction: column;
-    }
-
     .title-text h1 {
-      font-size: 2.5em;
       margin: 0;
+      font-size: 2.5em;
       letter-spacing: 2px;
     }
 
     .title-text .subtitle {
+      margin-top: 6px;
       font-size: 1.1em;
-      margin-top: 5px;
       opacity: 0.85;
+      transition: opacity 0.5s ease;
     }
 
-    /* Botones redes */
+    /* ===== Social buttons ===== */
     .social-buttons {
       display: flex;
       gap: 12px;
       flex-wrap: nowrap;
-      /* que no se rompa la fila */
       align-items: center;
-      /* centrado vertical */
-      justify-content: flex-start;
-      /* alinear al inicio del contenedor o a la derecha del header */
     }
 
     .social-buttons a {
+      width: 40px;
+      height: 40px;
+      background: #fff;
+      border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: #fff;
-      /* fondo blanco */
       transition: transform 0.2s, box-shadow 0.3s;
     }
 
     .social-buttons a:hover {
       transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
     }
 
     .social-buttons img {
@@ -93,21 +86,19 @@
       object-fit: contain;
     }
 
-    /* Grilla de posts */
+    /* ===== Posts grid ===== */
     #postsGrid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
       gap: 20px;
       padding: 40px 20px;
-      justify-items: center;
     }
 
     .item {
-      width: 100%;
       background: white;
       border-radius: 12px;
       overflow: hidden;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
       display: flex;
       flex-direction: column;
       transition: transform 0.3s, box-shadow 0.3s;
@@ -115,7 +106,7 @@
 
     .item:hover {
       transform: translateY(-5px);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.25);
     }
 
     .item img {
@@ -123,7 +114,6 @@
       height: 200px;
       object-fit: cover;
       cursor: pointer;
-      display: block;
       transition: transform 0.3s;
     }
 
@@ -133,10 +123,9 @@
 
     .item-title {
       padding: 12px;
-      font-size: 1.1em;
-      font-weight: bold;
       text-align: center;
-      flex-grow: 1;
+      font-size: 1.05em;
+      font-weight: bold;
     }
 
     .item-title a {
@@ -149,134 +138,150 @@
       color: #0077cc;
     }
 
-    /* Loader */
     #loader {
       text-align: center;
-      font-size: 1.2em;
-      color: #555;
       padding: 20px;
+      font-size: 1.1em;
+      color: #555;
     }
 
-    /* Responsive */
+    /* ===== Responsive ===== */
     @media (max-width: 800px) {
       header {
         flex-direction: column;
         text-align: center;
       }
-
       .title-section {
         justify-content: center;
       }
-
       .social-buttons {
         justify-content: center;
       }
     }
   </style>
 </head>
-
 <body>
 
-  <header>
-    <div class="title-section">
-      <img src="https://yamilburguener.com.ar/img/yamiburgenet-perfil.jpg" alt="yamil burguener">
-      <div class="title-text">
-        <h1>yamil burguener</h1>
-        <div class="subtitle">Creative coder, digital artist & composer 🎶</div>
+<header>
+  <div class="title-section">
+    <img src="https://yamilburguener.com.ar/img/yamiburgenet-perfil.jpg" alt="yamil burguener">
+    <div class="title-text">
+      <h1>yamil burguener</h1>
+      <div class="subtitle" id="subtitle">
+        Creative coder, digital artist, composer 🎶 & teacher
       </div>
     </div>
-    <div class="social-buttons">
-      <a href="https://x.com/yamiburgenet" target="_blank" aria-label="X">
-        <img src="https://yamilburguener.com.ar/img/twitter_x.svg" alt="X">
-      </a>
-      <a href="https://www.instagram.com/yamil.burguener/" target="_blank" aria-label="Instagram">
-        <img src="https://yamilburguener.com.ar/img/instagram.svg" alt="Instagram">
-      </a>
-      <a href="https://bsky.app/profile/yamiburgenet.bsky.social" target="_blank" aria-label="Bluesky">
-        <img src="https://yamilburguener.com.ar/img/bluesky.svg" alt="Bluesky">
-      </a>
-    </div>
-  </header>
+  </div>
 
-  <div id="postsGrid"></div>
-  <div id="loader">Cargando entradas...</div>
+  <div class="social-buttons">
+    <a href="https://x.com/yamiburgenet" target="_blank" aria-label="X">
+      <img src="https://yamilburguener.com.ar/img/twitter_x.svg" alt="X">
+    </a>
+    <a href="https://www.instagram.com/yamil.burguener/" target="_blank" aria-label="Instagram">
+      <img src="https://yamilburguener.com.ar/img/instagram.svg" alt="Instagram">
+    </a>
+    <a href="https://bsky.app/profile/yamiburgenet.bsky.social" target="_blank" aria-label="Bluesky">
+      <img src="https://yamilburguener.com.ar/img/bluesky.svg" alt="Bluesky">
+    </a>
+  </div>
+</header>
 
-  <script>
-    const container = document.getElementById("postsGrid");
-    const loader = document.getElementById("loader");
+<div id="postsGrid"></div>
+<div id="loader">Cargando entradas...</div>
 
-    const feedBase = "https://yamilburguener.blogspot.com/feeds/posts/default?alt=json-in-script&callback=mostrarPosts&max-results=500";
-    let startIndex = 1;
-    let totalPosts = Infinity;
-    let loading = false;
+<script>
+  /* ===== Subtitle language switch ===== */
+  const subtitles = [
+    "Creative coder, digital artist, composer 🎶 & teacher",
+    "Programador, multimedia, compositor 🎶 y profesor"
+  ];
 
-    const observer = new IntersectionObserver((entries, obs) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const img = entry.target;
-          img.src = img.dataset.src;
-          obs.unobserve(img);
-        }
-      });
-    }, { rootMargin: "100px" });
+  let subtitleIndex = 0;
+  const subtitleEl = document.getElementById("subtitle");
 
-    function mostrarPosts(data) {
-      const posts = data.feed.entry || [];
-      totalPosts = parseInt(data.feed.openSearch$totalResults.$t);
+  setInterval(() => {
+    subtitleIndex = (subtitleIndex + 1) % subtitles.length;
+    subtitleEl.style.opacity = 0;
+    setTimeout(() => {
+      subtitleEl.textContent = subtitles[subtitleIndex];
+      subtitleEl.style.opacity = 1;
+    }, 500);
+  }, 20000);
 
-      posts.forEach(post => {
-        const title = post.title.$t;
-        const link = post.link.find(l => l.rel === "alternate").href;
-        const content = post.content.$t;
+  /* ===== Blog feed loader ===== */
+  const container = document.getElementById("postsGrid");
+  const loader = document.getElementById("loader");
 
-        const imgMatch = content.match(/<img[^>]+src="([^">]+)"/i);
-        const imgUrl = imgMatch ? imgMatch[1] : "";
+  const feedBase =
+    "https://yamilburguener.blogspot.com/feeds/posts/default" +
+    "?alt=json-in-script&callback=mostrarPosts&max-results=500";
 
-        const item = document.createElement("div");
-        item.className = "item";
+  let startIndex = 1;
+  let totalPosts = Infinity;
+  let loading = false;
 
-        if (imgUrl) {
-          const img = document.createElement("img");
-          img.dataset.src = imgUrl;
-          img.alt = title;
-          img.onclick = () => window.open(link, "_blank");
-          item.appendChild(img);
-          observer.observe(img);
-        }
-
-        const titleEl = document.createElement("div");
-        titleEl.className = "item-title";
-        titleEl.innerHTML = `<a href="${link}" target="_blank">${title}</a>`;
-        item.appendChild(titleEl);
-
-        container.appendChild(item);
-      });
-
-      if (startIndex + 500 >= totalPosts) {
-        loader.style.display = "none";
-      }
-
-      loading = false;
-    }
-
-    function cargarFeed() {
-      if (loading || startIndex > totalPosts) return;
-      loading = true;
-      const script = document.createElement("script");
-      script.src = feedBase + "&start-index=" + startIndex;
-      document.body.appendChild(script);
-      startIndex += 500;
-    }
-
-    window.addEventListener("scroll", () => {
-      if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 100) {
-        cargarFeed();
+  const observer = new IntersectionObserver((entries, obs) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const img = entry.target;
+        img.src = img.dataset.src;
+        obs.unobserve(img);
       }
     });
+  }, { rootMargin: "100px" });
 
-    cargarFeed();
-  </script>
+  function mostrarPosts(data) {
+    const posts = data.feed.entry || [];
+    totalPosts = parseInt(data.feed.openSearch$totalResults.$t);
+
+    posts.forEach(post => {
+      const title = post.title.$t;
+      const link = post.link.find(l => l.rel === "alternate").href;
+      const content = post.content.$t;
+      const imgMatch = content.match(/<img[^>]+src="([^">]+)"/i);
+      const imgUrl = imgMatch ? imgMatch[1] : null;
+
+      const item = document.createElement("div");
+      item.className = "item";
+
+      if (imgUrl) {
+        const img = document.createElement("img");
+        img.dataset.src = imgUrl;
+        img.alt = title;
+        img.onclick = () => window.open(link, "_blank");
+        item.appendChild(img);
+        observer.observe(img);
+      }
+
+      const titleDiv = document.createElement("div");
+      titleDiv.className = "item-title";
+      titleDiv.innerHTML = `<a href="${link}" target="_blank">${title}</a>`;
+      item.appendChild(titleDiv);
+
+      container.appendChild(item);
+    });
+
+    loading = false;
+    if (startIndex + 500 >= totalPosts) loader.style.display = "none";
+  }
+
+  function cargarFeed() {
+    if (loading || startIndex > totalPosts) return;
+    loading = true;
+    const script = document.createElement("script");
+    script.src = feedBase + "&start-index=" + startIndex;
+    document.body.appendChild(script);
+    startIndex += 500;
+  }
+
+  window.addEventListener("scroll", () => {
+    if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100) {
+      cargarFeed();
+    }
+  });
+
+  cargarFeed();
+</script>
 
 </body>
-
 </html>
