@@ -1,287 +1,295 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-  <meta charset="UTF-8">
+    <meta charset="UTF-8">
 
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="./favicon.png">
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="./favicon.png">
 
-  <title>yamil burguener</title>
+    <title>yamil burguener</title>
 
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f0f0f0;
-      color: #333;
-    }
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f0f0f0;
+            color: #333;
+        }
 
-    /* ===== Banner ===== */
-    header {
-      background-color: #111;
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 30px 20px;
-      gap: 20px;
-      flex-wrap: wrap;
-    }
+        /* ===== Banner ===== */
+        header {
+            background-color: #111;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 30px 20px;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
 
-    .title-section {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      flex: 1 1 300px;
-    }
+        .title-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex: 1 1 300px;
+        }
 
-    .title-section img {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      border: 3px solid #fff;
-      object-fit: cover;
-    }
+        .title-section img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 3px solid #fff;
+            object-fit: cover;
+        }
 
-    .title-text h1 {
-      margin: 0;
-      font-size: 2.5em;
-      letter-spacing: 2px;
-    }
+        .title-text h1 {
+            margin: 0;
+            font-size: 2.5em;
+            letter-spacing: 2px;
+        }
 
-    .title-text .subtitle {
-      margin-top: 6px;
-      font-size: 1.1em;
-      opacity: 0.85;
-      transition: opacity 0.5s ease;
-    }
+        .title-text .subtitle {
+            margin-top: 6px;
+            font-size: 1.1em;
+            opacity: 0.85;
+            transition: opacity 0.5s ease;
+        }
 
-    /* ===== Social buttons ===== */
-    .social-buttons {
-      display: flex;
-      gap: 12px;
-      flex-wrap: nowrap;
-      align-items: center;
-    }
+        /* ===== Social buttons ===== */
+        .social-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: nowrap;
+            align-items: center;
+        }
 
-    .social-buttons a {
-      width: 40px;
-      height: 40px;
-      background: #fff;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: transform 0.2s, box-shadow 0.3s;
-    }
+        .social-buttons a {
+            width: 40px;
+            height: 40px;
+            background: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s, box-shadow 0.3s;
+        }
 
-    .social-buttons a:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-    }
+        .social-buttons a:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        }
 
-    .social-buttons img {
-      width: 24px;
-      height: 24px;
-      object-fit: contain;
-    }
+        .social-buttons img {
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+        }
 
-    /* ===== Posts grid ===== */
-    #postsGrid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 20px;
-      padding: 40px 20px;
-    }
+        /* ===== Posts grid ===== */
+        #postsGrid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 40px 20px;
+        }
 
-    .item {
-      background: white;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      display: flex;
-      flex-direction: column;
-      transition: transform 0.3s, box-shadow 0.3s;
-    }
+        .item {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
 
-    .item:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 20px rgba(0,0,0,0.25);
-    }
+        .item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+        }
 
-    .item img {
-      width: 100%;
-      height: 200px;
-      object-fit: cover;
-      cursor: pointer;
-      transition: transform 0.3s;
-    }
+        .item img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
 
-    .item img:hover {
-      transform: scale(1.05);
-    }
+        .item img:hover {
+            transform: scale(1.05);
+        }
 
-    .item-title {
-      padding: 12px;
-      text-align: center;
-      font-size: 1.05em;
-      font-weight: bold;
-    }
+        .item-title {
+            padding: 12px;
+            text-align: center;
+            font-size: 1.05em;
+            font-weight: bold;
+        }
 
-    .item-title a {
-      text-decoration: none;
-      color: #333;
-      transition: color 0.2s;
-    }
+        .item-title a {
+            text-decoration: none;
+            color: #333;
+            transition: color 0.2s;
+        }
 
-    .item-title a:hover {
-      color: #0077cc;
-    }
+        .item-title a:hover {
+            color: #0077cc;
+        }
 
-    #loader {
-      text-align: center;
-      padding: 20px;
-      font-size: 1.1em;
-      color: #555;
-    }
+        #loader {
+            text-align: center;
+            padding: 20px;
+            font-size: 1.1em;
+            color: #555;
+        }
 
-    /* ===== Responsive ===== */
-    @media (max-width: 800px) {
-      header {
-        flex-direction: column;
-        text-align: center;
-      }
-      .title-section {
-        justify-content: center;
-      }
-      .social-buttons {
-        justify-content: center;
-      }
-    }
-  </style>
+        /* ===== Responsive ===== */
+        @media (max-width: 800px) {
+            header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .title-section {
+                justify-content: center;
+            }
+
+            .social-buttons {
+                justify-content: center;
+            }
+        }
+    </style>
 </head>
+
 <body>
 
-<header>
-  <div class="title-section">
-    <img src="https://yamilburguener.com.ar/img/yamiburgenet-perfil.jpg" alt="yamil burguener">
-    <div class="title-text">
-      <h1>yamil burguener</h1>
-      <div class="subtitle" id="subtitle">
-        Creative coder, digital artist, composer 🎶 & teacher
-      </div>
-    </div>
-  </div>
+    <header>
+        <div class="title-section">
+            <img src="https://yamilburguener.com.ar/img/yamiburgenet-perfil.jpg" alt="yamil burguener">
+            <div class="title-text">
+                <h1>yamil burguener</h1>
+                <div class="subtitle" id="subtitle">
+                    Creative coder, digital artist, composer 🎶 & teacher
+                </div>
+            </div>
+        </div>
 
-  <div class="social-buttons">
-    <a href="https://x.com/yamiburgenet" target="_blank" aria-label="X">
-      <img src="https://yamilburguener.com.ar/img/twitter_x.svg" alt="X">
-    </a>
-    <a href="https://www.instagram.com/yamil.burguener/" target="_blank" aria-label="Instagram">
-      <img src="https://yamilburguener.com.ar/img/instagram.svg" alt="Instagram">
-    </a>
-    <a href="https://bsky.app/profile/yamiburgenet.bsky.social" target="_blank" aria-label="Bluesky">
-      <img src="https://yamilburguener.com.ar/img/bluesky.svg" alt="Bluesky">
-    </a>
-  </div>
-</header>
+        <div class="social-buttons">
+            <a href="https://x.com/yamiburgenet" target="_blank" aria-label="X">
+                <img src="https://yamilburguener.com.ar/img/twitter_x.svg" alt="X">
+            </a>
+            <a href="https://www.instagram.com/yamil.burguener/" target="_blank" aria-label="Instagram">
+                <img src="https://yamilburguener.com.ar/img/instagram.svg" alt="Instagram">
+            </a>
+            <a href="https://bsky.app/profile/yamiburgenet.bsky.social" target="_blank" aria-label="Bluesky">
+                <img src="https://yamilburguener.com.ar/img/bluesky.svg" alt="Bluesky">
+            </a>
+            <a href="https://linktr.ee/yamil.burguener" target="_blank" aria-label="Linktree">
+                <img src="https://yamilburguener.com.ar/img/linktree.svg" alt="Linktree">
+            </a>
+        </div>
+    </header>
 
-<div id="postsGrid"></div>
-<div id="loader">Cargando entradas...</div>
+    <div id="postsGrid"></div>
+    <div id="loader">Cargando entradas...</div>
 
-<script>
-  /* ===== Subtitle language switch ===== */
-  const subtitles = [
-    "Creative coder, digital artist, composer 🎶 & teacher",
-    "Programador, multimedia, compositor 🎶 y profesor"
-  ];
+    <script>
+        /* ===== Subtitle language switch ===== */
+        const subtitles = [
+            "Creative coder, digital artist, composer 🎶 & teacher",
+            "Programador, multimedia, compositor 🎶 y profesor"
+        ];
 
-  let subtitleIndex = 0;
-  const subtitleEl = document.getElementById("subtitle");
+        let subtitleIndex = 0;
+        const subtitleEl = document.getElementById("subtitle");
 
-  setInterval(() => {
-    subtitleIndex = (subtitleIndex + 1) % subtitles.length;
-    subtitleEl.style.opacity = 0;
-    setTimeout(() => {
-      subtitleEl.textContent = subtitles[subtitleIndex];
-      subtitleEl.style.opacity = 1;
-    }, 500);
-  }, 20000);
+        setInterval(() => {
+            subtitleIndex = (subtitleIndex + 1) % subtitles.length;
+            subtitleEl.style.opacity = 0;
+            setTimeout(() => {
+                subtitleEl.textContent = subtitles[subtitleIndex];
+                subtitleEl.style.opacity = 1;
+            }, 500);
+        }, 20000);
 
-  /* ===== Blog feed loader ===== */
-  const container = document.getElementById("postsGrid");
-  const loader = document.getElementById("loader");
+        /* ===== Blog feed loader ===== */
+        const container = document.getElementById("postsGrid");
+        const loader = document.getElementById("loader");
 
-  const feedBase =
-    "https://yamilburguener.blogspot.com/feeds/posts/default" +
-    "?alt=json-in-script&callback=mostrarPosts&max-results=500";
+        const feedBase =
+            "https://yamilburguener.blogspot.com/feeds/posts/default" +
+            "?alt=json-in-script&callback=mostrarPosts&max-results=500";
 
-  let startIndex = 1;
-  let totalPosts = Infinity;
-  let loading = false;
+        let startIndex = 1;
+        let totalPosts = Infinity;
+        let loading = false;
 
-  const observer = new IntersectionObserver((entries, obs) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        const img = entry.target;
-        img.src = img.dataset.src;
-        obs.unobserve(img);
-      }
-    });
-  }, { rootMargin: "100px" });
+        const observer = new IntersectionObserver((entries, obs) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const img = entry.target;
+                    img.src = img.dataset.src;
+                    obs.unobserve(img);
+                }
+            });
+        }, { rootMargin: "100px" });
 
-  function mostrarPosts(data) {
-    const posts = data.feed.entry || [];
-    totalPosts = parseInt(data.feed.openSearch$totalResults.$t);
+        function mostrarPosts(data) {
+            const posts = data.feed.entry || [];
+            totalPosts = parseInt(data.feed.openSearch$totalResults.$t);
 
-    posts.forEach(post => {
-      const title = post.title.$t;
-      const link = post.link.find(l => l.rel === "alternate").href;
-      const content = post.content.$t;
-      const imgMatch = content.match(/<img[^>]+src="([^">]+)"/i);
-      const imgUrl = imgMatch ? imgMatch[1] : null;
+            posts.forEach(post => {
+                const title = post.title.$t;
+                const link = post.link.find(l => l.rel === "alternate").href;
+                const content = post.content.$t;
+                const imgMatch = content.match(/<img[^>]+src="([^">]+)"/i);
+                const imgUrl = imgMatch ? imgMatch[1] : null;
 
-      const item = document.createElement("div");
-      item.className = "item";
+                const item = document.createElement("div");
+                item.className = "item";
 
-      if (imgUrl) {
-        const img = document.createElement("img");
-        img.dataset.src = imgUrl;
-        img.alt = title;
-        img.onclick = () => window.open(link, "_blank");
-        item.appendChild(img);
-        observer.observe(img);
-      }
+                if (imgUrl) {
+                    const img = document.createElement("img");
+                    img.dataset.src = imgUrl;
+                    img.alt = title;
+                    img.onclick = () => window.open(link, "_blank");
+                    item.appendChild(img);
+                    observer.observe(img);
+                }
 
-      const titleDiv = document.createElement("div");
-      titleDiv.className = "item-title";
-      titleDiv.innerHTML = `<a href="${link}" target="_blank">${title}</a>`;
-      item.appendChild(titleDiv);
+                const titleDiv = document.createElement("div");
+                titleDiv.className = "item-title";
+                titleDiv.innerHTML = `<a href="${link}" target="_blank">${title}</a>`;
+                item.appendChild(titleDiv);
 
-      container.appendChild(item);
-    });
+                container.appendChild(item);
+            });
 
-    loading = false;
-    if (startIndex + 500 >= totalPosts) loader.style.display = "none";
-  }
+            loading = false;
+            if (startIndex + 500 >= totalPosts) loader.style.display = "none";
+        }
 
-  function cargarFeed() {
-    if (loading || startIndex > totalPosts) return;
-    loading = true;
-    const script = document.createElement("script");
-    script.src = feedBase + "&start-index=" + startIndex;
-    document.body.appendChild(script);
-    startIndex += 500;
-  }
+        function cargarFeed() {
+            if (loading || startIndex > totalPosts) return;
+            loading = true;
+            const script = document.createElement("script");
+            script.src = feedBase + "&start-index=" + startIndex;
+            document.body.appendChild(script);
+            startIndex += 500;
+        }
 
-  window.addEventListener("scroll", () => {
-    if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100) {
-      cargarFeed();
-    }
-  });
+        window.addEventListener("scroll", () => {
+            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100) {
+                cargarFeed();
+            }
+        });
 
-  cargarFeed();
-</script>
+        cargarFeed();
+    </script>
 
 </body>
+
 </html>
