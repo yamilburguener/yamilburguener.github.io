@@ -3,65 +3,92 @@
 
 <head>
     <meta charset="UTF-8">
+    <title>Yamil Burguener – WORK</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="./favicon.png">
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="./favicon.png">
-
-    <title>yamil burguener</title>
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Yamil Burguener – WORK">
+    <meta property="og:description" content="Creative coder, digital artist, composer 🎶 & teacher">
+    <meta property="og:url" content="https://yamilburguener.com.ar/">
+    <meta property="og:image" content="https://yamilburguener.com.ar/img/yamiburgenet-perfil.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
 
     <style>
         body {
             margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f0f0f0;
-            color: #333;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f4f4f4;
+            color: #111;
         }
 
-        /* ===== Banner ===== */
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
         header {
-            background-color: #111;
-            color: white;
+            background: #000;
+            color: #fff;
+            padding: 24px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 30px 20px;
-            gap: 20px;
+            gap: 24px;
             flex-wrap: wrap;
         }
 
-        .title-section {
+        .header-left {
             display: flex;
             align-items: center;
             gap: 20px;
-            flex: 1 1 300px;
         }
 
-        .title-section img {
-            width: 120px;
-            height: 120px;
+        .profile-img {
+            width: 72px;
+            height: 72px;
             border-radius: 50%;
-            border: 3px solid #fff;
             object-fit: cover;
         }
 
-        .title-text h1 {
+        .title-block h1 {
             margin: 0;
-            font-size: 2.5em;
-            letter-spacing: 2px;
+            font-size: 1.6rem;
         }
 
-        .title-text .subtitle {
-            margin-top: 6px;
-            font-size: 1.1em;
-            opacity: 0.85;
-            transition: opacity 0.5s ease;
+        .subtitle {
+            margin-top: 4px;
+            font-size: 0.95rem;
+            opacity: 0.8;
         }
 
-        /* ===== Social buttons ===== */
+        .main-nav {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+        }
+
+        .nav-link {
+            color: #aaa;
+            font-size: 0.95rem;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: #fff;
+        }
+
+        .nav-separator {
+            color: #555;
+        }
+
         .social-buttons {
             display: flex;
             gap: 12px;
-            flex-wrap: nowrap;
             align-items: center;
         }
 
@@ -73,12 +100,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: transform 0.2s, box-shadow 0.3s;
-        }
-
-        .social-buttons a:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
         }
 
         .social-buttons img {
@@ -87,208 +108,139 @@
             object-fit: contain;
         }
 
-        /* ===== Posts grid ===== */
-        #postsGrid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 20px;
-            padding: 40px 20px;
+        main {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 24px;
         }
 
-        .item {
-            background: white;
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .card {
+            background: #fff;
             border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-            display: flex;
-            flex-direction: column;
-            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s, box-shadow 0.3s;
         }
 
-        .item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.12);
         }
 
-        .item img {
+        .card img {
             width: 100%;
-            height: 200px;
+            height: 180px;
             object-fit: cover;
-            cursor: pointer;
-            transition: transform 0.3s;
         }
 
-        .item img:hover {
-            transform: scale(1.05);
-        }
-
-        .item-title {
-            padding: 12px;
-            text-align: center;
-            font-size: 1.05em;
-            font-weight: bold;
-        }
-
-        .item-title a {
-            text-decoration: none;
-            color: #333;
-            transition: color 0.2s;
-        }
-
-        .item-title a:hover {
-            color: #0077cc;
-        }
-
-        #loader {
-            text-align: center;
+        .card-content {
             padding: 20px;
-            font-size: 1.1em;
-            color: #555;
         }
 
-        /* ===== Responsive ===== */
-        @media (max-width: 800px) {
-            header {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .title-section {
-                justify-content: center;
-            }
-
-            .social-buttons {
-                justify-content: center;
-            }
+        .card h2 {
+            margin: 0;
+            font-size: 1.1rem;
         }
     </style>
 </head>
 
-<body>
+<body data-page="work">
 
     <header>
-        <div class="title-section">
-            <img src="https://yamilburguener.com.ar/img/yamiburgenet-perfil.jpg" alt="yamil burguener">
-            <div class="title-text">
-                <h1>yamil burguener</h1>
+        <div class="header-left">
+            <img src="https://yamilburguener.com.ar/img/yamiburgenet-perfil.jpg" class="profile-img"
+                alt="Yamil Burguener">
+            <div class="title-block">
+                <h1>Yamil Burguener</h1>
                 <div class="subtitle" id="subtitle">
                     Creative coder, digital artist, composer 🎶 & teacher
                 </div>
             </div>
         </div>
 
+        <nav class="main-nav">
+            <a href="/" class="nav-link active">WORK</a>
+            <span class="nav-separator">|</span>
+            <a href="bio.html" class="nav-link">BIO</a>
+        </nav>
+
         <div class="social-buttons">
-            <a href="https://x.com/yamiburgenet" target="_blank" aria-label="X">
-                <img src="https://yamilburguener.com.ar/img/twitter_x.svg" alt="X">
+            <a href="https://x.com/yamiburgenet" target="_blank">
+                <img src="https://yamilburguener.com.ar/img/twitter_x.svg">
             </a>
-            <a href="https://www.instagram.com/yamil.burguener/" target="_blank" aria-label="Instagram">
-                <img src="https://yamilburguener.com.ar/img/instagram.svg" alt="Instagram">
+            <a href="https://www.instagram.com/yamil.burguener/" target="_blank">
+                <img src="https://yamilburguener.com.ar/img/instagram.svg">
             </a>
-            <a href="https://bsky.app/profile/yamiburgenet.bsky.social" target="_blank" aria-label="Bluesky">
-                <img src="https://yamilburguener.com.ar/img/bluesky.svg" alt="Bluesky">
+            <a href="https://bsky.app/profile/yamiburgenet.bsky.social" target="_blank">
+                <img src="https://yamilburguener.com.ar/img/bluesky.svg">
             </a>
-            <a href="https://linktr.ee/yamil.burguener" target="_blank" aria-label="Linktree">
-                <img src="https://yamilburguener.com.ar/img/linktree.svg" alt="Linktree">
+            <a href="https://linktr.ee/yamil.burguener" target="_blank">
+                <img src="https://yamilburguener.com.ar/img/linktree.svg">
             </a>
         </div>
     </header>
 
-    <div id="postsGrid"></div>
-    <div id="loader">Cargando entradas...</div>
+    <main>
+        <div class="grid" id="posts"></div>
+    </main>
 
     <script>
-        /* ===== Subtitle language switch ===== */
         const subtitles = [
             "Creative coder, digital artist, composer 🎶 & teacher",
             "Programador, multimedia, compositor 🎶 y profesor"
         ];
-
-        let subtitleIndex = 0;
-        const subtitleEl = document.getElementById("subtitle");
-
+        let si = 0;
         setInterval(() => {
-            subtitleIndex = (subtitleIndex + 1) % subtitles.length;
-            subtitleEl.style.opacity = 0;
-            setTimeout(() => {
-                subtitleEl.textContent = subtitles[subtitleIndex];
-                subtitleEl.style.opacity = 1;
-            }, 500);
+            si = (si + 1) % subtitles.length;
+            document.getElementById("subtitle").textContent = subtitles[si];
         }, 20000);
 
-        /* ===== Blog feed loader ===== */
-        const container = document.getElementById("postsGrid");
-        const loader = document.getElementById("loader");
+        document.querySelector('.nav-link.active')?.classList.add("active");
 
-        const feedBase =
-            "https://yamilburguener.blogspot.com/feeds/posts/default" +
-            "?alt=json-in-script&callback=mostrarPosts&max-results=500";
+        const container = document.getElementById("posts");
 
-        let startIndex = 1;
-        let totalPosts = Infinity;
-        let loading = false;
+        /* ===== Función para procesar JSONP ===== */
+        function handlePosts(data) {
+            const entries = data.feed.entry;
+            if (!entries) return;
 
-        const observer = new IntersectionObserver((entries, obs) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const img = entry.target;
-                    img.src = img.dataset.src;
-                    obs.unobserve(img);
-                }
-            });
-        }, { rootMargin: "100px" });
-
-        function mostrarPosts(data) {
-            const posts = data.feed.entry || [];
-            totalPosts = parseInt(data.feed.openSearch$totalResults.$t);
-
-            posts.forEach(post => {
-                const title = post.title.$t;
+            entries.forEach(post => {
                 const link = post.link.find(l => l.rel === "alternate").href;
-                const content = post.content.$t;
-                const imgMatch = content.match(/<img[^>]+src="([^">]+)"/i);
-                const imgUrl = imgMatch ? imgMatch[1] : null;
+                const title = post.title.$t;
+                const imgMatch = post.content?.$t?.match(/<img[^>]+src="([^">]+)"/);
 
-                const item = document.createElement("div");
-                item.className = "item";
+                const card = document.createElement("a");
+                card.className = "card";
+                card.href = link;
+                card.target = "_blank";
 
-                if (imgUrl) {
+                if (imgMatch) {
                     const img = document.createElement("img");
-                    img.dataset.src = imgUrl;
-                    img.alt = title;
-                    img.onclick = () => window.open(link, "_blank");
-                    item.appendChild(img);
-                    observer.observe(img);
+                    img.src = imgMatch[1];
+                    card.appendChild(img);
                 }
 
-                const titleDiv = document.createElement("div");
-                titleDiv.className = "item-title";
-                titleDiv.innerHTML = `<a href="${link}" target="_blank">${title}</a>`;
-                item.appendChild(titleDiv);
+                const content = document.createElement("div");
+                content.className = "card-content";
+                content.innerHTML = `<h2>${title}</h2>`;
+                card.appendChild(content);
 
-                container.appendChild(item);
+                container.appendChild(card);
             });
-
-            loading = false;
-            if (startIndex + 500 >= totalPosts) loader.style.display = "none";
         }
 
-        function cargarFeed() {
-            if (loading || startIndex > totalPosts) return;
-            loading = true;
-            const script = document.createElement("script");
-            script.src = feedBase + "&start-index=" + startIndex;
-            document.body.appendChild(script);
-            startIndex += 500;
-        }
-
-        window.addEventListener("scroll", () => {
-            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100) {
-                cargarFeed();
-            }
-        });
-
-        cargarFeed();
+        /* ===== Cargar feed JSONP ===== */
+        const script = document.createElement("script");
+        script.src = "https://yamilburguener.blogspot.com/feeds/posts/default?alt=json-in-script&callback=handlePosts&max-results=5000";
+        document.body.appendChild(script);
     </script>
+
 
 </body>
 
