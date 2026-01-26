@@ -1,23 +1,18 @@
-
-
-let b_pausa = false, b_trigger = false;
+let b_pausa = false, b_trigger = false, b_reset = false;;
 let controles = [], cont_cant = 0, cont_co, cont_colEx = [90, 120, 240, 270], cont_cE_n; // = 34
 let cont_ini_memo = []; let cont_ini = [], bCont_ini = true, cont_s = [];
 let cont_modo = "", cont_mute = [false, false, false, false, false];
 let cont_ro = [-0.001, 0, 0.001];
-const contM = [[0, 1], [0, 2], [0, 3], [0, 4], [1, 2], [1, 3], [1, 4], [2, 3], [2, 4], [3, 4]];//, [-1, -1], [-1, -1]];//-1 no mutea nada
-let bReset = false; // posiciona los sliders derechos, al frente
-let cont_rotZ;
+const contM = [[0, 1], [0, 2], [0, 3], [0, 4], [1, 2], [1, 3], [1, 4], [2, 3], [2, 4], [3, 4]];
+let ini_rotZ;
 let seccion = "cargando";
 let mi_m = []
-let pg, titInicio;
-let fuente;
+let pg, titInicio, fuente;
 
-let cam, cam_rotZ = 0, cam_rotZn, cam_rotSe//, cam_rMar;
+let cam, cam_rotZ = 0, cam_rotZn, cam_rotSe;
 let cam_oscSe = [], cam_oscM = 0.025;
 const cam_data = [[100, 0, 50], [0, 100, 50], [0, 100, 60], [-100, 200, 120], [200, -100, 150], [-200, 300, 150], [300, -200, 150]]; //el tercer parametro es para lookAt    //para que NO rote agregar:-200,300t
 let cam_posM, cam_posIni;
-//let plane_alf = 0.1;
 let grilla = [], grilla_sub, grilla_memo = 0;
 let luz_alfa;
 let col_data = [[], [], [], [], []], col_modo;
@@ -165,7 +160,7 @@ function setup() {
   pg.textFont(fuente);
   sh = createShader(vert, frag);
 
-  myShader = baseStrokeShader().modify({
+  /* myShader = baseStrokeShader().modify({
     'float random': `(vec2 p) {
       vec3 p3  = fract(vec3(p.xyx) * .1031);
       p3 += dot(p3, p3.yzx + 33.33);
@@ -179,7 +174,23 @@ function setup() {
       inputs.color *= random(inputs.position.xy) > a ? 0.5 : 1.0;
       return inputs;
     }`
+  }); */
+
+  myShader = baseStrokeShader().modify({
+    'Inputs getPixelInputs': `(Inputs inputs) {
+      float a = inputs.color.a;
+      vec2 p = inputs.position.xy;
+      // hash inline (sin función random externa)
+      vec3 p3  = fract(vec3(p.xyx) * .1031);
+      p3 += dot(p3, p3.yzx + 33.33);
+      float r = fract((p3.x + p3.y) * p3.z);
+  
+      inputs.color *= r > a ? 0.5 : 1.0;
+      return inputs;
+    }`
   });
+  
+  
 
   // camera config --------------------
   cam = createCamera();
@@ -195,24 +206,13 @@ function setup() {
   for (let i = 0; i < 17; i++) { marco[i + 17 * 2] = createVector(_plX, _plY); _plX -= 10; }
   for (let i = 0; i < 17; i++) { marco[i + 17 * 3] = createVector(_plX, _plY); _plY -= 10; }
 
-  /* let mi_seed = Math.floor(9999999999 * random());
-  // 6738271180 , 8815953958!! 6483520730,  new
-  // 249764199, 7930900029! 2878231690 new2
-  print("seed: " + mi_seed);
-  randomSeed(mi_seed);
-  m0 = random(), m1 = random(), m2 = random(), m3 = random(), m4 = random();
-  
-  //  m0 = 0.5; m1 = 0.5, m2 = 0.5, m3 = 0.5, m4 = 0.5; // poner delay tipo 5
-  //m0 = 0.666666666//, 
-  //m2 = 0.8683887438382953// color lindo bug */
-
   seedRandomness();
   prepara_sketch();
 }
 
 
 function prepara_sketch() {
-  print(m0, m1, m2, m3, m4); // bug
+  //print(m0, m1, m2, m3, m4); // bug
   mi_m = [m0, m1, m2, m3, m4], cont_s = [m0, m1, m2, m3, m4];
   console.log("::: Sliders - Yamil Burguener 2026");
 
@@ -327,7 +327,7 @@ function prepara_sketch() {
     _da = cont_modo + " " + grilla_sub;
   }
   // rotation speed (clock)
-  cont_rotZ = 16 + int(randomFull() * 16) * 5; // en que frame empieza a girar
+  ini_rotZ = 16 + int(randomFull() * 16) * 5;
   if (randomFull() < 0.5) cam_rotSe = 1; else cam_rotSe = -1;
   let _vG;
   if (cont_modo == "spins") _vG = [0.02, 0.015, 0.0125, 0.015, 0.01, 0.01, 0.01, 0.005, 0.002]; // vel giro * 0.01 orig
@@ -351,10 +351,10 @@ function prepara_sketch() {
 
   // slider5
   if (mi_m[4] < 0.4) {
-    col_modo = "dark";// oscuro
+    col_modo = "dark";
     col_data = [100, 90, 1, 5, -4]; // color background, fondo, col plane B, line, sentido de this.co
   } else {
-    col_modo = "light";// claro
+    col_modo = "light";
     col_data = [0, 10, 99, 95, 4];
   }
   let _cd5 = [180, 180, 180, 120, 240, 85, 265];
@@ -372,7 +372,7 @@ function prepara_sketch() {
 
   // reset
   intervalN = 0, notas_cont = 0, cont_cant = 0, cont_cE_n = 14, bCont_ini = true;
-  cont_mute = [false, false, false, false, false], bReset = false, cam_rotZ = 0;
+  cont_mute = [false, false, false, false, false], b_reset = false, cam_rotZ = 0;
   sinte_par = 0, subdiv = 0;
   cam.setPosition(0, 0, 300);
   clearInterval(interval_sin); interval_sin = null;
@@ -442,11 +442,11 @@ function draw() {
 
     // controles: drawing, reset, etc.
     if (bCont_ini) {
-      if (sinte_par == 3 || bReset) {
-       // if (sinte_par == 3) print("solo ") //bug
+      if (sinte_par == 3 || b_reset) {
+        // if (sinte_par == 3) print("solo ") //bug
         cont_cant = 0; //new
         bCont_ini = false;
-        if (bReset) bReset = false;
+        if (b_reset) b_reset = false;
         for (let i = controles.length; i > 0; i--) controles.splice(i, 1);
         for (let i = 0; i < 5; i++) { cont_ini[i] = cont_ini_memo[i] + notas_cont - 20; }
       }
@@ -486,7 +486,6 @@ function suena_sinte(_no) { // = nota
   let _re = sinte_R + sin(sinte_osc * 0.01) * sinte_R;  //  * 0.5 // 0.01 a 1
 
   const _va = constrain(map(intervalN % 15000, 1000, 15000, 0, altura_modo), 0, altura_modo); //% 11000, 1000, 10000
-  ////if (bEstela) { _r = -1; print("estela") } // para que suenen agudos con la estela NO ANDA bug
   let _vol = 0.5, _desaf = false, _repeat = false; //_n = 0, 
 
   const _r = sound_random();
@@ -534,7 +533,7 @@ function suena_sinte(_no) { // = nota
 }
 
 function envelope(_n, _at, _re) {
-
+if (_at < 0.0001) print(_at + " at!!!!") // bug
   sinte[_n].set({ envelope: { attack: _at, release: _re } });
 }
 
@@ -557,12 +556,12 @@ function Rep_sinte(_r) {
         else if (notas_cont == cont_ini[3]) crea_controles();
         else if (notas_cont == cont_ini[4]) crea_controles();
 
-        if (notas_cont == cont_rotZ) {   // 16 a 96 .... antes == 20
+        if (notas_cont == ini_rotZ) {   // 16 a 96 .... antes == 20
           cam_rotZ = 0.000001 * cam_rotSe//  (0.0001 + randomFull() * 0.0001) * cam_rotSe[int(randomFull() * 2)];
         }
 
-        if (notas_cont % 740 >= 720)  posicion_reset();// 600 bug eran 12 notas, ahora 20
-         
+        if (notas_cont % 740 >= 720) posicion_reset();// 600 bug eran 12 notas, ahora 20
+
         if (notas_cont % 160 == 140) {
           const _r = int(randomFull() * contM.length);
           for (let i = 0; i < 5; i++) {
@@ -604,7 +603,7 @@ function estela(_a) {
   // adelantar el plano frente a la cámara
   translate(0, 0, 95);
   noStroke();
-  if (_a != 0) { 
+  if (_a != 0) {
     fill((cont_co + 30) % 360, 2, col_data[2], _a); // orig
     plane(160, 160); // 160, 160 .....  85,85 /1080x1080
     if (seccion == "cargando") {
@@ -612,7 +611,7 @@ function estela(_a) {
       texture(pg);
       plane(160, 160);
     }
-  } 
+  }
   if (frameCount % 4 == 0) {
     const _f = int(frameCount * 0.25) % marco.length;
     translate(marco[_f].x, marco[_f].y);
@@ -628,9 +627,9 @@ function posicion_reset() {
   cam_posIni = notas_cont;
   cam_rotZ = 0;// 0.000001 * cam_rotSe;
   controles[0].reset_z();
-  cont_rotZ = notas_cont + 6; // + 1
+  ini_rotZ = notas_cont + 6; // + 1
   bCont_ini = true;
-  bReset = true;
+  b_reset = true;
 }
 
 function crea_controles() {
@@ -655,13 +654,13 @@ function muestra_titulo() {
   pg.rect(pg.width / 2 - 135, pg.height / 2 + 400, 270, 60);
   pg.rect(pg.width / 2 + 135, pg.height / 2 + 400, 270, 60);
   pg.fill((cont_co + 30) % 360, 2, col_data[2], 0.5)
-  pg.text("S L I D E R S", pg.width / 2 - 135, pg.height / 2 + 340);
+  pg.text("PARACHUTE WALTZ", pg.width / 2 - 135, pg.height / 2 + 340);//  pg.text("Parachute waltz", pg.width / 2 - 135, pg.height / 2 + 340);//  pg.text("S L I D E R S", pg.width / 2 - 135, pg.height / 2 + 340);
   pg.text("by yamil burguener", pg.width / 2 + 135, pg.height / 2 + 340);
   const _t = int((titInicio - millis()) * 0.001);
   pg.text("CLICK TO START", pg.width / 2 - 135, pg.height / 2 + 400);
   pg.text("or wait (" + _t + ") seconds", pg.width / 2 + 135, pg.height / 2 + 400);
   if (_t <= 0) {
-    seccion = "jugando"; 
+    seccion = "jugando";
     Rep_sinte(tiempo_ms); // ms independiente de draw()
     pg.clear(); pg.remove();
   }
@@ -711,7 +710,14 @@ function mouseClicked() {
 function keyReleased() {
 
   if (key == "q") { // bug!!!
+    let mi_seed = Math.floor(9999999999 * random());
+    // 3628068176
+    // 7479478610 ritmo loco
+    print("seed: " + mi_seed);
+    randomSeed(mi_seed);
     m0 = random(), m1 = random(), m2 = random(), m3 = random(), m4 = random();
+    
+    //m2 = 0.8683887438382953// color lindo bug 
     seedRandomness();
     prepara_sketch();
   }
@@ -733,7 +739,6 @@ function windowResizedUser() {
   // Handle resizing if needed, but since canvas is fixed at 1080x1080, maybe nothing
   // resizeCanvas(canvasWidth, canvasHeight); // If dynamic, but here fixed
 }
-
 
 
 // ----------------------------------------------
@@ -794,7 +799,7 @@ class Control {
     }
     // lines
     for (let i = 0; i < 5; i++) {
-      if (notas_cont == cont_rotZ || notas_cont % 50 > 44) stroke(col_data[3], 0.25); //100, 0.25
+      if (notas_cont == ini_rotZ || notas_cont % 50 > 44) stroke(col_data[3], 0.25); //100, 0.25
       else stroke(this.co[i], this.s[i], this.b[i], this.alfa[i] * this.al);
       if (controles.indexOf(this) != 0) {
         let _x = 0;
@@ -860,7 +865,7 @@ class Control {
     if (notas_cont % 20 == cont_cE_n) { //% 40 == 34
       const _c = cont_colEx[int(randomFull() * 4)];
       this.coBo[i] = (this.coBo[i] + _c) % 360;
-    } 
+    }
     else if (notas_cont % 20 == cont_cE_n + 5) { //% 40 == 39
       for (let j = 0; j < 5; j++) { this.coBo[j] = this.coBmemo[j] };
       cont_cE_n = (cont_cE_n + 1) % 5; //% 35 ....decia:% 75
