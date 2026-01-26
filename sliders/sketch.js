@@ -26,7 +26,7 @@ let sinte_osc, sinte_dur, sinte_var = [];
 let delay, del_cont, del_var = [];
 let subdiv = 0;
 const pan_LR = [-0.9, 0.9];
-let vol_final = [], b_sound = false;
+let vol_final, b_sound = false;
 const altura_var = [0.08, 0.16, 0.24, 0.3, 0.4]; //[0.05, 0.1, 0.15, 0.2]
 let altura_modo;
 let notas = [], notas_memo = [], notas_cont = 0, modulN = 0; // modul = 0, 
@@ -83,27 +83,37 @@ void main() {
 
   vec3 rgb = hsb2rgb(vec3(h, s, b));
 
-  // DITHER PORTABLE
+  // --- ruido estable en UV ---
   float r = mi_random(vUv * 1024.0);
 
-  if (r > a) discard;
+  // --- CONTROL DE DESINTEGRACIÓN ---
+  float density = 1.5;          // ← subir este valor = más desintegrado
+  float threshold = pow(a, density);
+
+  if (r > threshold) discard;
 
   gl_FragColor = vec4(rgb, 1.0);
 }
+
 `;
 
 
 function preload() {
 
-  const channel = new Tone.Channel({ volume: 0, channelCount: 2 })
-  const channel2 = new Tone.Channel({ volume: 0, channelCount: 2 })
-  const channel3 = new Tone.Channel({ volume: 0, channelCount: 2 })
+  const channel1 = new Tone.Channel({ volume: 0, channelCount: 2 });
+  const channel2 = new Tone.Channel({ volume: 0, channelCount: 2 });
+  const channel3 = new Tone.Channel({ volume: 0, channelCount: 2 });
+  const channel4 = new Tone.Channel({ volume: 0, channelCount: 2 })
 
-  sinte_pan[0] = new Tone.Panner(0); sinte_pan[1] = new Tone.Panner(0)
+  for (let i = 0; i < 3; i++) sinte_pan[i] = new Tone.Panner(0)
+  let _PanLFO = new Tone.LFO(0.15, -0.6, 0.6).start();
+  _PanLFO.type = "triangle";
+  _PanLFO.connect(sinte_pan[2].pan)//(sinte[0].pan);
+
   reverb = new Tone.Reverb({ decay: 1.9, wet: 0.95 })
   const reverb2 = new Tone.Reverb({ decay: 0.5, wet: 0.5 }) //1, 0.75
   delay = new Tone.FeedbackDelay({ wet: 0 })//.toDestination();
-  for (let i = 0; i < 3; i++) vol_final[i] = new Tone.Volume(2);
+
 
   sinte[0] = new Tone.PolySynth()
   sinte[0].set({
@@ -112,12 +122,14 @@ function preload() {
     },
     oscillator: { type: "sawtooth20" }, // hasta 32 parciales
   })
-  sinte[0].chain(sinte_pan[0], channel); //reverb, 
-
-  for (let i = 0; i < 3; i++) vol_final[i] = new Tone.Volume(2);
+  sinte[0].chain(channel1); //reverb, 
+  sinte[0].chain(channel2);
   const comp = new Tone.Compressor({
     ratio: 12, threshold: -20, release: 0.25, attack: 0.003, knee: 3
-  })
+  });
+  //for (let i = 0; i < 3; i++) 
+  vol_final = new Tone.Gain(1.1); // 1.8
+  const limiter = new Tone.Limiter(-0.5);
 
   sinte[1] = new Tone.AMSynth()//AMSynth(), FMSynth(), MonoSynth
   sinte[1].set({
@@ -134,15 +146,16 @@ function preload() {
   })
   sinte[1].chain(sinte_pan[1], channel3);
 
-  channel.chain(reverb, comp, vol_final[0], Tone.Destination)//channel.chain(comp, Tone.Destination)
-  channel2.chain(channel, delay, vol_final[1], Tone.Destination)  //channel2.chain(channel, delay, Tone.Destination) // channel, delay
-  //cheby = new Tone.Chebyshev(0)// 300 ¿? set({ order: 100})
-  channel3.chain(reverb2, vol_final[2], Tone.Destination)//channel, cheby, reverb2, vol_final[2], Tone.Destination)
+  channel1.chain(sinte_pan[0], reverb, channel4)//channel.chain(comp, Tone.Destination)
+  channel2.chain(delay, sinte_pan[2], channel4)//vol_final[1], Tone.Destination)  //channel2.chain(channel, delay, Tone.Destination) // channel, delay
+  channel3.chain(reverb2, channel4)//, vol_final[2], Tone.Destination)//channel, cheby, reverb2, vol_final[2], Tone.Destination)
+  channel4.chain(comp, vol_final, limiter, Tone.Destination);
 }
 
 
 function setup() {
 
+  console.log("::: Sliders - Yamil Burguener 2026");
   let cv = createCanvas(1620, 1620, WEBGL);
   cv.parent("cv"); cv.id("sl"); cv.class("sl");
   // cv.imageSmoothingEnabled = false // bug ¿?
@@ -192,8 +205,6 @@ function setup() {
       return inputs;
     }`
   });
-  
-  
 
   // camera config --------------------
   cam = createCamera();
@@ -201,7 +212,8 @@ function setup() {
   let cameraZ = (height / 2) / tan((PI / 3) / 2.0);
   perspective(1.5, 1, cameraZ / 20, cameraZ * 5) //cameraZ / 10.0, cameraZ * 10 -> 187 a 18706
 
-  for (let i = 0; i < 3; i++) vol_final[i].mute = true; //sacar bug
+  //for (let i = 0; i < 3; i++) vol_final.mute = true; //sacar bug
+  //vol_final.gain.rampTo(0, 0.05);
 
   let _plX = -85, _plY = -85;
   for (let i = 0; i < 17; i++) { marco[i] = createVector(_plX, _plY); _plX += 10; }
@@ -217,11 +229,10 @@ function setup() {
 function prepara_sketch() {
   //print(m0, m1, m2, m3, m4); // bug
   mi_m = [m0, m1, m2, m3, m4], cont_s = [m0, m1, m2, m3, m4];
-  console.log("::: Sliders - Yamil Burguener 2026");
 
   // sound setting -----------------------------------
   console.log("::: sound/visual setting");
-  // slider1 , si aumenta tiempo, bajar del sinte release y duracion
+  // slider1
   cont_ini_memo = [45, 65, 85, 100, 115];
   if (mi_m[0] < 0.5) {
     tiempo_ms = int(map(mi_m[0], 0, 0.5, 5, 15)); //5, 15
@@ -245,7 +256,6 @@ function prepara_sketch() {
   let _ha = [0.1, 0.3, 0.5, 0.7, 1, 3, 5, 8]; let _ha1 = int(map(tiempo_ms, 5, 20, 0, _ha.length - 1))
   sinte_har = _ha[_ha1] //_ha[int(randomFull() * _ha.length)];
   sinte[1].set({ harmonicity: sinte_har });
-  //let _be = int (1000/tiempo_ms) //5-20
   console.log("[1] musical tempo (5-20): " + tiempo_ms + "ms");
 
   // slider2
@@ -280,7 +290,7 @@ function prepara_sketch() {
 
   // harmony
   let _mod_txt = "--";
-  if (mi_m[3] >= 0.7 && tiempo_ms >= 8) { // depende de si es "jumps" en visual
+  if (mi_m[3] >= 0.7 && tiempo_ms >= 8) { 
     const _m = [2, 3, 4, 5];
     modulN = _m[int(randomFull() * _m.length)]; //int(map(mi_m[4], 0.7, 1, 6, 2)) //
     _mod_txt = modulN + "st";
@@ -289,7 +299,7 @@ function prepara_sketch() {
   if (tiempo_ms < 8) { notas = [52 + 12, 52 + 1, 52, 52 - 1, 52 - 12]; _arm = "E unison" }
   else if (mi_m[4] < 0.1) { notas = [66, 62 + 1, 59, 55, 52]; _arm = "Emin 7M(9)" } //< 0.15
   else if (mi_m[4] < 0.51) { notas = [66, 62, 59, 55, 52]; _arm = "Emin 7(9)" } //["F#5", "D5", "B4", "G4", "E4"];
-  else if (mi_m[4] < 0.9) { notas = [66, 63, 59, 56, 52]; _arm = "Emaj 7(9)" } // maj,7 9 -> "F#5", "D#5", "B4", "G#4", "E4" < 0.85
+  else if (mi_m[4] < 0.95) { notas = [66, 63, 59, 56, 52]; _arm = "Emaj 7(9)" } // maj,7 9 -> "F#5", "D#5", "B4", "G#4", "E4" < 0.85
   else { notas = [66, 63 - 1, 59 + 1, 56, 52]; _arm = "Eaug 7(9)" }
   for (let i = 0; i < 5; i++) notas_memo[i] = notas[i];
 
@@ -517,7 +527,8 @@ function suena_sinte(_no) { // = nota
 
   if (_desaf && sound_random() < 0.05) _hertz = _hertz * (0.975 + sound_random() * 0.05);
 
-  sinte_pan[0].set({ pan: _pa })
+
+  sinte_pan[0].pan.rampTo(_pa, 0.03); //sinte_pan[0].set({ pan: _pa })
   sinte[0].triggerAttackRelease(_hertz, sinte_dur, Tone.now(), _vol); //
 
 
@@ -536,7 +547,7 @@ function suena_sinte(_no) { // = nota
 }
 
 function envelope(_n, _at, _re) {
-if (_at < 0.0001) print(_at + " at!!!!") // bug
+  //if (_at < 0.0001) print(_at + " at!!!!") // bug
   sinte[_n].set({ envelope: { attack: _at, release: _re } });
 }
 
@@ -706,8 +717,8 @@ function mouseClicked() {
     pg.clear(); pg.remove();
   }
   b_sound = !b_sound;
-  if (b_sound) { for (let i = 0; i < 3; i++) vol_final[i].mute = false; }
-  else { for (let i = 0; i < 3; i++) vol_final[i].mute = true; }
+  if (b_sound) { vol_final.gain.rampTo(1.1, 0.05); }//vol_final[i].mute = false; }
+  else { vol_final.gain.rampTo(0, 0.05); }// vol_final[i].mute = true; }
 }
 
 function keyReleased() {
@@ -719,8 +730,7 @@ function keyReleased() {
     print("seed: " + mi_seed);
     randomSeed(mi_seed);
     m0 = random(), m1 = random(), m2 = random(), m3 = random(), m4 = random();
-    
-    //m2 = 0.8683887438382953// color lindo bug 
+    m2 = 0.8683887438382953// color lindo bug 
     seedRandomness();
     prepara_sketch();
   }
