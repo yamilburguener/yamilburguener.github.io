@@ -50,19 +50,20 @@ void main() {
 }
 `;
 const frag = `
-precision mediump float;
+#ifdef GL_ES
+precision highp float;
+#endif
+
 varying vec2 vUv;
 uniform vec4 uColorHSB;   // H:0–360, S:0–100, B:0–100, A:0–1
 uniform vec2 uResolution;
 
-// hash mi_random
 float mi_random(vec2 p) {
   vec3 p3 = fract(vec3(p.xyx) * 0.1031);
   p3 += dot(p3, p3.yzx + 33.33);
   return fract((p3.x + p3.y) * p3.z);
 }
 
-// HSB → RGB (expects normalized values)
 vec3 hsb2rgb(vec3 c) {
   vec3 rgb = clamp(
     abs(mod(c.x * 6.0 + vec3(0.0,4.0,2.0), 6.0) - 3.0) - 1.0,
@@ -75,16 +76,18 @@ vec3 hsb2rgb(vec3 c) {
 
 void main() {
 
-  // --- normalizar HSB p5.js ---
   float h = uColorHSB.x / 360.0;
   float s = uColorHSB.y / 100.0;
   float b = uColorHSB.z / 100.0;
   float a = uColorHSB.w;
+
   vec3 rgb = hsb2rgb(vec3(h, s, b));
 
-  // dithering por alpha
-  float r = mi_random(gl_FragCoord.xy);
+  // DITHER PORTABLE
+  float r = mi_random(vUv * 1024.0);
+
   if (r > a) discard;
+
   gl_FragColor = vec4(rgb, 1.0);
 }
 `;
@@ -180,7 +183,7 @@ function setup() {
     'Inputs getPixelInputs': `(Inputs inputs) {
       float a = inputs.color.a;
       vec2 p = inputs.position.xy;
-      // hash inline (sin función random externa)
+      // hash inline (without external random)
       vec3 p3  = fract(vec3(p.xyx) * .1031);
       p3 += dot(p3, p3.yzx + 33.33);
       float r = fract((p3.x + p3.y) * p3.z);
