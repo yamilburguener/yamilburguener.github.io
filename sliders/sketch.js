@@ -227,7 +227,7 @@ function setup() {
 
 
 function prepara_sketch() {
-  //print(m0, m1, m2, m3, m4); // bug
+  print(m0, m1, m2, m3, m4); // bug
   mi_m = [m0, m1, m2, m3, m4], cont_s = [m0, m1, m2, m3, m4];
 
   // sound setting -----------------------------------
