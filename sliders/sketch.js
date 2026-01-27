@@ -1,3 +1,5 @@
+// consulta 
+//The AudioContext is "suspended". Invoke Tone.start() from a user action to start the audio.
 let b_pausa = false, b_trigger = false, b_reset = false;;
 let controles = [], cont_cant = 0, cont_co, cont_colEx = [90, 120, 240, 270], cont_cE_n; // = 34
 let cont_ini_memo = []; let cont_ini = [], bCont_ini = true, cont_s = [];
@@ -229,13 +231,13 @@ function setup() {
 function prepara_sketch() {
   print(m0, m1, m2, m3, m4); // bug
   mi_m = [m0, m1, m2, m3, m4], cont_s = [m0, m1, m2, m3, m4];
-
   // sound setting -----------------------------------
   console.log("::: sound/visual setting");
   // slider1
   cont_ini_memo = [45, 65, 85, 100, 115];
   if (mi_m[0] < 0.5) {
     tiempo_ms = int(map(mi_m[0], 0, 0.5, 5, 15)); //5, 15
+    tiempo_ms = 13;//bug
     const _de = map(mi_m[0], 0, 0.5, 0.01, 1.9);
     const _we = map(mi_m[0], 0, 0.5, 0, 0.95);
     reverb.set({ decay: _de, wet: _we });
@@ -290,7 +292,7 @@ function prepara_sketch() {
 
   // harmony
   let _mod_txt = "--";
-  if (mi_m[3] >= 0.7 && tiempo_ms >= 8) { 
+  if (mi_m[3] >= 0.7 && tiempo_ms >= 8) {
     const _m = [2, 3, 4, 5];
     modulN = _m[int(randomFull() * _m.length)]; //int(map(mi_m[4], 0.7, 1, 6, 2)) //
     _mod_txt = modulN + "st";
@@ -409,8 +411,7 @@ function draw() {
   }
   else {
     if (cam_rotZ != 0) {
-      ////if (abs(cam_rotZ) > HALF_PI) cam_rotZ = 0; // bug
-      cam_rotZ += cam_rotZn * cam_rotSe; //para que vaya cambiando 
+      cam_rotZ += cam_rotZn * cam_rotSe;
       rotateZ(cam_rotZ);
     }
 
@@ -456,7 +457,6 @@ function draw() {
     // controles: drawing, reset, etc.
     if (bCont_ini) {
       if (sinte_par == 3 || b_reset) {
-        // if (sinte_par == 3) print("solo ") //bug
         cont_cant = 0; //new
         bCont_ini = false;
         if (b_reset) b_reset = false;
@@ -481,10 +481,7 @@ function draw() {
 }
 
 // sound --------------------------------
-function suena_sinte(_no) { // = nota
-
-  ////const _or = int(50 - cos(notas_cont * 0.01) * 50); bug
-  ////cheby.set({ order: _or }) bug
+function suena_sinte(_no) {
 
   // delay
   let _we = 0.75;
@@ -529,10 +526,10 @@ function suena_sinte(_no) { // = nota
 
 
   sinte_pan[0].pan.rampTo(_pa, 0.03); //sinte_pan[0].set({ pan: _pa })
-  sinte[0].triggerAttackRelease(_hertz, sinte_dur, Tone.now(), _vol); //
+  if (b_sound) sinte[0].triggerAttackRelease(_hertz, sinte_dur, Tone.now(), _vol); //
 
 
-  if (_repeat) {
+  if (b_sound && _repeat) {
     let _p = int(randomFull() * 2);
     sinte_pan[1].set({ pan: pan_LR[_p] });// + sound_random() * 2 })
     envelope(1, _at, _re);
@@ -541,13 +538,13 @@ function suena_sinte(_no) { // = nota
     sinte[1].triggerRelease();
 
     for (let i = 0; i < _r; i++) {
-      sinte[1].triggerAttackRelease(_hertz, _f * 0.4, _ti[i], 1);//_vol * 0.75);
+      sinte[1].triggerAttackRelease(_hertz, _f * 0.4, _ti[i], 0.9);//_vol * 0.75);
     }
   }
 }
 
 function envelope(_n, _at, _re) {
-  //if (_at < 0.0001) print(_at + " at!!!!") // bug
+
   sinte[_n].set({ envelope: { attack: _at, release: _re } });
 }
 
@@ -730,7 +727,10 @@ function keyReleased() {
     print("seed: " + mi_seed);
     randomSeed(mi_seed);
     m0 = random(), m1 = random(), m2 = random(), m3 = random(), m4 = random();
-    m2 = 0.8683887438382953// color lindo bug 
+    // m0=0.299, m1= 0.699, m2= 0.478, m3 = 0, m4= 0.865 video demo
+    m0 = 0.446, m1 = 0.567, m2 = 0.999, m3 = 0.493, m4 = 0.241 // carmen
+    //m2 = 0.8683887438382953// color lindo bug 
+
     seedRandomness();
     prepara_sketch();
   }
