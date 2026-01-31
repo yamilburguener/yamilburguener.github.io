@@ -96,12 +96,9 @@ function preload() {
   const channel4 = new Tone.Channel({ volume: 0, channelCount: 2 });
   const channel5 = new Tone.Channel({ volume: 0, channelCount: 2 })
   for (let i = 0; i < 3; i++) sinte_pan[i] = new Tone.Panner(0)
-  let _PanLFO = new Tone.LFO(0.15, -0.7, 0.7).start(); _PanLFO.type = "triangle";
+  let _PanLFO = new Tone.LFO(0.15, -0.75, 0.75).start(); _PanLFO.type = "sine";
   _PanLFO.connect(sinte_pan[2].pan);
-  reverb = new Tone.Reverb({
-    decay: 1, preDelay: 0.02, wet: 0.95
-    // dampening: 2000  // Hz → corta agudos en la cola
-  });
+  reverb = new Tone.Reverb({  decay: 1, preDelay: 0.02, wet: 0.95});
   const lp = new Tone.Filter(600, "lowpass");
   const reverb2 = new Tone.Reverb({ decay: 0.5, wet: 0.5 });
   delay = new Tone.FeedbackDelay({ wet: 0 });
@@ -198,9 +195,9 @@ function setup() {
 function prepara_sketch() {
   print(m0, m1, m2, m3, m4); // bug
   mi_m = [m0, m1, m2, m3, m4], cont_s = [m0, m1, m2, m3, m4];
-  // sound setting -----------------------------------
   console.log("::: sound/visual setting");
-
+  // sound setting -----------------------------------
+  for (let i = 0; i < 1000; i++) { soundR[i] = randomFull(); }
   // slider1
   cont_ini_memo = [45, 65, 85, 100, 115];
   if (mi_m[0] < 0.5) {
@@ -230,7 +227,7 @@ function prepara_sketch() {
   let _plus = 0;
   if (mi_m[1] > 0.8) {
     tiempo_modo = "free", altura_modo = 0.4;
-    if (tiempo_ms < 8) _plus = 0.5;
+    if (tiempo_ms < 8) _plus = 0.4;
   } else if (mi_m[1] > 0.35) {
     const _nn = [0, 0.13, 0.25, 0.37, 0.5, 0.63, 0.75, 0.87];
     for (let i = 0; i < 5; i++) cont_s[i] = _nn[int(mi_m[i] * 8)]
@@ -241,10 +238,14 @@ function prepara_sketch() {
     tiempo_modo = "4/4", altura_modo = 1;
   }
   // delay
-  let _de, _deR = randomM1();
-  if (_deR + _plus < 0.75) {
-    let _m = int(map(_deR, 0, 0.75, 0, 6));
-    set_delay(_m);
+  let _de;
+  if (randomM1() + _plus < 0.75) {
+    const _td = [0.087, 0.075, 0.0667, 0.05, 0.0334, 0.025];
+    let _m = int(randomM1() * _td.length);
+    tiempo_delay = tiempo_ms * _td[_m];
+    if (tiempo_delay > 1) tiempo_delay *= 0.5;
+    delay.set({ delayTime: tiempo_delay });
+
     _de = _m + 1;
   } else {
     delayTimeLFO = new Tone.LFO(0.002, 0.0001, 0.99).start();
@@ -252,6 +253,7 @@ function prepara_sketch() {
     delayTimeLFO.connect(delay.delayTime);
     _de = "LFO";
   }
+  del_cont = int(randomM1() * 6000);
   console.log("[2] musical quantization: " + tiempo_modo + ", delay mode: " + _de);
 
   // harmony
@@ -270,13 +272,12 @@ function prepara_sketch() {
   else {
     const _fr = [-1, 1];
     notas = [65 + _fr[int(randomM4() * _fr.length)], 63 + _fr[int(randomM4() * _fr.length)], 59 + _fr[int(randomM4() * _fr.length)],
-      55 + _fr[int(randomM4() * _fr.length)], 52]; _arm = "E freak"
+    55 + _fr[int(randomM4() * _fr.length)], 52]; _arm = "E freak"
     //notas = [66, 63, 59, 55, 52]; _arm = "Eaug 7(9)" bug
   }
   if (mi_m[4] < 0.4 && randomM4() < 0.3) { for (let i = 0; i < 5; i++) notas[i] -= 12; _arm += " bass"; }
   for (let i = 0; i < 5; i++) notas_memo[i] = notas[i];
 
-  del_cont = int(randomFull() * 6000);
   sinte_osc = int(randomFull() * 6000);
   sinte_parS = 0.01 + randomFull() * 0.004;
   sinte_A = map(tiempo_ms, 5, 20, 0.0001, 0.01);
@@ -328,14 +329,14 @@ function prepara_sketch() {
 
   // object position/movement from camera
   let _ca = [0, 5]; if (cont_modo == "jumps") _ca = [2, 7];
+  cam_posIni = 20 + int(randomM3() * 60);
   cam_oscSe = cam_data[int(map(randomM3(), 0, 1, _ca[0], _ca[1]))];
-  cam_posIni = 20 + int(randomM3() * 60); if (randomM3() < 0.5) cam_oscSe[2] *= -1;
+  if (randomM3() < 0.5) cam_oscSe[2] *= -1;
   let _r = randomM3();
   if (_r < 0.2) { cam_oscSe[3] = 0; }
-  else if (_r > 0.8) { cam_oscSe[3] = 100; } else { cam_oscSe[3] = 50; }
+  else if (_r < 0.4) { cam_oscSe[3] = 100; } else { cam_oscSe[3] = 50; }
   _r = randomM3();
-  if (_r < 0.22) { cam_oscSe[4] = 0.1; }
-  else if (_r > 0.55) { cam_oscSe[4] = 0.05; } else { cam_oscSe[4] = 0.01; }
+  if (_r < 0.22) cam_oscSe[4] = 0.1; else if (_r < 0.55) cam_oscSe[4] = 0.05; else cam_oscSe[4] = 0.01;
   const _cr = int(map(cam_rotZn, 0.01, 0.00001, 100, 1));
   console.log("[4] sliders movement: " + _da + ", rotation: ", _cr * cam_rotSe + "%, data: " + cam_oscSe);
 
@@ -349,7 +350,6 @@ function prepara_sketch() {
   col_data[5] = _cd5[int(cont_co) % _cd5.length];
   console.log("[5] background: " + col_modo + col_data[5] + ", harmony: " + _arm + ", mod: " + _mod_txt);
 
-  for (let i = 0; i < 1000; i++) { soundR[i] = randomFull(); }
   for (let i = 0; i < 5; i++) cont_ini[i] = cont_ini_memo[i];
   const _ta = [5, 5, 5, 5, 5];
 
@@ -630,13 +630,13 @@ function muestra_titulo() {
   }
 }
 
-function set_delay(_i) {
-
+/* function set_delay(_i) {
+print(_i)
   const _td = [0.025, 0.0334, 0.05, 0.0667, 0.075, 0.08];
-  tiempo_delay = tiempo_ms * _td[_i];
+  tiempo_delay = tiempo_ms * 0.075// _td[_i];
   if (tiempo_delay > 1) tiempo_delay *= 0.5;
   delay.set({ delayTime: tiempo_delay });
-}
+} */
 
 function sound_random() {
 
@@ -850,7 +850,6 @@ class Control {
 
     this.tz = 0;
   }
-
 
   final() {
 
