@@ -1,7 +1,9 @@
-// consulta 
-//The AudioContext is "suspended". Invoke Tone.start() from a user action to start the audio.
-let b_pausa = false, b_trigger = false, b_reset = false;;
-let controles = [], cont_cant = 0, cont_co, cont_colEx = [90, 120, 240, 270], cont_cE_n; // = 34
+/*
+"Parachute waltz" - Yamil Burguener - 2026 
+https://www.editart.xyz/user/tz1LXx82P2LHyzuGYYxjYFCbChTXWNpYKmTg
+*/
+let b_pausa = false, b_trigger = false, b_reset = false;
+let controles = [], cont_cant = 0, cont_co, cont_colEx = [90, 120, 240, 270], cont_cE_n;
 let cont_ini_memo = []; let cont_ini = [], bCont_ini = true, cont_s = [];
 let cont_modo = "", cont_mute = [false, false, false, false, false];
 let cont_ro = [-0.001, 0, 0.001];
@@ -13,28 +15,25 @@ let pg, titInicio, fuente;
 
 let cam, cam_rotZ = 0, cam_rotZn, cam_rotSe;
 let cam_oscSe = [], cam_oscM = 0.025;
-const cam_data = [[100, 0, 50], [0, 100, 50], [0, 100, 60], [-100, 200, 120], [200, -100, 150], [-200, 300, 150], [300, -200, 150]]; //el tercer parametro es para lookAt    //para que NO rote agregar:-200,300t
+const cam_data = [[100, 0, 50], [0, 100, 52], [0, 100, 60], [-100, 200, 100], [200, -100, 125], [-200, 300, 140], [300, -200, 150]];
 let cam_posM, cam_posIni;
 let grilla = [], grilla_sub, grilla_memo = 0;
 let luz_alfa;
 let col_data = [[], [], [], [], []], col_modo;
-let planeR = [], plane_cont = 0;
 let marco = [];
 
 let sinte = [], sinte_pan = [], reverb, sinte_par = 0, sinte_parS, sinte_A, sinte_R, sinte_har = 0.7;
-//let cheby;//pluck;
 let interval_sin, intervalN = 0;
 let sinte_osc, sinte_dur, sinte_var = [];
 let delay, del_cont, del_var = [];
 let subdiv = 0;
 const pan_LR = [-0.9, 0.9];
 let vol_final, b_sound = false;
-const altura_var = [0.08, 0.16, 0.24, 0.3, 0.4]; //[0.05, 0.1, 0.15, 0.2]
+const altura_var = [0.08, 0.16, 0.24, 0.3, 0.4];
 let altura_modo;
-let notas = [], notas_memo = [], notas_cont = 0, modulN = 0; // modul = 0, 
+let notas = [], notas_memo = [], notas_cont = 0, modulN = 0;
 let tiempo_ms, tiempo_modo, tiempo_delay = 0;
-let soundR = [], sound_cont = 0
-let delayTimeLFO;
+let soundR = [], sound_cont = 0, delayTimeLFO;
 
 let myShader;
 let sh;
@@ -55,17 +54,14 @@ const frag = `
 #ifdef GL_ES
 precision highp float;
 #endif
-
 varying vec2 vUv;
 uniform vec4 uColorHSB;   // H:0–360, S:0–100, B:0–100, A:0–1
 uniform vec2 uResolution;
-
 float mi_random(vec2 p) {
   vec3 p3 = fract(vec3(p.xyx) * 0.1031);
   p3 += dot(p3, p3.yzx + 33.33);
   return fract((p3.x + p3.y) * p3.z);
 }
-
 vec3 hsb2rgb(vec3 c) {
   vec3 rgb = clamp(
     abs(mod(c.x * 6.0 + vec3(0.0,4.0,2.0), 6.0) - 3.0) - 1.0,
@@ -82,21 +78,13 @@ void main() {
   float s = uColorHSB.y / 100.0;
   float b = uColorHSB.z / 100.0;
   float a = uColorHSB.w;
-
   vec3 rgb = hsb2rgb(vec3(h, s, b));
-
-  // --- ruido estable en UV ---
   float r = mi_random(vUv * 1024.0);
-
-  // --- CONTROL DE DESINTEGRACIÓN ---
-  float density = 1.5;          // ← subir este valor = más desintegrado
+  float density = 1.5;
   float threshold = pow(a, density);
-
   if (r > threshold) discard;
-
   gl_FragColor = vec4(rgb, 1.0);
 }
-
 `;
 
 
@@ -104,68 +92,69 @@ function preload() {
 
   const channel1 = new Tone.Channel({ volume: 0, channelCount: 2 });
   const channel2 = new Tone.Channel({ volume: 0, channelCount: 2 });
-  const channel3 = new Tone.Channel({ volume: 0, channelCount: 2 });
-  const channel4 = new Tone.Channel({ volume: 0, channelCount: 2 })
-
+  const channel3 = new Tone.Channel({ volume: -3, channelCount: 2 });
+  const channel4 = new Tone.Channel({ volume: 0, channelCount: 2 });
+  const channel5 = new Tone.Channel({ volume: 0, channelCount: 2 })
   for (let i = 0; i < 3; i++) sinte_pan[i] = new Tone.Panner(0)
-  let _PanLFO = new Tone.LFO(0.15, -0.6, 0.6).start();
-  _PanLFO.type = "triangle";
-  _PanLFO.connect(sinte_pan[2].pan)//(sinte[0].pan);
-
-  reverb = new Tone.Reverb({ decay: 1.9, wet: 0.95 })
-  const reverb2 = new Tone.Reverb({ decay: 0.5, wet: 0.5 }) //1, 0.75
-  delay = new Tone.FeedbackDelay({ wet: 0 })//.toDestination();
-
+  let _PanLFO = new Tone.LFO(0.15, -0.7, 0.7).start(); _PanLFO.type = "triangle";
+  _PanLFO.connect(sinte_pan[2].pan);
+  reverb = new Tone.Reverb({
+    decay: 1, preDelay: 0.02, wet: 0.95
+    // dampening: 2000  // Hz → corta agudos en la cola
+  });
+  const lp = new Tone.Filter(600, "lowpass");
+  const reverb2 = new Tone.Reverb({ decay: 0.5, wet: 0.5 });
+  delay = new Tone.FeedbackDelay({ wet: 0 });
+  const comp = new Tone.Compressor({
+    ratio: 12, threshold: -20, release: 0.25, attack: 0.003, knee: 3
+  });
+  vol_final = new Tone.Gain(1.1);
+  const limiter = new Tone.Limiter(-0.5);
 
   sinte[0] = new Tone.PolySynth()
   sinte[0].set({
     envelope: {
       attack: 0.01, decay: 0.03, sustain: 0.25, release: 0.13, releaseCurve: [1, 0]
     },
-    oscillator: { type: "sawtooth20" }, // hasta 32 parciales
+    oscillator: { type: "sawtooth20" },
   })
-  sinte[0].chain(channel1); //reverb, 
-  sinte[0].chain(channel2);
-  const comp = new Tone.Compressor({
-    ratio: 12, threshold: -20, release: 0.25, attack: 0.003, knee: 3
-  });
-  //for (let i = 0; i < 3; i++) 
-  vol_final = new Tone.Gain(1.1); // 1.8
-  const limiter = new Tone.Limiter(-0.5);
+  sinte[0].chain(channel1); sinte[0].chain(channel2);
+  sinte[0].chain(channel3);
 
-  sinte[1] = new Tone.AMSynth()//AMSynth(), FMSynth(), MonoSynth
+  sinte[1] = new Tone.AMSynth()
   sinte[1].set({
     portamento: 100,
     envelope: {
       attack: 0.001, decay: 0.3, sustain: 1, release: 0.1, releaseCurve: [1, 0]
     },
-    oscillator: { type: "square" }, //sawtooth, triangle, square, sine
+    oscillator: { type: "square" },
     harmonicity: sinte_har,
     modulation: { type: "square" },
     modulationEnvelope: {
-      attack: 0.001, decay: 0.3, sustain: 1, release: 0//0.3
+      attack: 0.001, decay: 0.3, sustain: 1, release: 0
     }
   })
-  sinte[1].chain(sinte_pan[1], channel3);
+  sinte[1].chain(sinte_pan[1], channel4);
 
-  channel1.chain(sinte_pan[0], reverb, channel4)//channel.chain(comp, Tone.Destination)
-  channel2.chain(delay, sinte_pan[2], channel4)//vol_final[1], Tone.Destination)  //channel2.chain(channel, delay, Tone.Destination) // channel, delay
-  channel3.chain(reverb2, channel4)//, vol_final[2], Tone.Destination)//channel, cheby, reverb2, vol_final[2], Tone.Destination)
-  channel4.chain(comp, vol_final, limiter, Tone.Destination);
+  channel1.chain(sinte_pan[0], channel5);
+  channel2.chain(reverb, lp, channel5);
+  channel3.chain(delay, sinte_pan[2], channel5);
+  channel4.chain(reverb2, channel5);
+  channel5.chain(comp, vol_final, limiter, Tone.Destination);
 }
 
 
 function setup() {
 
-  console.log("::: Sliders - Yamil Burguener 2026");
+  console.log("::: Parachute waltz - Yamil Burguener 2026");
   let cv = createCanvas(1620, 1620, WEBGL);
-  cv.parent("cv"); cv.id("sl"); cv.class("sl");
+  cv.parent("cv"); cv.id("pw"); cv.class("pw");
   // cv.imageSmoothingEnabled = false // bug ¿?
   pixelDensity(1);
   colorMode(HSB);
   imageMode(CENTER);
   rectMode(CENTER);
-  //noSmooth();
+  //noSmooth(); bug
   strokeWeight(1);
 
   pg = createGraphics(1620, 1620);
@@ -177,32 +166,13 @@ function setup() {
   fuente = loadFont('./Menlo-Regular.ttf');
   pg.textFont(fuente);
   sh = createShader(vert, frag);
-
-  /* myShader = baseStrokeShader().modify({
-    'float random': `(vec2 p) {
-      vec3 p3  = fract(vec3(p.xyx) * .1031);
-      p3 += dot(p3, p3.yzx + 33.33);
-      return fract((p3.x + p3.y) * p3.z);
-    }`,
-    'Inputs getPixelInputs': `(Inputs inputs) {
-      // Replace alpha in the color with dithering by
-      // randomly setting pixel colors to 0 based on opacity
-      float a = inputs.color.a;
-      //inputs.color.a = 1.0;
-      inputs.color *= random(inputs.position.xy) > a ? 0.5 : 1.0;
-      return inputs;
-    }`
-  }); */
-
   myShader = baseStrokeShader().modify({
     'Inputs getPixelInputs': `(Inputs inputs) {
       float a = inputs.color.a;
       vec2 p = inputs.position.xy;
-      // hash inline (without external random)
       vec3 p3  = fract(vec3(p.xyx) * .1031);
       p3 += dot(p3, p3.yzx + 33.33);
       float r = fract((p3.x + p3.y) * p3.z);
-  
       inputs.color *= r > a ? 0.5 : 1.0;
       return inputs;
     }`
@@ -212,10 +182,7 @@ function setup() {
   cam = createCamera();
   cam.camera(0, 0, 300, 0, 0, 0, 0, 1, 0);
   let cameraZ = (height / 2) / tan((PI / 3) / 2.0);
-  perspective(1.5, 1, cameraZ / 20, cameraZ * 5) //cameraZ / 10.0, cameraZ * 10 -> 187 a 18706
-
-  //for (let i = 0; i < 3; i++) vol_final.mute = true; //sacar bug
-  //vol_final.gain.rampTo(0, 0.05);
+  perspective(1.5, 1, cameraZ / 20, cameraZ * 5);
 
   let _plX = -85, _plY = -85;
   for (let i = 0; i < 17; i++) { marco[i] = createVector(_plX, _plY); _plX += 10; }
@@ -233,49 +200,45 @@ function prepara_sketch() {
   mi_m = [m0, m1, m2, m3, m4], cont_s = [m0, m1, m2, m3, m4];
   // sound setting -----------------------------------
   console.log("::: sound/visual setting");
+
   // slider1
   cont_ini_memo = [45, 65, 85, 100, 115];
   if (mi_m[0] < 0.5) {
-    tiempo_ms = int(map(mi_m[0], 0, 0.5, 5, 15)); //5, 15
-    tiempo_ms = 13;//bug
+    tiempo_ms = int(map(mi_m[0], 0, 0.5, 5, 15));
     const _de = map(mi_m[0], 0, 0.5, 0.01, 1.9);
     const _we = map(mi_m[0], 0, 0.5, 0, 0.95);
     reverb.set({ decay: _de, wet: _we });
-    if (mi_m[0] < 0.2) { sinte_var = [84, 36, 0.3], cont_ini_memo[2] = -1, cont_ini_memo[3] = -1, cont_ini_memo[4] = -1; } // anula los ultimos
-    else if (mi_m[0] < 0.35) { sinte_var = [36, 24, 0.15], cont_ini_memo[3] = -1, cont_ini_memo[4] = -1; }
+    if (mi_m[0] < 0.1) { sinte_var = [84, 36, 0.3], cont_ini_memo[1] = -1, cont_ini_memo[3] = -1, cont_ini_memo[4] = -1; }
+    else if (mi_m[0] < 0.3) { sinte_var = [36, 24, 0.15], cont_ini_memo[2] = -1, cont_ini_memo[4] = -1; }
     else { sinte_var = [24, 24, 0.1], cont_ini_memo[4] = -1; }
   } else {
-    tiempo_ms = int(map(mi_m[0], 0.5, 1, 15, 21)); //15, 21
-    const _re = map(mi_m[0], 0.5, 1, 1.5, 0.5);
+    tiempo_ms = int(map(mi_m[0], 0.5, 1, 15, 21));
+    const _re = map(mi_m[0], 0.5, 1, 1.5, 3);
     reverb.set({ decay: _re });
     sinte_var = [12, 24, 0.4];
   }
   sinte_dur = constrain(map(tiempo_ms, 10, 20, 0.01, 0.75), 0.01, 1);
-  const _ro = constrain(map(tiempo_ms, 5, 11, 0.1, 0.001), 0.001, 0.05); // rotacion de los hijos controladores
+  const _ro = constrain(map(tiempo_ms, 5, 11, 0.1, 0.001), 0.001, 0.025);
   cont_ro = [-_ro, 0, _ro];
-  if (randomFull() < 0.35) cam_oscM = 0.025; else cam_oscM = map(tiempo_ms, 5, 20, 0.02, 0.05); // antes todo a 0.025. mayor se mueve mas
-  print("*** cam_oscM ", cam_oscM)
-  let _ha = [0.1, 0.3, 0.5, 0.7, 1, 3, 5, 8]; let _ha1 = int(map(tiempo_ms, 5, 20, 0, _ha.length - 1))
-  sinte_har = _ha[_ha1] //_ha[int(randomFull() * _ha.length)];
+  if (randomFull() < 0.5) cam_oscM = 0.025; else cam_oscM = map(tiempo_ms, 5, 20, 0.02, 0.05);
+  const _ha = [0.1, 0.3, 0.5, 0.7, 1, 3, 5, 8]; const _ha1 = int(map(tiempo_ms, 5, 20, 0, _ha.length - 1));
+  sinte_har = _ha[_ha1];
   sinte[1].set({ harmonicity: sinte_har });
   console.log("[1] musical tempo (5-20): " + tiempo_ms + "ms");
 
   // slider2
   let _plus = 0;
-  if (mi_m[1] > 0.8) { // 0.75
-    tiempo_modo = "free"
-    altura_modo = 0.4;
+  if (mi_m[1] > 0.8) {
+    tiempo_modo = "free", altura_modo = 0.4;
     if (tiempo_ms < 8) _plus = 0.5;
   } else if (mi_m[1] > 0.35) {
-    const _nn = [0, 0.13, 0.25, 0.48, 0.5, 0.63, 0.75, 0.87]; // mueve los sliders
+    const _nn = [0, 0.13, 0.25, 0.37, 0.5, 0.63, 0.75, 0.87];
     for (let i = 0; i < 5; i++) cont_s[i] = _nn[int(mi_m[i] * 8)]
-    tiempo_modo = "8/4"; //cuantizado en corcheas
-    altura_modo = 0.75;
+    tiempo_modo = "8/4", altura_modo = 0.75;
   } else {
-    const _nn = [0, 0.25, 0.5, 0.75];  // mueve los sliders
+    const _nn = [0, 0.25, 0.5, 0.75];
     for (let i = 0; i < 5; i++) cont_s[i] = _nn[int(mi_m[i] * 4)];
-    tiempo_modo = "4/4"; // cuantizado en negras
-    altura_modo = 1;
+    tiempo_modo = "4/4", altura_modo = 1;
   }
   // delay
   let _de, _deR = randomFull();
@@ -284,7 +247,8 @@ function prepara_sketch() {
     set_delay(_m);
     _de = _m + 1;
   } else {
-    delayTimeLFO = new Tone.LFO(0.002, 0.0001, 0.99).start();  // LFO entre 0.1 y 1 segundos
+    delayTimeLFO = new Tone.LFO(0.002, 0.0001, 0.99).start();
+    delayTimeLFO.type = "triangle";
     delayTimeLFO.connect(delay.delayTime);
     _de = "LFO";
   }
@@ -294,96 +258,104 @@ function prepara_sketch() {
   let _mod_txt = "--";
   if (mi_m[3] >= 0.7 && tiempo_ms >= 8) {
     const _m = [2, 3, 4, 5];
-    modulN = _m[int(randomFull() * _m.length)]; //int(map(mi_m[4], 0.7, 1, 6, 2)) //
+    modulN = _m[int(randomFull() * _m.length)];
     _mod_txt = modulN + "st";
-  } //else { modulN = 12; }
+  }
   let _arm = "";
   if (tiempo_ms < 8) { notas = [52 + 12, 52 + 1, 52, 52 - 1, 52 - 12]; _arm = "E unison" }
-  else if (mi_m[4] < 0.1) { notas = [66, 62 + 1, 59, 55, 52]; _arm = "Emin 7M(9)" } //< 0.15
-  else if (mi_m[4] < 0.51) { notas = [66, 62, 59, 55, 52]; _arm = "Emin 7(9)" } //["F#5", "D5", "B4", "G4", "E4"];
-  else if (mi_m[4] < 0.95) { notas = [66, 63, 59, 56, 52]; _arm = "Emaj 7(9)" } // maj,7 9 -> "F#5", "D#5", "B4", "G#4", "E4" < 0.85
-  else { notas = [66, 63 - 1, 59 + 1, 56, 52]; _arm = "Eaug 7(9)" }
+  else if (mi_m[4] < 0.1) { notas = [66, 62 + 1, 59, 55, 52]; _arm = "Emin 7M(9)" }
+  else if (mi_m[4] < 0.55) { notas = [66, 62, 59, 55, 52]; _arm = "Emin 7(9)" }
+  else if (mi_m[4] < 0.93) { notas = [66, 63, 59, 56, 52]; _arm = "Emaj 7(9)" }
+  else if (mi_m[4] < 0.97) { notas = [66, 63 - 1, 59 + 1, 56, 52]; _arm = "Eaug 7(9)" }
+  else {
+    const _fr = [-1, 1];
+    notas = [65 + _fr[int(randomFull() * _fr.length)], 63 + _fr[int(randomFull() * _fr.length)], 59 + _fr[int(randomFull() * _fr.length)],
+      55 + _fr[int(randomFull() * _fr.length)], 52]; _arm = "E freak"
+    //notas = [66, 63, 59, 55, 52]; _arm = "Eaug 7(9)" bug
+  }
+  if (mi_m[4] < 0.4 && randomFull() < 0.3) { for (let i = 0; i < 5; i++) notas[i] -= 12; _arm += " bass"; }
   for (let i = 0; i < 5; i++) notas_memo[i] = notas[i];
 
-  del_cont = int(randomFull() * 6000); // valor inicial del delay
-  sinte_osc = int(randomFull() * 6000); // valor inicial
-  sinte_parS = 0.01 + randomFull() * 0.004;   // valor inicial parciales 0.01-0.014
-  sinte_A = map(tiempo_ms, 5, 20, 0, 0.01); // 0, 0.1
-  sinte_R = map(tiempo_ms, 5, 20, 0.02, 0.5); // 0.05, 0.5
+  del_cont = int(randomFull() * 6000);
+  sinte_osc = int(randomFull() * 6000);
+  sinte_parS = 0.01 + randomFull() * 0.004;
+  sinte_A = map(tiempo_ms, 5, 20, 0.0001, 0.01);
+  sinte_R = map(tiempo_ms, 5, 20, 0.02, 0.03);
 
   // visual setting -------------------------------------
   // slider3
   cont_co = map(mi_m[2], 0, 1, 0, 360 + 70) % 360;
   console.log("[3] color palette: " + int(cont_co));
-  luz_alfa = map(tiempo_ms, 5, 20, 0.04, 0.01);// 0.01 a 0.05
+  luz_alfa = map(tiempo_ms, 5, 20, 0.04, 0.015); //0.04, 0.01 bug
   del_var[0] = map(mi_m[2], 0, 1, 0.05, 0.3);
   del_var[1] = del_var[0] * 2;
 
   // slider4
   let _da = "";
   if (mi_m[3] < 0.7) {
-    cont_modo = "spins"; //trompos
+    cont_modo = "spins";
     _da = cont_modo;
   }
   else {
-    cont_modo = "jumps"; //jumps
+    cont_modo = "jumps";
     let _r = randomFull();
-    if (_r < 0.2) grilla = [[0, 0], [-100, 0], [100, -100], [0, -100], [-100, -100], [100, 100], [0, 100], [-100, 100], [100, 0]]; //tipo texto
-    else if (_r < 0.4) grilla = [[0, 0], [100, 100], [0, 100], [-100, 100], [-100, 0], [-100, -100], [0, -100], [100, -100], [100, 0]]; //giro reloj
-    else if (_r < 0.6) grilla = [[0, 0], [100, -100], [0, -100], [-100, -100], [-100, 0], [-100, 100], [0, 100], [100, 100], [100, 0]]; //giro -reloj
-    else if (_r < 0.8) grilla = [[0, 0], [100, 100], [-100, 100], [0, 0], [100, -100], [-100, -100]]; //giro 8
-    else grilla = [[0, 0], [100, -100], [0, -100], [-100, -100], [0, 0], [0, 100]]; //giro triangulo
-    const _zo = constrain(0.5 + randomFull(), 0, 1);//randomFull o map mi_m3??? bug
+    if (_r < 0.2) grilla = [[0, 0], [-100, 0], [100, -100], [0, -100], [-100, -100], [100, 100], [0, 100], [-100, 100], [100, 0]];
+    else if (_r < 0.4) grilla = [[0, 0], [100, 100], [0, 100], [-100, 100], [-100, 0], [-100, -100], [0, -100], [100, -100], [100, 0]];
+    else if (_r < 0.6) grilla = [[0, 0], [100, -100], [0, -100], [-100, -100], [-100, 0], [-100, 100], [0, 100], [100, 100], [100, 0]];
+    else if (_r < 0.8) grilla = [[0, 0], [100, 100], [-100, 100], [0, 0], [100, -100], [-100, -100]];
+    else grilla = [[0, 0], [100, -100], [0, -100], [-100, -100], [0, 0], [0, 100]];
+    const _zo = constrain(0.5 + randomFull(), 0, 1);
     for (let i = 0; i < grilla.length; i++) { grilla[i][0] *= _zo; grilla[i][1] *= _zo; }
-    for (let i = 0; i < 5; i++) cont_ini_memo[i] = int(cont_ini_memo[i] * 2.25); //* 2.5 ... * 3
-    const _g = [0.05, 0.1, 0.2, 0.25, 0.5, 1]; //a menor numero cambia menos de lugar la grilla
+    for (let i = 0; i < 5; i++) cont_ini_memo[i] = int(cont_ini_memo[i] * 2);
+    const _g = [0.05, 0.1, 0.2, 0.25, 0.5, 1];
     const _g2 = int(map(mi_m[3], 0.7, 1, 0, _g.length));
     grilla_sub = _g[_g2];
-    _da = cont_modo + " " + grilla_sub;
+    _da = cont_modo + grilla_sub;
   }
   // rotation speed (clock)
   ini_rotZ = 16 + int(randomFull() * 16) * 5;
   if (randomFull() < 0.5) cam_rotSe = 1; else cam_rotSe = -1;
-  let _vG;
-  if (cont_modo == "spins") _vG = [0.02, 0.015, 0.0125, 0.015, 0.01, 0.01, 0.01, 0.005, 0.002]; // vel giro * 0.01 orig
-  else _vG = [0.01, 0.01, 0.01, 0.0075, 0.005, 0.001, 0.0001, 0.00001]; //0.0002, 
-  cam_rotZn = _vG[int(randomFull() * _vG.length)];
-  const _cr = int(map(cam_rotZn, 0.01, 0.00001, 100, 1));
+  let _vG, _vG1;
+  if (cont_modo == "spins") {
+    _vG = [0.02, 0.015, 0.0125, 0.015, 0.01, 0.01, 0.01, 0.007, 0.005];
+    _vG1 = int(map(mi_m[0], 0, 1, _vG.length - 1, 0))
+  }
+  else {
+    _vG = [0.01, 0.01, 0.01, 0.0075, 0.005, 0.004, 0.002];
+    _vG1 = int(map(mi_m[0], 0, 1, _vG.length - 1, 0))
+  }
+  cam_rotZn = _vG[_vG1];
 
   // object position/movement from camera
   let _ca = [0, 5]; if (cont_modo == "jumps") _ca = [2, 7];
-  cam_oscSe = cam_data[int(map(randomFull(), 0, 1, _ca[0], _ca[1]))]; //_cS[int(randomFull() * _cS.length)];
-  cam_posIni = 20 + int(randomFull() * 60); // en que frame empieza a rotar hacia abajo
-  if (randomFull() < 0.5) cam_oscSe[2] *= -1; // sentido
+  cam_oscSe = cam_data[int(map(randomFull(), 0, 1, _ca[0], _ca[1]))];
+  cam_posIni = 20 + int(randomFull() * 60); if (randomFull() < 0.5) cam_oscSe[2] *= -1;
   let _r = randomFull();
   if (_r < 0.2) { cam_oscSe[3] = 0; }
   else if (_r > 0.8) { cam_oscSe[3] = 100; } else { cam_oscSe[3] = 50; }
   _r = randomFull();
   if (_r < 0.22) { cam_oscSe[4] = 0.1; }
   else if (_r > 0.55) { cam_oscSe[4] = 0.05; } else { cam_oscSe[4] = 0.01; }
-  console.log("[4] sliders movement: " + _da +
-    ", rotation: ", _cr * cam_rotSe + "%, data: " + cam_oscSe);
+  const _cr = int(map(cam_rotZn, 0.01, 0.00001, 100, 1));
+  console.log("[4] sliders movement: " + _da + ", rotation: ", _cr * cam_rotSe + "%, data: " + cam_oscSe);
 
   // slider5
   if (mi_m[4] < 0.4) {
-    col_modo = "dark";
-    col_data = [100, 90, 1, 5, -4]; // color background, fondo, col plane B, line, sentido de this.co
+    col_modo = "dark", col_data = [100, 90, 1, 5, -4];
   } else {
-    col_modo = "light";
-    col_data = [0, 10, 99, 95, 4];
+    col_modo = "light", col_data = [0, 10, 99, 95, 4];
   }
-  let _cd5 = [180, 180, 180, 120, 240, 85, 265];
+  const _cd5 = [180, 180, 180, 120, 240, 85, 265];
   col_data[5] = _cd5[int(cont_co) % _cd5.length];
-  console.log("[5] background: " + col_modo + col_data[5] +
-    ", harmony: " + _arm + ", mod: " + _mod_txt);
+  console.log("[5] background: " + col_modo + col_data[5] + ", harmony: " + _arm + ", mod: " + _mod_txt);
 
-  // loop setting --------------------
   for (let i = 0; i < 1000; i++) { soundR[i] = randomFull(); }
-  for (let i = 0; i < 1000; i++) { planeR[i] = randomFull(); }
   for (let i = 0; i < 5; i++) cont_ini[i] = cont_ini_memo[i];
+  const _ta = [5, 5, 5, 5, 5];
 
   controles = [];
-  controles.push(new Control(0, cont_s[0], cont_s[1], cont_s[2], cont_s[3], cont_s[4], 0, 0, 0, cont_co));
+  controles.push(new Control(0, cont_s[0], cont_s[1], cont_s[2], cont_s[3], cont_s[4],
+    0, 0, 0, cont_co, 0, _ta));
 
   // reset
   intervalN = 0, notas_cont = 0, cont_cant = 0, cont_cE_n = 14, bCont_ini = true;
@@ -417,47 +389,40 @@ function draw() {
 
     let _int = 0;
     if (notas_cont > cam_posIni) {
-      // vaiven de camara
+      // camera swing
       _int = intervalN * cam_posM - cam_posIni;
-      const cam_osc = 50 - sin(_int * cam_oscM) * 50; // 100 - 0 (empieza en 50) //* 0.025 bug! ver feature
-
-      const _ang = map(cam_osc, cam_oscSe[0], cam_oscSe[1], HALF_PI, -HALF_PI);// HALF_PI, 0
-      const camY = 300 * sin(_ang); //cos
-      const camZ = 300 * cos(_ang); //sin
-
-      cam.setPosition(0, camY, camZ); //_oscX. camY, camZ
-
+      const cam_osc = 50 - sin(_int * cam_oscM) * 50;
+      const _ang = map(cam_osc, cam_oscSe[0], cam_oscSe[1], HALF_PI, -HALF_PI);
+      const camY = 300 * sin(_ang);
+      const camZ = 300 * cos(_ang);
+      cam.setPosition(0, camY, camZ);
       for (let i = 0; i < controles.length; i++) { controles[i].set_z(cam_osc) }
     }
     else {
-      cam_posM = cam_posIni / intervalN; // M de multiplicacion
-      for (let i = 0; i < controles.length; i++) { controles[i].set_z(cam_oscSe[3]) }// 0,[50],100
+      cam_posM = cam_posIni / intervalN;
+      for (let i = 0; i < controles.length; i++) { controles[i].set_z(cam_oscSe[3]) }
     }
 
     if (cont_modo == "spins") {
-      const _oscX = cam_oscSe[2] * sin(_int * cam_oscSe[4]); //10 bug!! 50 * .... 0.01
+      const _oscX = cam_oscSe[2] * sin(_int * cam_oscSe[4]);
       cam.lookAt(_oscX, 0, 0);
     } else {
       const _i = int(notas_cont * grilla_sub) % grilla.length;
       cam.lookAt(grilla[_i][0], grilla[_i][1], 0);
-      if (_i != grilla_memo) {// && _i % grilla.length == 0) {
-        // modul = (modul + modulN) % 12; // modula
+      if (_i != grilla_memo) {
         let _m = 0;
         if (grilla[_i][1] > 0) _m = modulN; else if (grilla[_i][1] < 0) _m = -modulN;
         for (let i = 0; i < notas.length; i++) {
-          notas[i] = notas_memo[i] + _m; // + modul;
-          /*  if (notas[4] >= 64) {
-             for (let i = 0; i < notas.length; i++) notas[i] = notas[i] - 12;
-           } */
+          notas[i] = notas_memo[i] + _m;
         }
       }
       grilla_memo = _i;
     }
 
-    // controles: drawing, reset, etc.
+    // controls: drawing, reset, etc.
     if (bCont_ini) {
       if (sinte_par == 3 || b_reset) {
-        cont_cant = 0; //new
+        cont_cant = 0;
         bCont_ini = false;
         if (b_reset) b_reset = false;
         for (let i = controles.length; i > 0; i--) controles.splice(i, 1);
@@ -470,11 +435,11 @@ function draw() {
     for (let i = 0; i < controles.length; i++) controles[i].dibuja();
 
     // trail
-    let _e, _a; // 0.01 ... 0.025 .... 0.1
-    if (notas_cont > 200) { _e = 200, _a = 0.05 } // 0.025
-    else if (notas_cont > 160) { _e = 60, _a = 0.05 } //0.03
-    else if (notas_cont > 80) { _e = 12, _a = 0.05 }
-    else { _e = 2; _a = 0.1 }
+    let _e, _a;
+    if (notas_cont > 200) { _e = 200, _a = 0.05 }
+    else if (notas_cont > 160) { _e = 60, _a = 0.05 }
+    else if (notas_cont > 80) { _e = 20, _a = 0.05 }
+    else { _e = 2; _a = 0.05 }
 
     if (frameCount % _e == 0) estela(_a); else { estela(0); }
   }
@@ -488,57 +453,50 @@ function suena_sinte(_no) {
   if (notas_cont <= cam_posIni) _we = constrain(map(notas_cont, 10, cam_posIni - 1, 0, 0.75), 0, 0.75);
   let _d = 0.5 + sin(del_cont * 0.01) * 0.5;
   del_cont++;
-  const _f = map(_d, 0, 1, del_var[0], del_var[1]); //0.6, 0.2
+  const _f = map(_d, 0, 1, del_var[0], del_var[1]);
   delay.set({ feedback: _f, wet: _we });
 
   let _pa = -0.5 + sound_random();
-  let _at = sinte_A + cos(sinte_osc * 0.0495) * (sinte_A * 0.3)// 0.055 + cos(sinte_osc * 0.0495) * 0.045; // 0.01 a 0.1
-  let _re = sinte_R + sin(sinte_osc * 0.01) * sinte_R;  //  * 0.5 // 0.01 a 1
-
-  const _va = constrain(map(intervalN % 15000, 1000, 15000, 0, altura_modo), 0, altura_modo); //% 11000, 1000, 10000
-  let _vol = 0.5, _desaf = false, _repeat = false; //_n = 0, 
-
+  let _at = sinte_A + cos(sinte_osc * 0.0495) * (sinte_A * 0.3)
+  let _re = sinte_R + sin(sinte_osc * 0.01) * sinte_R;
+  const _va = constrain(map(intervalN % 15000, 1000, 15000, 0, altura_modo), 0, altura_modo);
+  let _vol = 0.5, _desaf = false, _repeat = false;
   const _r = sound_random();
   if (_r < altura_var[0] * _va) {
     _no += sinte_var[0]; _vol = sinte_var[2]; bEstela = false;
-    if (_no > 100) { _no -= 36; }
+    if (_no > 100) _no -= 36;
     _at = 0.3; _re = 1.5;
-  } //12
+  }
   else if (_r < altura_var[1] * _va) {
     _no -= sinte_var[1]; _vol = 0.9; _pa = 0; _at *= 2;
-    if (_no < 0) { _no = int(sound_random() * 12); print("bajo " + _no) }
+    //if (_no < 0) { _no = int(sound_random() * 12); print("bajo " + _no) } //bug
     delay.set({ feedback: 0, wet: 0.3 });
-  } //48 
+  }
   else if (_r < altura_var[2] * _va) { _no += 1; }
   else if (_r < altura_var[3] * _va) { _no -= 1; }
   else if (_r < altura_var[4] * _va) { _no += 12, _repeat = true, _at *= 0.3, _re *= 0.3; }
-  else _desaf = true;
+  else if (notas_cont > 20 && sound_random() < 0.05) _desaf = true;
 
   let _hertz = constrain(Tone.Frequency(_no, "midi").toFrequency(), 20, 40000);
-
-  if (intervalN % (25 - tiempo_ms) == 0) _at *= 0.25;  //variacion
-  sinte_par = int(15 + sin(sinte_osc * sinte_parS) * 12); // 12 + .... * 0.012) * 9 
+  if (intervalN % (25 - tiempo_ms) == 0) _at *= 0.25;
+  sinte_par = int(15 + sin(sinte_osc * sinte_parS) * 12);
   envelope(0, _at, _re);
   sinte[0].set({ oscillator: { type: "sawtooth" + sinte_par } });
   sinte_osc++;
+  if (_desaf) _hertz = _hertz * (0.975 + sound_random() * 0.05);
 
-  if (_desaf && sound_random() < 0.05) _hertz = _hertz * (0.975 + sound_random() * 0.05);
-
-
-  sinte_pan[0].pan.rampTo(_pa, 0.03); //sinte_pan[0].set({ pan: _pa })
-  if (b_sound) sinte[0].triggerAttackRelease(_hertz, sinte_dur, Tone.now(), _vol); //
-
+  sinte_pan[0].pan.rampTo(_pa, 0.025);
+  if (b_sound) sinte[0].triggerAttackRelease(_hertz, sinte_dur, Tone.now(), _vol);
 
   if (b_sound && _repeat) {
-    let _p = int(randomFull() * 2);
-    sinte_pan[1].set({ pan: pan_LR[_p] });// + sound_random() * 2 })
+    let _p = int(sound_random() * 2);
+    sinte_pan[1].set({ pan: pan_LR[_p] });
     envelope(1, _at, _re);
-    let _ti = ["+" + str(_f * 0.5), "+" + str(_f), "+" + str(_f) * 1.5, "+" + str(_f * 2)];
-    const _r = constrain(int(randomFull() * 8), 0, 4); //int(randomFull() * 8);
+    let _ti = ["+" + str(_f * 0.5), "+" + str(_f), "+" + str(_f * 1.5), "+" + str(_f * 2)];
+    const _r = constrain(int(sound_random() * 7), 1, 4);
     sinte[1].triggerRelease();
-
     for (let i = 0; i < _r; i++) {
-      sinte[1].triggerAttackRelease(_hertz, _f * 0.4, _ti[i], 0.9);//_vol * 0.75);
+      sinte[1].triggerAttackRelease(_hertz, _f * 0.4, _ti[i], 0.6);
     }
   }
 }
@@ -550,12 +508,11 @@ function envelope(_n, _at, _re) {
 
 function Rep_sinte(_r) {
 
-  interval_sin = setInterval(() => {//entra cada 15 ms. si frameRate esta a 60, entra minimamente mas veces que el frame
-    let _n = []
+  interval_sin = setInterval(() => {
+    let _n = [];
     for (let i = 0; i < 5; i++) {
-      if (!cont_mute[i]) _n[i] = int(cont_s[i] * 100); // mi_m[i]
+      if (!cont_mute[i]) _n[i] = int(cont_s[i] * 100);
     }
-
     for (let i = 0; i < 5; i++) {
       if (_n[i] == subdiv) {
         suena_sinte(notas[i]);
@@ -567,11 +524,9 @@ function Rep_sinte(_r) {
         else if (notas_cont == cont_ini[3]) crea_controles();
         else if (notas_cont == cont_ini[4]) crea_controles();
 
-        if (notas_cont == ini_rotZ) {   // 16 a 96 .... antes == 20
-          cam_rotZ = 0.000001 * cam_rotSe//  (0.0001 + randomFull() * 0.0001) * cam_rotSe[int(randomFull() * 2)];
-        }
+        if (notas_cont == ini_rotZ) { cam_rotZ = 0.000001 * cam_rotSe; }
 
-        if (notas_cont % 740 >= 720) posicion_reset();// 600 bug eran 12 notas, ahora 20
+        if (notas_cont % 740 >= 720) posicion_reset();
 
         if (notas_cont % 160 == 140) {
           const _r = int(randomFull() * contM.length);
@@ -586,8 +541,8 @@ function Rep_sinte(_r) {
     }
     subdiv++;
     if (subdiv == 100) subdiv = 0;
-    intervalN++; // simil frame Count
-    if (intervalN == 14300 && !b_trigger) { //11000  (calculo: 720*100/5 = 14400)
+    intervalN++;
+    if (intervalN == 14300 && !b_trigger) {
       b_trigger = true;
       triggerPreview();
       grabaImagen(); // bug
@@ -598,25 +553,20 @@ function Rep_sinte(_r) {
 function estela(_a) {
 
   push();
-  // ir a la posición de la cámara
   rotateZ(-cam_rotZ);
   translate(cam.eyeX, cam.eyeY, cam.eyeZ);
-
-  // orientar el plano como la cámara
   const dx = cam.centerX - cam.eyeX;
   const dy = cam.centerY - cam.eyeY;
   const dz = cam.centerZ - cam.eyeZ;
   const yaw = atan2(dx, dz);
   const pitch = -atan2(dy, sqrt(dx * dx + dz * dz));
-  rotateY(yaw)// + random(-0.05,0.05));
-  rotateX(pitch)//+ random(-0.05,0.05));
-
-  // adelantar el plano frente a la cámara
+  rotateY(yaw);
+  rotateX(pitch);
   translate(0, 0, 95);
   noStroke();
   if (_a != 0) {
-    fill((cont_co + 30) % 360, 2, col_data[2], _a); // orig
-    plane(160, 160); // 160, 160 .....  85,85 /1080x1080
+    fill((cont_co + 30) % 360, 2, col_data[2], _a);
+    plane(160, 160);
     if (seccion == "cargando") {
       rotateY(PI);
       texture(pg);
@@ -636,9 +586,9 @@ function posicion_reset() {
 
   cam_posM = cam_posIni / intervalN;
   cam_posIni = notas_cont;
-  cam_rotZ = 0;// 0.000001 * cam_rotSe;
+  cam_rotZ = 0;
   controles[0].reset_z();
-  ini_rotZ = notas_cont + 6; // + 1
+  ini_rotZ = notas_cont + 6;
   bCont_ini = true;
   b_reset = true;
 }
@@ -651,8 +601,11 @@ function crea_controles() {
   const _tz = [50, 100, 150, 200, 250];
   cont_cant++;
   let _zPlus = controles[0].get_z();
+  const _rot = cont_ro[int(randomFull() * cont_ro.length)];
+  let _ta = constrain(5 - i, 1, 4);
+  const _ta1 = [_ta, _ta, _ta, _ta, _ta];
   controles.push(new Control(cont_cant, cont_s[0], cont_s[1], cont_s[2], cont_s[3], cont_s[4],
-    _tx, _ty[i % 5], _tz[i % 5] + _zPlus, cont_co));
+    _tx, _ty[i % 5], _tz[i % 5] + _zPlus, cont_co, _rot, _ta1));
 }
 
 function muestra_titulo() {
@@ -665,14 +618,14 @@ function muestra_titulo() {
   pg.rect(pg.width / 2 - 135, pg.height / 2 + 400, 270, 60);
   pg.rect(pg.width / 2 + 135, pg.height / 2 + 400, 270, 60);
   pg.fill((cont_co + 30) % 360, 2, col_data[2], 0.5)
-  pg.text("PARACHUTE WALTZ", pg.width / 2 - 135, pg.height / 2 + 340);//  pg.text("Parachute waltz", pg.width / 2 - 135, pg.height / 2 + 340);//  pg.text("S L I D E R S", pg.width / 2 - 135, pg.height / 2 + 340);
+  pg.text("PARACHUTE WALTZ", pg.width / 2 - 135, pg.height / 2 + 340);
   pg.text("by yamil burguener", pg.width / 2 + 135, pg.height / 2 + 340);
   const _t = int((titInicio - millis()) * 0.001);
-  pg.text("CLICK TO START", pg.width / 2 - 135, pg.height / 2 + 400);
+  pg.text("click to start", pg.width / 2 - 135, pg.height / 2 + 400);
   pg.text("or wait (" + _t + ") seconds", pg.width / 2 + 135, pg.height / 2 + 400);
   if (_t <= 0) {
     seccion = "jugando";
-    Rep_sinte(tiempo_ms); // ms independiente de draw()
+    Rep_sinte(tiempo_ms);
     pg.clear(); pg.remove();
   }
 }
@@ -692,43 +645,39 @@ function sound_random() {
   return soundR[sound_cont];
 }
 
-function plane_random() {
-
-  plane_cont++;
-  if (plane_cont > 998) { plane_cont = 0; print("********* reset 0") }; //bug
-  return planeR[plane_cont];
-}
-
 function grabaImagen() {
 
   console.log("saving!")
   let now = new Date();
   let seedName = `${now.getFullYear()}_${now.getMonth() + 1}_${now.getDate()}_${now.getHours()}_${now.getMinutes()}_${now.getSeconds()}`;
-  saveCanvas("Sliders_" + seedName + ".png")
+  saveCanvas("Parachute_waltz_" + seedName + ".png")
 }
 
 function mouseClicked() {
 
   if (seccion == "cargando") {
-    seccion = "jugando"; Rep_sinte(tiempo_ms); // ms independiente de draw()
+    seccion = "jugando"; Rep_sinte(tiempo_ms);
     pg.clear(); pg.remove();
   }
   b_sound = !b_sound;
-  if (b_sound) { vol_final.gain.rampTo(1.1, 0.05); }//vol_final[i].mute = false; }
-  else { vol_final.gain.rampTo(0, 0.05); }// vol_final[i].mute = true; }
+  if (b_sound) { vol_final.gain.rampTo(1.1, 0.05); }
+  else { vol_final.gain.rampTo(0, 0.05); }
 }
 
 function keyReleased() {
 
   if (key == "q") { // bug!!!
     let mi_seed = Math.floor(9999999999 * random());
-    // 3628068176
+    // 3628068176 saltos linda melo
     // 7479478610 ritmo loco
+    // 1678056575 saltos rapidos!
+    // 5622852111 9ms poliritmia oki
+    // 7534527152 15ms amarillo rosa LFO
     print("seed: " + mi_seed);
     randomSeed(mi_seed);
     m0 = random(), m1 = random(), m2 = random(), m3 = random(), m4 = random();
     // m0=0.299, m1= 0.699, m2= 0.478, m3 = 0, m4= 0.865 video demo
-    m0 = 0.446, m1 = 0.567, m2 = 0.999, m3 = 0.493, m4 = 0.241 // carmen
+    //m0 = 0.446, m1 = 0.567, m2 = 0.999, m3 = 0.493, m4 = 0.241 // carmen
     //m2 = 0.8683887438382953// color lindo bug 
 
     seedRandomness();
@@ -757,33 +706,32 @@ function windowResizedUser() {
 // ----------------------------------------------
 class Control {
 
-  constructor(_index, _m0, _m1, _m2, _m3, _m4, _tx, _ty, _tz, _coBo) {
+  constructor(_index, _m0, _m1, _m2, _m3, _m4, _tx, _ty, _tz, _coBo, _rot, _ta) {
     this.m = [_m0, _m1, _m2, _m3, _m4];
     this.x = [-50, -50, -50, -50, -50];
     this.y = [-40, -20, 0, 20, 40];
-    this.alfa = [0, 0, 0, 0, 0]; //
+    this.alfa = [0, 0, 0, 0, 0];
     this.tx = _tx; this.ty = _ty; this.tz = _tz;
     this.vida = 0;
     this.rot = 0;
-    const _ro = cont_ro;
-    if (_index != 0) { this.rotN = _ro[int(randomFull() * _ro.length)]; this.ta = [3, 3, 3, 3, 3]; } // = 2
-    else { this.rotN = 0; this.ta = [5, 5, 5, 5, 5]; }
-    this.taM = [this.ta[0], this.ta[0], this.ta[0], this.ta[0], this.ta[0]]; // memo. para que exploten
-    let _al = [0.5, 0.4, 0.3, 0.2, 0.1, 0.05];//[0.7, 0.65, 0.4, 0.2, 0.15, 0.1];
+    this.rotN = _rot;
+    this.ta = _ta;
+    this.taM = [this.ta[0], this.ta[0], this.ta[0], this.ta[0], this.ta[0]];
+    let _al = [0.8, 0.7, 0.6, 0.5, 0.4, 0.3]; //[0.5, 0.4, 0.3, 0.2, 0.1, 0.05];
     this.al = _al[_index % 6];
-    let _co = [1, 12, 23, 34, 45, 56]; // 15, 30, 45, 60, 70];
+    let _co = [1, 12, 23, 34, 45, 56];
     if (col_modo == "dark") for (let i = 0; i < 6; i++) _co[i] = 100 - _co[i];
     this.co = [];
     // color buttons
     let _c = [];
     if (tiempo_modo != "free") _c = [0, 5, 10, 15, 20]; else _c = [0, 15, 30, 45, 60];
-    this.coBo = [_coBo, (_coBo + _c[1]) % 360, (_coBo + _c[2]) % 360, (_coBo + _c[3]) % 360, (_coBo + _c[4]) % 360]; //[30,35,40,45,50]
+    this.coBo = [_coBo, (_coBo + _c[1]) % 360, (_coBo + _c[2]) % 360, (_coBo + _c[3]) % 360, (_coBo + _c[4]) % 360];
     this.coBmemo = [];
     for (let i = 0; i < 5; i++) this.coBmemo[i] = this.coBo[i];
     // color lines
     for (let i = 0; i < 5; i++) {
       if (i == 1 || i == 3) this.co[i] = (this.coBo[i] + col_data[5]) % 360;
-      else this.co[i] = _co[_index % 6] + i * col_data[4]; //4
+      else this.co[i] = _co[_index % 6] + i * col_data[4];
     }
     this.s = [0, 85, 0, 25, 0];
     if (col_modo == "light") this.b = [0, 25, 0, 85, 0];
@@ -812,7 +760,7 @@ class Control {
     }
     // lines
     for (let i = 0; i < 5; i++) {
-      if (notas_cont == ini_rotZ || notas_cont % 50 > 44) stroke(col_data[3], 0.25); //100, 0.25
+      if (notas_cont == ini_rotZ || notas_cont % 50 > 44) stroke(col_data[3], 0.25);
       else stroke(this.co[i], this.s[i], this.b[i], this.alfa[i] * this.al);
       if (controles.indexOf(this) != 0) {
         let _x = 0;
@@ -821,17 +769,11 @@ class Control {
             _x = map(this.vida, 100, 200, 50, 0);
             line(this.x[i] + _x, this.y[i], this.x[i] + 100 - _x, this.y[i])
           }
-          else {
-            line(this.x[i], this.y[i], this.x[i] + 100, this.y[i]); // todo duplicad abajo, arreglar
-            stroke(this.co[i], 0.3)//, noFill();
-            point(this.x[i], this.y[i]), point(this.x[i] + 100, this.y[i])
-          }
+          else { this.pinta_linea(i); }
       }
       else {
-        if (seccion == "cargando") stroke(col_data[0]); //  bug era 0
-        line(this.x[i], this.y[i], this.x[i] + 100, this.y[i]);
-        stroke(this.co[i], 0.3)
-        point(this.x[i], this.y[i]), point(this.x[i] + 100, this.y[i])
+        if (seccion == "cargando") stroke(col_data[0]);
+        this.pinta_linea(i);
       }
     }
 
@@ -839,25 +781,18 @@ class Control {
     if (controles.indexOf(this) == 0 || ((controles.indexOf(this) != 0) && this.vida > 200)) {
       for (let i = 0; i < 5; i++) {
         push();
-        // if (notas_cont % 81 < 78) fill(this.co[i], 100, 0, this.al); else fill(100, 0.25);
         translate(this.x[i] + this.m[i] * abs(this.x[i] * 2), this.y[i], 2);
-        //// plane(4, 4);
         if (seccion == "jugando") {
           shader(sh);
           let _hsba = [];
-          //  if (this.alfa[i] > 0.8) { //> 0.9
-          //    _hsba = [this.coBo[i], this.alfa[i] * 30, 100, this.alfa[i] * 0.5];
-          //  } else 
-          if (this.alfa[i] > 0.1) { // > 0.4
+          if (this.alfa[i] > 0.1) {
             const _sa = map(this.alfa[i], 1, 0.1, this.alfa[i] * 30, 85);
-            const _br = map(this.alfa[i], 1, 0.1, 100, this.alfa[i] * 90);
+            const _br = map(this.alfa[i], 1, 0.1, 100, this.alfa[i] * 70); // * 90
             const _al = map(this.alfa[i], 1, 0.1, this.alfa[i] * 0.5, this.alfa[i] * 0.8);
-            //  sh.setUniform("uColorHSB", [this.coBo[i], 100, this.alfa[i] * 70, constrain(this.alfa[i], 0.7, 0.3)]);
             _hsba = [this.coBo[i], _sa, _br, _al];
-            ////_hsba = [this.coBo[i], 85, this.alfa[i] * 90, this.alfa[i] * 0.8]
           }
 
-          if (this.alfa[i] > 0.1) { // > 0.4
+          if (this.alfa[i] > 0.1) {
             sh.setUniform("uColorHSB", _hsba);
             sh.setUniform("uResolution", [width, height]);
             plane(this.ta[i], this.ta[i]);
@@ -874,14 +809,21 @@ class Control {
     this.vida++;
   }
 
+  pinta_linea(i) {
+    line(this.x[i], this.y[i], this.x[i] + 100, this.y[i]);
+    stroke(this.co[i], 0.4); // 0.3
+    point(this.x[i], this.y[i]), point(this.x[i] + 100, this.y[i]);
+  }
+
   set_luz(i) {
-    if (notas_cont % 20 == cont_cE_n) { //% 40 == 34
+
+    if (notas_cont % 20 == cont_cE_n) {
       const _c = cont_colEx[int(randomFull() * 4)];
       this.coBo[i] = (this.coBo[i] + _c) % 360;
     }
-    else if (notas_cont % 20 == cont_cE_n + 5) { //% 40 == 39
+    else if (notas_cont % 20 == cont_cE_n + 5) {
       for (let j = 0; j < 5; j++) { this.coBo[j] = this.coBmemo[j] };
-      cont_cE_n = (cont_cE_n + 1) % 5; //% 35 ....decia:% 75
+      cont_cE_n = (cont_cE_n + 1) % 5;
     }
     this.alfa[i] = 1;
     this.ta[i] = this.taM[i];
@@ -894,7 +836,7 @@ class Control {
 
   set_z(_z) {
 
-    if (_z > 50) this.tz += 0.12; else if (_z < 50) this.tz -= 0.12; //0.2
+    if (_z > 50) this.tz += 0.12; else if (_z < 50) this.tz -= 0.12;
   }
 
   get_z() {
