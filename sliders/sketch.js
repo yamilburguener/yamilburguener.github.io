@@ -258,7 +258,7 @@ function prepara_sketch() {
   let _mod_txt = "--";
   if (mi_m[3] >= 0.7 && tiempo_ms >= 8) {
     const _m = [2, 3, 4, 5];
-    modulN = _m[int(randomM4() * _m.length)];
+    modulN = _m[int(randomM3() * _m.length)];
     _mod_txt = modulN + "st";
   }
   let _arm = "";
