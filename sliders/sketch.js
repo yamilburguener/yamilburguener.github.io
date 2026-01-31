@@ -220,7 +220,7 @@ function prepara_sketch() {
   sinte_dur = constrain(map(tiempo_ms, 10, 20, 0.01, 0.75), 0.01, 1);
   const _ro = constrain(map(tiempo_ms, 5, 11, 0.1, 0.001), 0.001, 0.025);
   cont_ro = [-_ro, 0, _ro];
-  if (randomFull() < 0.5) cam_oscM = 0.025; else cam_oscM = map(tiempo_ms, 5, 20, 0.02, 0.05);
+  if (randomM0() < 0.5) cam_oscM = 0.025; else cam_oscM = map(tiempo_ms, 5, 20, 0.02, 0.05);
   const _ha = [0.1, 0.3, 0.5, 0.7, 1, 3, 5, 8]; const _ha1 = int(map(tiempo_ms, 5, 20, 0, _ha.length - 1));
   sinte_har = _ha[_ha1];
   sinte[1].set({ harmonicity: sinte_har });
@@ -241,7 +241,7 @@ function prepara_sketch() {
     tiempo_modo = "4/4", altura_modo = 1;
   }
   // delay
-  let _de, _deR = randomFull();
+  let _de, _deR = randomM1();
   if (_deR + _plus < 0.75) {
     let _m = int(map(_deR, 0, 0.75, 0, 6));
     set_delay(_m);
@@ -258,7 +258,7 @@ function prepara_sketch() {
   let _mod_txt = "--";
   if (mi_m[3] >= 0.7 && tiempo_ms >= 8) {
     const _m = [2, 3, 4, 5];
-    modulN = _m[int(randomFull() * _m.length)];
+    modulN = _m[int(randomM4() * _m.length)];
     _mod_txt = modulN + "st";
   }
   let _arm = "";
@@ -269,11 +269,11 @@ function prepara_sketch() {
   else if (mi_m[4] < 0.97) { notas = [66, 63 - 1, 59 + 1, 56, 52]; _arm = "Eaug 7(9)" }
   else {
     const _fr = [-1, 1];
-    notas = [65 + _fr[int(randomFull() * _fr.length)], 63 + _fr[int(randomFull() * _fr.length)], 59 + _fr[int(randomFull() * _fr.length)],
-      55 + _fr[int(randomFull() * _fr.length)], 52]; _arm = "E freak"
+    notas = [65 + _fr[int(randomM4() * _fr.length)], 63 + _fr[int(randomM4() * _fr.length)], 59 + _fr[int(randomM4() * _fr.length)],
+      55 + _fr[int(randomM4() * _fr.length)], 52]; _arm = "E freak"
     //notas = [66, 63, 59, 55, 52]; _arm = "Eaug 7(9)" bug
   }
-  if (mi_m[4] < 0.4 && randomFull() < 0.3) { for (let i = 0; i < 5; i++) notas[i] -= 12; _arm += " bass"; }
+  if (mi_m[4] < 0.4 && randomM4() < 0.3) { for (let i = 0; i < 5; i++) notas[i] -= 12; _arm += " bass"; }
   for (let i = 0; i < 5; i++) notas_memo[i] = notas[i];
 
   del_cont = int(randomFull() * 6000);
@@ -298,13 +298,13 @@ function prepara_sketch() {
   }
   else {
     cont_modo = "jumps";
-    let _r = randomFull();
+    let _r = randomM3();
     if (_r < 0.2) grilla = [[0, 0], [-100, 0], [100, -100], [0, -100], [-100, -100], [100, 100], [0, 100], [-100, 100], [100, 0]];
     else if (_r < 0.4) grilla = [[0, 0], [100, 100], [0, 100], [-100, 100], [-100, 0], [-100, -100], [0, -100], [100, -100], [100, 0]];
     else if (_r < 0.6) grilla = [[0, 0], [100, -100], [0, -100], [-100, -100], [-100, 0], [-100, 100], [0, 100], [100, 100], [100, 0]];
     else if (_r < 0.8) grilla = [[0, 0], [100, 100], [-100, 100], [0, 0], [100, -100], [-100, -100]];
     else grilla = [[0, 0], [100, -100], [0, -100], [-100, -100], [0, 0], [0, 100]];
-    const _zo = constrain(0.5 + randomFull(), 0, 1);
+    const _zo = constrain(0.5 + randomM3(), 0, 1);
     for (let i = 0; i < grilla.length; i++) { grilla[i][0] *= _zo; grilla[i][1] *= _zo; }
     for (let i = 0; i < 5; i++) cont_ini_memo[i] = int(cont_ini_memo[i] * 2);
     const _g = [0.05, 0.1, 0.2, 0.25, 0.5, 1];
@@ -313,8 +313,8 @@ function prepara_sketch() {
     _da = cont_modo + grilla_sub;
   }
   // rotation speed (clock)
-  ini_rotZ = 16 + int(randomFull() * 16) * 5;
-  if (randomFull() < 0.5) cam_rotSe = 1; else cam_rotSe = -1;
+  ini_rotZ = 16 + int(randomM3() * 16) * 5;
+  if (randomM3() < 0.5) cam_rotSe = 1; else cam_rotSe = -1;
   let _vG, _vG1;
   if (cont_modo == "spins") {
     _vG = [0.02, 0.015, 0.0125, 0.015, 0.01, 0.01, 0.01, 0.007, 0.005];
@@ -328,12 +328,12 @@ function prepara_sketch() {
 
   // object position/movement from camera
   let _ca = [0, 5]; if (cont_modo == "jumps") _ca = [2, 7];
-  cam_oscSe = cam_data[int(map(randomFull(), 0, 1, _ca[0], _ca[1]))];
-  cam_posIni = 20 + int(randomFull() * 60); if (randomFull() < 0.5) cam_oscSe[2] *= -1;
-  let _r = randomFull();
+  cam_oscSe = cam_data[int(map(randomM3(), 0, 1, _ca[0], _ca[1]))];
+  cam_posIni = 20 + int(randomM3() * 60); if (randomM3() < 0.5) cam_oscSe[2] *= -1;
+  let _r = randomM3();
   if (_r < 0.2) { cam_oscSe[3] = 0; }
   else if (_r > 0.8) { cam_oscSe[3] = 100; } else { cam_oscSe[3] = 50; }
-  _r = randomFull();
+  _r = randomM3();
   if (_r < 0.22) { cam_oscSe[4] = 0.1; }
   else if (_r > 0.55) { cam_oscSe[4] = 0.05; } else { cam_oscSe[4] = 0.01; }
   const _cr = int(map(cam_rotZn, 0.01, 0.00001, 100, 1));
@@ -673,6 +673,8 @@ function keyReleased() {
     // 1678056575 saltos rapidos!
     // 5622852111 9ms poliritmia oki
     // 7534527152 15ms amarillo rosa LFO
+    // 0.999 0.719 0.516 0.257 0   rara forma
+    // 0.724 0.229 0.999 0.631 0.159 con grave
     print("seed: " + mi_seed);
     randomSeed(mi_seed);
     m0 = random(), m1 = random(), m2 = random(), m3 = random(), m4 = random();
