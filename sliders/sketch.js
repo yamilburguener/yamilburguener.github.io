@@ -15,11 +15,12 @@ let pg, titInicio, fuente;
 
 let cam, cam_rotZ = 0, cam_rotZn, cam_rotSe;
 let cam_oscSe = [], cam_oscM = 0.025;
-const cam_data = [[100, 0, 50], [0, 100, 52], [0, 100, 60], [-100, 200, 100], [200, -100, 125], [-200, 300, 140], [300, -200, 150]];
+const cam_data = [[100, 0, 50], [0, 100, 52], [100, 0, 57], [0, 100, 60],
+[-100, 200, 100], [200, -100, 125], [-200, 300, 140], [300, -200, 150]];
 let cam_posM, cam_posIni;
 let grilla = [], grilla_sub, grilla_memo = 0;
 let luz_alfa;
-let col_data = [[], [], [], [], []], col_modo;
+let col_data = [0, 0, 0, 0, 0, 0], col_modo;
 let marco = [];
 
 let sinte = [], sinte_pan = [], reverb, sinte_par = 0, sinte_parS, sinte_A, sinte_R, sinte_har = 0.7;
@@ -55,7 +56,7 @@ const frag = `
 precision highp float;
 #endif
 varying vec2 vUv;
-uniform vec4 uColorHSB;   // H:0–360, S:0–100, B:0–100, A:0–1
+uniform vec4 uColorHSB; // H:0–360, S:0–100, B:0–100, A:0–1
 uniform vec2 uResolution;
 float mi_random(vec2 p) {
   vec3 p3 = fract(vec3(p.xyx) * 0.1031);
@@ -88,6 +89,7 @@ void main() {
 `;
 
 
+
 function preload() {
 
   const channel1 = new Tone.Channel({ volume: 0, channelCount: 2 });
@@ -98,7 +100,7 @@ function preload() {
   for (let i = 0; i < 3; i++) sinte_pan[i] = new Tone.Panner(0)
   let _PanLFO = new Tone.LFO(0.15, -0.75, 0.75).start(); _PanLFO.type = "sine";
   _PanLFO.connect(sinte_pan[2].pan);
-  reverb = new Tone.Reverb({  decay: 1, preDelay: 0.02, wet: 0.95});
+  reverb = new Tone.Reverb({ decay: 1, preDelay: 0.02, wet: 0.95 });
   const lp = new Tone.Filter(600, "lowpass");
   const reverb2 = new Tone.Reverb({ decay: 0.5, wet: 0.5 });
   delay = new Tone.FeedbackDelay({ wet: 0 });
@@ -144,14 +146,13 @@ function preload() {
 function setup() {
 
   console.log("::: Parachute waltz - Yamil Burguener 2026");
+
   let cv = createCanvas(1620, 1620, WEBGL);
   cv.parent("cv"); cv.id("pw"); cv.class("pw");
-  // cv.imageSmoothingEnabled = false // bug ¿?
+  setAttributes('preserveDrawingBuffer', true);
   pixelDensity(1);
   colorMode(HSB);
   imageMode(CENTER);
-  rectMode(CENTER);
-  //noSmooth(); bug
   strokeWeight(1);
 
   pg = createGraphics(1620, 1620);
@@ -273,7 +274,6 @@ function prepara_sketch() {
     const _fr = [-1, 1];
     notas = [65 + _fr[int(randomM4() * _fr.length)], 63 + _fr[int(randomM4() * _fr.length)], 59 + _fr[int(randomM4() * _fr.length)],
     55 + _fr[int(randomM4() * _fr.length)], 52]; _arm = "E freak"
-    //notas = [66, 63, 59, 55, 52]; _arm = "Eaug 7(9)" bug
   }
   if (mi_m[4] < 0.4 && randomM4() < 0.3) { for (let i = 0; i < 5; i++) notas[i] -= 12; _arm += " bass"; }
   for (let i = 0; i < 5; i++) notas_memo[i] = notas[i];
@@ -286,8 +286,10 @@ function prepara_sketch() {
   // visual setting -------------------------------------
   // slider3
   cont_co = map(mi_m[2], 0, 1, 0, 360 + 70) % 360;
-  console.log("[3] color palette: " + int(cont_co));
-  luz_alfa = map(tiempo_ms, 5, 20, 0.04, 0.015); //0.04, 0.01 bug
+  const _cd5 = [180, 180, 180, 120, 240, 85, 265];
+  col_data[5] = _cd5[int(cont_co) % _cd5.length];
+  console.log("[3] color palette: " + int(cont_co) + "º & " + int(cont_co + col_data[5]) % 360 + "º");
+  luz_alfa = map(tiempo_ms, 5, 20, 0.04, 0.015);
   del_var[0] = map(mi_m[2], 0, 1, 0.05, 0.3);
   del_var[1] = del_var[0] * 2;
 
@@ -328,13 +330,14 @@ function prepara_sketch() {
   cam_rotZn = _vG[_vG1];
 
   // object position/movement from camera
-  let _ca = [0, 5]; if (cont_modo == "jumps") _ca = [2, 7];
+  let _ca = [0, 6]; if (cont_modo == "jumps") _ca = [3, 8];
   cam_posIni = 20 + int(randomM3() * 60);
   cam_oscSe = cam_data[int(map(randomM3(), 0, 1, _ca[0], _ca[1]))];
-  if (randomM3() < 0.5) cam_oscSe[2] *= -1;
+  if (mi_m[3] < 0.35|| mi_m[3] > 0.85) cam_oscSe[2] *= -1;
+  //if (randomM3() < 0.5) cam_oscSe[2] *= -1; bug
   let _r = randomM3();
-  if (_r < 0.2) { cam_oscSe[3] = 0; }
-  else if (_r < 0.4) { cam_oscSe[3] = 100; } else { cam_oscSe[3] = 50; }
+  if (_r < 0.17) { cam_oscSe[3] = 0; }
+  else if (_r < 0.34) { cam_oscSe[3] = 100; } else { cam_oscSe[3] = 50; }
   _r = randomM3();
   if (_r < 0.22) cam_oscSe[4] = 0.1; else if (_r < 0.55) cam_oscSe[4] = 0.05; else cam_oscSe[4] = 0.01;
   const _cr = int(map(cam_rotZn, 0.01, 0.00001, 100, 1));
@@ -342,17 +345,14 @@ function prepara_sketch() {
 
   // slider5
   if (mi_m[4] < 0.4) {
-    col_modo = "dark", col_data = [100, 90, 1, 5, -4];
+    col_modo = "dark", col_data = [100, 90, 1, 5, -4, col_data[5]];
   } else {
-    col_modo = "light", col_data = [0, 10, 99, 95, 4];
+    col_modo = "light", col_data = [0, 10, 99, 95, 4, col_data[5]];
   }
-  const _cd5 = [180, 180, 180, 120, 240, 85, 265];
-  col_data[5] = _cd5[int(cont_co) % _cd5.length];
-  console.log("[5] background: " + col_modo + col_data[5] + ", harmony: " + _arm + ", mod: " + _mod_txt);
+  console.log("[5] background: " + col_modo + ", harmony: " + _arm + ", mod: " + _mod_txt);
 
   for (let i = 0; i < 5; i++) cont_ini[i] = cont_ini_memo[i];
   const _ta = [5, 5, 5, 5, 5];
-
   controles = [];
   controles.push(new Control(0, cont_s[0], cont_s[1], cont_s[2], cont_s[3], cont_s[4],
     0, 0, 0, cont_co, 0, _ta));
@@ -436,12 +436,16 @@ function draw() {
 
     // trail
     let _e, _a;
-    if (notas_cont > 200) { _e = 200, _a = 0.05 }
-    else if (notas_cont > 160) { _e = 60, _a = 0.05 }
-    else if (notas_cont > 80) { _e = 20, _a = 0.05 }
-    else { _e = 2; _a = 0.05 }
+    if (notas_cont > 200) _e = 200; else if (notas_cont > 160) _e = 60;
+    else if (notas_cont > 80) _e = 20; else _e = 2;
+    if (frameCount % _e == 0) estela(0.05); else { estela(0); }
+  }
 
-    if (frameCount % _e == 0) estela(_a); else { estela(0); }
+  if (intervalN >= 400 && !b_trigger) { //14300
+    b_trigger = true;
+    triggerPreview();
+    print(intervalN) //bug
+   // grabaImagen(); // bug
   }
 }
 
@@ -469,7 +473,6 @@ function suena_sinte(_no) {
   }
   else if (_r < altura_var[1] * _va) {
     _no -= sinte_var[1]; _vol = 0.9; _pa = 0; _at *= 2;
-    //if (_no < 0) { _no = int(sound_random() * 12); print("bajo " + _no) } //bug
     delay.set({ feedback: 0, wet: 0.3 });
   }
   else if (_r < altura_var[2] * _va) { _no += 1; }
@@ -529,9 +532,9 @@ function Rep_sinte(_r) {
         if (notas_cont % 740 >= 720) posicion_reset();
 
         if (notas_cont % 160 == 140) {
-          const _r = int(randomFull() * contM.length);
+          const _r = int(sound_random() * contM.length);
           for (let i = 0; i < 5; i++) {
-            if (i == contM[_r][0] && randomFull() < 0.5 || i == contM[_r][1] && randomFull() < 0.5) cont_mute[i] = true;
+            if (i == contM[_r][0] && sound_random() < 0.5 || i == contM[_r][1] && sound_random() < 0.5) cont_mute[i] = true;
           }
         } else if (notas_cont % 160 == 0) {
           cont_mute = [false, false, false, false, false];
@@ -542,11 +545,12 @@ function Rep_sinte(_r) {
     subdiv++;
     if (subdiv == 100) subdiv = 0;
     intervalN++;
-    if (intervalN == 14300 && !b_trigger) {
+    /* if (intervalN >= 14300 && !b_trigger) {
       b_trigger = true;
       triggerPreview();
-      grabaImagen(); // bug
-    }
+      print(intervalN)
+     // grabaImagen(); // bug
+    } */
   }, _r)
 }
 
@@ -624,19 +628,10 @@ function muestra_titulo() {
   pg.text("click to start", pg.width / 2 - 135, pg.height / 2 + 400);
   pg.text("or wait (" + _t + ") seconds", pg.width / 2 + 135, pg.height / 2 + 400);
   if (_t <= 0) {
-    seccion = "jugando";
-    Rep_sinte(tiempo_ms);
+    seccion = "jugando"; Rep_sinte(tiempo_ms);
     pg.clear(); pg.remove();
   }
 }
-
-/* function set_delay(_i) {
-print(_i)
-  const _td = [0.025, 0.0334, 0.05, 0.0667, 0.075, 0.08];
-  tiempo_delay = tiempo_ms * 0.075// _td[_i];
-  if (tiempo_delay > 1) tiempo_delay *= 0.5;
-  delay.set({ delayTime: tiempo_delay });
-} */
 
 function sound_random() {
 
@@ -666,25 +661,6 @@ function mouseClicked() {
 
 function keyReleased() {
 
-  if (key == "q") { // bug!!!
-    let mi_seed = Math.floor(9999999999 * random());
-    // 3628068176 saltos linda melo
-    // 7479478610 ritmo loco
-    // 1678056575 saltos rapidos!
-    // 5622852111 9ms poliritmia oki
-    // 7534527152 15ms amarillo rosa LFO
-    // 0.999 0.719 0.516 0.257 0   rara forma
-    // 0.724 0.229 0.999 0.631 0.159 con grave
-    print("seed: " + mi_seed);
-    randomSeed(mi_seed);
-    m0 = random(), m1 = random(), m2 = random(), m3 = random(), m4 = random();
-    // m0=0.299, m1= 0.699, m2= 0.478, m3 = 0, m4= 0.865 video demo
-    //m0 = 0.446, m1 = 0.567, m2 = 0.999, m3 = 0.493, m4 = 0.241 // carmen
-    //m2 = 0.8683887438382953// color lindo bug 
-
-    seedRandomness();
-    prepara_sketch();
-  }
   if (key == "s" || key == "S") {
     grabaImagen();
   }
@@ -700,7 +676,7 @@ function keyReleased() {
 }
 
 function windowResizedUser() {
-  // Handle resizing if needed, but since canvas is fixed at 1080x1080, maybe nothing
+  // Handle resizing if needed, but since canvas is fixed at 1620x1620, maybe nothing
   // resizeCanvas(canvasWidth, canvasHeight); // If dynamic, but here fixed
 }
 
@@ -719,7 +695,7 @@ class Control {
     this.rotN = _rot;
     this.ta = _ta;
     this.taM = [this.ta[0], this.ta[0], this.ta[0], this.ta[0], this.ta[0]];
-    let _al = [0.8, 0.7, 0.6, 0.5, 0.4, 0.3]; //[0.5, 0.4, 0.3, 0.2, 0.1, 0.05];
+    let _al = [0.7, 0.6, 0.5, 0.4, 0.3, 0.2];
     this.al = _al[_index % 6];
     let _co = [1, 12, 23, 34, 45, 56];
     if (col_modo == "dark") for (let i = 0; i < 6; i++) _co[i] = 100 - _co[i];
@@ -788,8 +764,8 @@ class Control {
           shader(sh);
           let _hsba = [];
           if (this.alfa[i] > 0.1) {
-            const _sa = map(this.alfa[i], 1, 0.1, this.alfa[i] * 30, 85);
-            const _br = map(this.alfa[i], 1, 0.1, 100, this.alfa[i] * 70); // * 90
+            const _sa = map(this.alfa[i], 1, 0.1, this.alfa[i] * 30, 80);
+            const _br = map(this.alfa[i], 1, 0.1, 100, this.alfa[i] * 50);
             const _al = map(this.alfa[i], 1, 0.1, this.alfa[i] * 0.5, this.alfa[i] * 0.8);
             _hsba = [this.coBo[i], _sa, _br, _al];
           }
@@ -813,7 +789,7 @@ class Control {
 
   pinta_linea(i) {
     line(this.x[i], this.y[i], this.x[i] + 100, this.y[i]);
-    stroke(this.co[i], 0.4); // 0.3
+    stroke(this.co[i], 0.4);
     point(this.x[i], this.y[i]), point(this.x[i] + 100, this.y[i]);
   }
 
@@ -838,7 +814,7 @@ class Control {
 
   set_z(_z) {
 
-    if (_z > 50) this.tz += 0.12; else if (_z < 50) this.tz -= 0.12;
+    if (_z > 50) this.tz += 0.1; else if (_z < 50) this.tz -= 0.1;
   }
 
   get_z() {
