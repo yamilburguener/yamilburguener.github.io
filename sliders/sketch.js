@@ -11,7 +11,7 @@ const contM = [[0, 1], [0, 2], [0, 3], [0, 4], [1, 2], [1, 3], [1, 4], [2, 3], [
 let ini_rotZ;
 let seccion = "cargando";
 let mi_m = []
-let pg, titInicio, fuente;
+let pg, titInicio;
 
 let cam, cam_rotZ = 0, cam_rotZn, cam_rotSe;
 let cam_oscSe = [], cam_oscM = 0.025;
@@ -92,7 +92,6 @@ void main() {
 `;
 
 
-
 function preload() {
 
   const channel1 = new Tone.Channel({ volume: 0, channelCount: 2 });
@@ -156,6 +155,10 @@ function setup() {
   cv.parent("cv"); cv.id("pw"); cv.class("pw");
   ////fbo = createFramebuffer({ width: _size, height: _size, format: FLOAT  }); ////bug
   gl = cv.GL; // Acceso directo al contexto de WebGL
+   // Opcional: mejora la mezcla de colores
+   gl.enable(gl.BLEND);
+   gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+   
   pixelDensity(1);
   colorMode(HSB);
   imageMode(CENTER);
@@ -167,8 +170,8 @@ function setup() {
   pg.textAlign(CENTER, CENTER);
   pg.textSize(22);
   pg.rectMode(CENTER);
-  fuente = loadFont('./Menlo-Regular.ttf');
-  pg.textFont(fuente);
+  let _fuente = loadFont('./Menlo-Regular.ttf');
+  pg.textFont(_fuente);
   sh = createShader(vert, frag);
   myShader = baseStrokeShader().modify({
     'Inputs getPixelInputs': `(Inputs inputs) {
@@ -381,7 +384,7 @@ function draw() {
    // Asegura que WebGL tenga permiso para escribir en el buffer de profundidad
    gl.depthMask(true); 
    gl.clearDepth(1.0);
-   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+   gl.clear(gl.DEPTH_BUFFER_BIT);//gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
 
  
@@ -409,7 +412,7 @@ function draw() {
   ////image(fbo, 0,0, width, height)//-width/2, -height/2);
 
 
-  if (intervalN >= 7000 && !b_trigger) { //14300
+  if (intervalN >= 5000 && !b_trigger) { //14300
     b_trigger = true;
     triggerPreview();
     //grabaImagen(); // bug
