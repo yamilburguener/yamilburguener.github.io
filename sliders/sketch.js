@@ -2,7 +2,7 @@
 "Parachute waltz" - Yamil Burguener - 2026 
 https://www.editart.xyz/user/tz1LXx82P2LHyzuGYYxjYFCbChTXWNpYKmTg
 */
-let b_pausa = false, b_trigger = false, b_reset = false;
+let b_pausa = false, b_trigger = false, b_reset = false; let b_trigger2 = false//bug
 let controles = [], cont_cant = 0, cont_co, cont_colEx = [90, 120, 240, 270], cont_cE_n;
 let cont_ini_memo = []; let cont_ini = [], bCont_ini = true, cont_s = [];
 let cont_modo = "", cont_mute = [false, false, false, false, false];
@@ -35,6 +35,9 @@ let altura_modo;
 let notas = [], notas_memo = [], notas_cont = 0, modulN = 0;
 let tiempo_ms, tiempo_modo, tiempo_delay = 0;
 let soundR = [], sound_cont = 0, delayTimeLFO;
+
+let fbo; //bug
+//let gl;
 
 let myShader;
 let sh;
@@ -147,15 +150,18 @@ function setup() {
 
   console.log("::: Parachute waltz - Yamil Burguener 2026");
 
-  let cv = createCanvas(1620, 1620, WEBGL);
-  cv.parent("cv"); cv.id("pw"); cv.class("pw");
   setAttributes('preserveDrawingBuffer', true);
+  let  _size = 1080// 1620;
+  let cv = createCanvas(_size, _size, WEBGL);
+  cv.parent("cv"); cv.id("pw"); cv.class("pw");
+  ////fbo = createFramebuffer({ width: _size, height: _size, format: FLOAT  }); ////bug
+  gl = cv.GL; // Acceso directo al contexto de WebGL
   pixelDensity(1);
   colorMode(HSB);
   imageMode(CENTER);
   strokeWeight(1);
 
-  pg = createGraphics(1620, 1620);
+  pg = createGraphics(_size, _size);
   pg.pixelDensity(1);
   pg.colorMode(HSB);
   pg.textAlign(CENTER, CENTER);
@@ -332,8 +338,9 @@ function prepara_sketch() {
   // object position/movement from camera
   let _ca = [0, 6]; if (cont_modo == "jumps") _ca = [3, 8];
   cam_posIni = 20 + int(randomM3() * 60);
+  cam_oscSe[2] = abs(cam_oscSe[2]);
   cam_oscSe = cam_data[int(map(randomM3(), 0, 1, _ca[0], _ca[1]))];
-  if (mi_m[3] < 0.35|| mi_m[3] > 0.85) cam_oscSe[2] *= -1;
+  if (mi_m[3] < 0.35 || mi_m[3] > 0.85) cam_oscSe[2] *= -1;
   //if (randomM3() < 0.5) cam_oscSe[2] *= -1; bug
   let _r = randomM3();
   if (_r < 0.17) { cam_oscSe[3] = 0; }
@@ -370,11 +377,23 @@ function prepara_sketch() {
 
 
 function draw() {
+  //if (b_trigger) noLoop(); //bug
+   // Asegura que WebGL tenga permiso para escribir en el buffer de profundidad
+   gl.depthMask(true); 
+   gl.clearDepth(1.0);
+   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+
+ 
 
   if (resetAnimation) {
     prepara_sketch();
     resetAnimation = false;
   }
+
+  ////fbo.begin();
+  ////clear(); //bug fbo
+
 
   if (seccion == "cargando") {
     for (let i = 0; i < controles.length; i++) controles[i].dibuja();
@@ -382,71 +401,99 @@ function draw() {
     muestra_titulo();
   }
   else {
-    if (cam_rotZ != 0) {
-      cam_rotZ += cam_rotZn * cam_rotSe;
-      rotateZ(cam_rotZ);
-    }
-
-    let _int = 0;
-    if (notas_cont > cam_posIni) {
-      // camera swing
-      _int = intervalN * cam_posM - cam_posIni;
-      const cam_osc = 50 - sin(_int * cam_oscM) * 50;
-      const _ang = map(cam_osc, cam_oscSe[0], cam_oscSe[1], HALF_PI, -HALF_PI);
-      const camY = 300 * sin(_ang);
-      const camZ = 300 * cos(_ang);
-      cam.setPosition(0, camY, camZ);
-      for (let i = 0; i < controles.length; i++) { controles[i].set_z(cam_osc) }
-    }
-    else {
-      cam_posM = cam_posIni / intervalN;
-      for (let i = 0; i < controles.length; i++) { controles[i].set_z(cam_oscSe[3]) }
-    }
-
-    if (cont_modo == "spins") {
-      const _oscX = cam_oscSe[2] * sin(_int * cam_oscSe[4]);
-      cam.lookAt(_oscX, 0, 0);
-    } else {
-      const _i = int(notas_cont * grilla_sub) % grilla.length;
-      cam.lookAt(grilla[_i][0], grilla[_i][1], 0);
-      if (_i != grilla_memo) {
-        let _m = 0;
-        if (grilla[_i][1] > 0) _m = modulN; else if (grilla[_i][1] < 0) _m = -modulN;
-        for (let i = 0; i < notas.length; i++) {
-          notas[i] = notas_memo[i] + _m;
-        }
-      }
-      grilla_memo = _i;
-    }
-
-    // controls: drawing, reset, etc.
-    if (bCont_ini) {
-      if (sinte_par == 3 || b_reset) {
-        cont_cant = 0;
-        bCont_ini = false;
-        if (b_reset) b_reset = false;
-        for (let i = controles.length; i > 0; i--) controles.splice(i, 1);
-        for (let i = 0; i < 5; i++) { cont_ini[i] = cont_ini_memo[i] + notas_cont - 20; }
-      }
-    }
-    else {
-      if (sinte_par == 4) bCont_ini = true;
-    }
-    for (let i = 0; i < controles.length; i++) controles[i].dibuja();
-
-    // trail
-    let _e, _a;
-    if (notas_cont > 200) _e = 200; else if (notas_cont > 160) _e = 60;
-    else if (notas_cont > 80) _e = 20; else _e = 2;
-    if (frameCount % _e == 0) estela(0.05); else { estela(0); }
+    renderScene();
   }
 
-  if (intervalN >= 400 && !b_trigger) { //14300
+ ////fbo.end();
+  // Muestra el contenido en el canvas principal
+  ////image(fbo, 0,0, width, height)//-width/2, -height/2);
+
+
+  if (intervalN >= 7000 && !b_trigger) { //14300
     b_trigger = true;
     triggerPreview();
-    print(intervalN) //bug
-   // grabaImagen(); // bug
+    //grabaImagen(); // bug
+    noLoop(); //bug
   }
+
+  /* if (window.capturePreview && !b_trigger2) {
+    // forzar redraw para asegurar que el frame esté completo
+    b_trigger2 = true;
+    renderScene();
+    grabaImagen(); // bug
+    console.log("Frame listo para preview, flag capturePreview activo");
+  } */
+
+  
+}
+
+// Escuchar cuando EditArt dispara el mensaje de "sketch-loaded"
+/* window.addEventListener("message", (e) => {
+  console.log("Mensaje recibido:", e.data);
+  if (e.data?.type === "sketch-loaded") {
+    renderScene();
+    console.log("Frame listo para capture, justo antes del preview");
+  }
+}); */
+
+function renderScene() {
+  if (cam_rotZ != 0) {
+    cam_rotZ += cam_rotZn * cam_rotSe;
+    rotateZ(cam_rotZ);
+  }
+
+  let _int = 0;
+  if (notas_cont > cam_posIni) {
+    // camera swing
+    _int = intervalN * cam_posM - cam_posIni;
+    const cam_osc = 50 - sin(_int * cam_oscM) * 50;
+    const _ang = map(cam_osc, cam_oscSe[0], cam_oscSe[1], HALF_PI, -HALF_PI);
+    const camY = 300 * sin(_ang);
+    const camZ = 300 * cos(_ang);
+    cam.setPosition(0, camY, camZ);
+    for (let i = 0; i < controles.length; i++) { controles[i].set_z(cam_osc) }
+  }
+  else {
+    cam_posM = cam_posIni / intervalN;
+    for (let i = 0; i < controles.length; i++) { controles[i].set_z(cam_oscSe[3]) }
+  }
+
+  if (cont_modo == "spins") {
+    const _oscX = cam_oscSe[2] * sin(_int * cam_oscSe[4]);
+    cam.lookAt(_oscX, 0, 0);
+  } else {
+    const _i = int(notas_cont * grilla_sub) % grilla.length;
+    cam.lookAt(grilla[_i][0], grilla[_i][1], 0);
+    if (_i != grilla_memo) {
+      let _m = 0;
+      if (grilla[_i][1] > 0) _m = modulN; else if (grilla[_i][1] < 0) _m = -modulN;
+      for (let i = 0; i < notas.length; i++) {
+        notas[i] = notas_memo[i] + _m;
+      }
+    }
+    grilla_memo = _i;
+  }
+
+  // controls: drawing, reset, etc.
+  if (bCont_ini) {
+    if (sinte_par == 3 || b_reset) {
+      cont_cant = 0;
+      bCont_ini = false;
+      if (b_reset) b_reset = false;
+      for (let i = controles.length; i > 0; i--) controles.splice(i, 1);
+      for (let i = 0; i < 5; i++) { cont_ini[i] = cont_ini_memo[i] + notas_cont - 20; }
+    }
+  }
+  else {
+    if (sinte_par == 4) bCont_ini = true;
+  }
+  for (let i = 0; i < controles.length; i++) controles[i].dibuja();
+
+  // trail
+  let _e, _a;
+  if (notas_cont > 200) _e = 200; else if (notas_cont > 160) _e = 60;
+  else if (notas_cont > 80) _e = 20; else _e = 2;
+  if (frameCount % _e == 0) estela(0.05); else { estela(0); }
 }
 
 // sound --------------------------------
