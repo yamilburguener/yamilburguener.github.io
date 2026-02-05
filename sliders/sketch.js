@@ -11,8 +11,8 @@ const contM = [[0, 1], [0, 2], [0, 3], [0, 4], [1, 2], [1, 3], [1, 4], [2, 3], [
 let ini_rotZ;
 let seccion = "cargando";
 let mi_m = [];
-let pg, titInicio;
-let fRateN = 2;
+let cv, pg, titInicio;
+let fRateN = 0.5;
 
 let cam, cam_rotZ = 0, cam_rotZn, cam_rotSe;
 let cam_oscSe = [], cam_oscM = 0.025;
@@ -153,8 +153,8 @@ function setup() {
   //setAttributes('antialias', true);
   setAttributes('preserveDrawingBuffer', true);
   //setAttributes('premultipliedAlpha', false);
-  let _size = 1080// 1620;
-  let cv = createCanvas(_size, _size, WEBGL);
+  let _size = 1080;
+  cv = createCanvas(_size, _size, WEBGL);
   cv.parent("cv"); cv.id("pw"); cv.class("pw");
   //fbo = createFramebuffer({ width: _size, height: _size }); ////bug    , format: FLOAT 
   gl = cv.GL; // Acceso directo al contexto de WebGL
@@ -212,7 +212,7 @@ function prepara_sketch() {
   // sound setting -----------------------------------
   for (let i = 0; i < 1000; i++) { soundR[i] = randomFull(); }
   // slider1
-  cont_ini_memo = [45, 65, 85, 100, 115];// new 
+  cont_ini_memo = [45, 65, 80, 95, 105];// new 
   if (mi_m[0] < 0.5) {
     tiempo_ms = int(map(mi_m[0], 0, 0.5, 5, 15));
     const _de = map(mi_m[0], 0, 0.5, 0.01, 1.9);
@@ -313,10 +313,10 @@ function prepara_sketch() {
   }
   else {
     cont_modo = "jumps";
-    _da = cont_modo
+    _da = cont_modo;
     let _ti;
     let _r = randomM3();
-    if (_r < 0.5) {
+    if (_r < 0.4) {
       let _n = 0;
       for (let x = 5; x >= -5; x--) {
         for (let y = 5; y >= -5; y--) {
@@ -324,13 +324,13 @@ function prepara_sketch() {
           _n++;
         }
       }
-      b_grillaJu = true, _ti = 4;
+      _da += "10x10"; b_grillaJu = true, _ti = 4;
     }
     else {
-      if (_r < 0.6) grilla = [[0, 0], [-100, 0], [100, -100], [0, -100], [-100, -100], [100, 100], [0, 100], [-100, 100], [100, 0]];
-      else if (_r < 0.7) grilla = [[0, 0], [100, 100], [0, 100], [-100, 100], [-100, 0], [-100, -100], [0, -100], [100, -100], [100, 0]];
-      else if (_r < 0.8) grilla = [[0, 0], [100, -100], [0, -100], [-100, -100], [-100, 0], [-100, 100], [0, 100], [100, 100], [100, 0]];
-      else if (_r < 0.9) grilla = [[0, 0], [100, 100], [-100, 100], [0, 0], [100, -100], [-100, -100]];
+      if (_r < 0.52) grilla = [[0, 0], [-100, 0], [100, -100], [0, -100], [-100, -100], [100, 100], [0, 100], [-100, 100], [100, 0]];
+      else if (_r < 0.64) grilla = [[0, 0], [100, 100], [0, 100], [-100, 100], [-100, 0], [-100, -100], [0, -100], [100, -100], [100, 0]];
+      else if (_r < 0.76) grilla = [[0, 0], [100, -100], [0, -100], [-100, -100], [-100, 0], [-100, 100], [0, 100], [100, 100], [100, 0]];
+      else if (_r < 0.88) grilla = [[0, 0], [100, 100], [-100, 100], [0, 0], [100, -100], [-100, -100]];
       else grilla = [[0, 0], [100, -100], [0, -100], [-100, -100], [0, 0], [0, 100]];
       const _zo = constrain(0.5 + randomM3(), 0, 1);
       for (let i = 0; i < grilla.length; i++) { grilla[i][0] *= _zo; grilla[i][1] *= _zo; }
@@ -338,14 +338,12 @@ function prepara_sketch() {
       const _g = [0.05, 0.1, 0.2, 0.25, 0.5, 1];
       const _g2 = int(map(mi_m[3], 0.65, 1, 0, _g.length));
       grilla_sub = _g[_g2];
-      _da = cont_modo + grilla_sub;
-
-      b_grillaJu = false, _ti = 1.75; //new
+      _da = cont_modo + grilla_sub; b_grillaJu = false, _ti = 1.75;
     }
     for (let i = 0; i < 5; i++) cont_ini_memo[i] = int(cont_ini_memo[i] * _ti); // new
   }
   // rotation speed (clock)
-  ini_rotZ = 16 + int(randomM3() * 4) * 5;
+  ini_rotZ = 11 + int(randomM3() * 4) * 5;
   if (randomM3() < 0.5) cam_rotSe = 1; else cam_rotSe = -1;
   let _vG, _vG1;
   if (cont_modo == "spins") {
@@ -367,15 +365,14 @@ function prepara_sketch() {
   if (mi_m[3] < 0.35 || mi_m[3] > 0.85) cam_oscSe[2] *= -1;
 
   if (b_grillaJu) {
-    cam_oscSe[3] = 0;// bug!!
-    cam_rotZn *= 0.5; // new
+    cam_oscSe[3] = 0; cam_rotZn *= 0.5; // new
   } else {
     let _r = randomM3();
     if (_r < 0.17) { cam_oscSe[3] = 0; }
     else if (_r < 0.34) { cam_oscSe[3] = 100; } else { cam_oscSe[3] = 50; }
   }
   let _r = randomM3();
-  if (_r < 0.22) cam_oscSe[4] = 0.3; else if (_r < 0.5) cam_oscSe[4] = 0.2; else cam_oscSe[4] = 0.1;//0.1, 0.05,0.01 // new
+  if (_r < 0.22) cam_oscSe[4] = 0.2; else if (_r < 0.5) cam_oscSe[4] = 0.1; else cam_oscSe[4] = 0.05;//0.1, 0.05,0.01 // new
   const _cr = int(constrain(map(cam_rotZn, 0.01, 0.00001, 100, 1), 1, 100));
   console.log("[4] sliders movement: " + _da + ", rotation: ", _cr * cam_rotSe + "%, data: " + cam_oscSe);
 
@@ -435,9 +432,8 @@ function draw() {
     gl.finish();
   } */
 
-  // anda a intervalN 2300. a 3600 (32) 4000->no
-  // anda a frameCount >= 2113 
-  if (intervalN >= 3800 && !b_trigger) { //14300  
+  // anda a intervalN 2300. a 5600 (32)
+  if (intervalN >= 6000 && !b_trigger) { //14300  
     b_trigger = true;
     gl.finish();
 
@@ -445,7 +441,6 @@ function draw() {
       triggerPreview();
     }
     grabaImagen();//bug
-    //{ clearInterval(interval_sin); interval_sin = null; noLoop(); }//bug
   }
 }
 
@@ -517,7 +512,7 @@ function renderScene() {
   let _e, _a;
   //if (notas_cont > 200) _e = 200; else if (notas_cont > 160) _e = 60;
   //else if (notas_cont > 80) _e = 20; else _e = 2;
-  if (notas_cont > 30) { int(_e = 200 / fRateN); _a = 0.05 }
+  if (notas_cont > 30) { int(_e = 200 * fRateN); _a = 0.05 }
   else if (notas_cont > 10) { _e = 1; _a = 0.1 }
   else { _e = 1; _a = 0.2 };
   if (frameCount % _e == 0) estela(_a); else { estela(0); }
@@ -645,8 +640,8 @@ function estela(_a) {
       plane(160, 160);
     } */
   }
-  if (frameCount % int(4 / fRateN) == 0) {
-    const _f = int(frameCount * 0.25) % marco.length;
+  if (frameCount % int(4 * fRateN) == 0) {
+    const _f = int(frameCount * 0.25 / fRateN) % marco.length;
     translate(marco[_f].x, marco[_f].y);
     fill(col_data[1], 0.4);
     plane(10, 10)
@@ -698,7 +693,7 @@ function crea_controles() {
   let i = cont_cant % 5;
   const _tx = -50 + cont_s[i] * abs(-50 * 2);
   const _ty = [-40, -20, 0, 20, 40];
-  const _tz = [100, 150, 200, 250, 290] // [60, 120, 180, 240, 290];// new[50, 100, 150, 200, 250];
+  const _tz = [100, 150, 200, 240, 270] // [60, 120, 180, 240, 290];// new[50, 100, 150, 200, 250];
   cont_cant++;
   let _zPlus = controles[0].get_z();
   const _rot = cont_ro[int(randomFull() * cont_ro.length)];
@@ -752,17 +747,33 @@ function mouseClicked() {
   if (seccion == "cargando") {
     seccion = "jugando"; Rep_sinte(tiempo_ms);
     pg.clear(); //pg.remove();
-    frameRate(30); // poner 60 bug
+    mas_definicion(); //frameRate(30);
   }
   b_sound = !b_sound;
   if (b_sound) { vol_final.gain.rampTo(1.1, 0.05); }
   else { vol_final.gain.rampTo(0, 0.05); }
 }
 
+function mas_definicion() {
+  frameRate(60);
+  cv = resizeCanvas(1620, 1620);
+  gl = _renderer.GL;
+  background(col_data[1]);
+  estela(1);
+}
+
+function menos_definicion() {
+  frameRate(30);
+  cv = resizeCanvas(1080, 1080);
+  gl = _renderer.GL;
+  background(col_data[1]);
+  estela(1);
+}
+
 function keyReleased() {
 
   if (key == "q") { // bug!!!
-    let mi_seed = Math.floor(9999999999 * random());
+    let mi_seed =Math.floor(9999999999 * random());
     print("seed: " + mi_seed);
     randomSeed(mi_seed);
     m0 = random(), m1 = random(), m2 = random(), m3 = random(), m4 = random();
@@ -783,14 +794,14 @@ function keyReleased() {
     fullscreen(!fs);
   }
   if (key == "1") {
-    fRateN = 2;
-    console.log("set frameRate(30)");
-    frameRate(30);
+    fRateN = 0.5;
+    console.log("set framerate = 30, canvas 1080x1080");
+    menos_definicion();
   }
   else if (key == "2") {
     fRateN = 1;
-    console.log("set frameRate(60)");
-    frameRate(60);
+    console.log("set framerate= 60, canvas 1620x1620");
+    mas_definicion();
   }
 }
 
