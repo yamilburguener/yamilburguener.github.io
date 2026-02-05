@@ -2,7 +2,7 @@
 "Parachute waltz" - Yamil Burguener - 2026 
 https://www.editart.xyz/user/tz1LXx82P2LHyzuGYYxjYFCbChTXWNpYKmTg
 */
-let b_pausa = false, b_trigger = false, b_reset = false; let b_trigger2 = false//bug
+let b_pausa = false, b_trigger = false, b_reset = false;
 let controles = [], cont_cant = 0, cont_co, cont_colEx = [90, 120, 240, 270], cont_cE_n;
 let cont_ini_memo = []; let cont_ini = [], bCont_ini = true, cont_s = [];
 let cont_modo = "", cont_mute = [false, false, false, false, false];
@@ -10,15 +10,16 @@ let cont_ro = [-0.001, 0, 0.001];
 const contM = [[0, 1], [0, 2], [0, 3], [0, 4], [1, 2], [1, 3], [1, 4], [2, 3], [2, 4], [3, 4]];
 let ini_rotZ;
 let seccion = "cargando";
-let mi_m = []
+let mi_m = [];
 let pg, titInicio;
+let fRateN = 2;
 
 let cam, cam_rotZ = 0, cam_rotZn, cam_rotSe;
 let cam_oscSe = [], cam_oscM = 0.025;
 const cam_data = [[100, 0, 50], [0, 100, 52], [100, 0, 57], [0, 100, 60],
 [-100, 200, 100], [200, -100, 125], [-200, 300, 140], [300, -200, 150]];
 let cam_posM, cam_posIni;
-let grilla = [], grilla_sub, grilla_memo = 0;
+let grilla = [], grilla_sub, grilla_memo = 0, grillaSp = 0, grillaJu = [], b_grillaJu;
 let luz_alfa;
 let col_data = [0, 0, 0, 0, 0, 0], col_modo;
 let marco = [];
@@ -36,8 +37,8 @@ let notas = [], notas_memo = [], notas_cont = 0, modulN = 0;
 let tiempo_ms, tiempo_modo, tiempo_delay = 0;
 let soundR = [], sound_cont = 0, delayTimeLFO;
 
-let fbo; //bug
-//let gl;
+////let fbo; //bug
+let gl;
 
 let myShader;
 let sh;
@@ -149,16 +150,15 @@ function setup() {
 
   console.log("::: Parachute waltz - Yamil Burguener 2026");
 
+  //setAttributes('antialias', true);
   setAttributes('preserveDrawingBuffer', true);
-  let  _size = 1080// 1620;
+  //setAttributes('premultipliedAlpha', false);
+  let _size = 1080// 1620;
   let cv = createCanvas(_size, _size, WEBGL);
   cv.parent("cv"); cv.id("pw"); cv.class("pw");
-  ////fbo = createFramebuffer({ width: _size, height: _size, format: FLOAT  }); ////bug
+  //fbo = createFramebuffer({ width: _size, height: _size }); ////bug    , format: FLOAT 
   gl = cv.GL; // Acceso directo al contexto de WebGL
-   // Opcional: mejora la mezcla de colores
-   gl.enable(gl.BLEND);
-   gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-   
+
   pixelDensity(1);
   colorMode(HSB);
   imageMode(CENTER);
@@ -186,10 +186,12 @@ function setup() {
   });
 
   // camera config --------------------
-  cam = createCamera();
+  ////fbo.begin();
+  cam = createCamera();//  fbo.createCamera();// bug
   cam.camera(0, 0, 300, 0, 0, 0, 0, 1, 0);
   let cameraZ = (height / 2) / tan((PI / 3) / 2.0);
   perspective(1.5, 1, cameraZ / 20, cameraZ * 5);
+  ////fbo.end();
 
   let _plX = -85, _plY = -85;
   for (let i = 0; i < 17; i++) { marco[i] = createVector(_plX, _plY); _plX += 10; }
@@ -197,6 +199,7 @@ function setup() {
   for (let i = 0; i < 17; i++) { marco[i + 17 * 2] = createVector(_plX, _plY); _plX -= 10; }
   for (let i = 0; i < 17; i++) { marco[i + 17 * 3] = createVector(_plX, _plY); _plY -= 10; }
 
+  frameRate(5);
   seedRandomness();
   prepara_sketch();
 }
@@ -209,7 +212,7 @@ function prepara_sketch() {
   // sound setting -----------------------------------
   for (let i = 0; i < 1000; i++) { soundR[i] = randomFull(); }
   // slider1
-  cont_ini_memo = [45, 65, 85, 100, 115];
+  cont_ini_memo = [45, 65, 85, 100, 115];// new 
   if (mi_m[0] < 0.5) {
     tiempo_ms = int(map(mi_m[0], 0, 0.5, 5, 15));
     const _de = map(mi_m[0], 0, 0.5, 0.01, 1.9);
@@ -268,7 +271,7 @@ function prepara_sketch() {
 
   // harmony
   let _mod_txt = "--";
-  if (mi_m[3] >= 0.7 && tiempo_ms >= 8) {
+  if (mi_m[3] >= 0.65 && tiempo_ms >= 8) {
     const _m = [2, 3, 4, 5];
     modulN = _m[int(randomM3() * _m.length)];
     _mod_txt = modulN + "st";
@@ -287,7 +290,7 @@ function prepara_sketch() {
   if (mi_m[4] < 0.4 && randomM4() < 0.3) { for (let i = 0; i < 5; i++) notas[i] -= 12; _arm += " bass"; }
   for (let i = 0; i < 5; i++) notas_memo[i] = notas[i];
 
-  sinte_osc = int(randomFull() * 6000);
+  sinte_osc = int(randomFull() * 230); //new
   sinte_parS = 0.01 + randomFull() * 0.004;
   sinte_A = map(tiempo_ms, 5, 20, 0.0001, 0.01);
   sinte_R = map(tiempo_ms, 5, 20, 0.02, 0.03);
@@ -304,28 +307,45 @@ function prepara_sketch() {
 
   // slider4
   let _da = "";
-  if (mi_m[3] < 0.7) {
+  if (mi_m[3] < 0.65) {
     cont_modo = "spins";
     _da = cont_modo;
   }
   else {
     cont_modo = "jumps";
+    _da = cont_modo
+    let _ti;
     let _r = randomM3();
-    if (_r < 0.2) grilla = [[0, 0], [-100, 0], [100, -100], [0, -100], [-100, -100], [100, 100], [0, 100], [-100, 100], [100, 0]];
-    else if (_r < 0.4) grilla = [[0, 0], [100, 100], [0, 100], [-100, 100], [-100, 0], [-100, -100], [0, -100], [100, -100], [100, 0]];
-    else if (_r < 0.6) grilla = [[0, 0], [100, -100], [0, -100], [-100, -100], [-100, 0], [-100, 100], [0, 100], [100, 100], [100, 0]];
-    else if (_r < 0.8) grilla = [[0, 0], [100, 100], [-100, 100], [0, 0], [100, -100], [-100, -100]];
-    else grilla = [[0, 0], [100, -100], [0, -100], [-100, -100], [0, 0], [0, 100]];
-    const _zo = constrain(0.5 + randomM3(), 0, 1);
-    for (let i = 0; i < grilla.length; i++) { grilla[i][0] *= _zo; grilla[i][1] *= _zo; }
-    for (let i = 0; i < 5; i++) cont_ini_memo[i] = int(cont_ini_memo[i] * 2);
-    const _g = [0.05, 0.1, 0.2, 0.25, 0.5, 1];
-    const _g2 = int(map(mi_m[3], 0.7, 1, 0, _g.length));
-    grilla_sub = _g[_g2];
-    _da = cont_modo + grilla_sub;
+    if (_r < 0.5) {
+      let _n = 0;
+      for (let x = 5; x >= -5; x--) {
+        for (let y = 5; y >= -5; y--) {
+          grillaJu[_n] = createVector(x * 30, y * 30);
+          _n++;
+        }
+      }
+      b_grillaJu = true, _ti = 4;
+    }
+    else {
+      if (_r < 0.6) grilla = [[0, 0], [-100, 0], [100, -100], [0, -100], [-100, -100], [100, 100], [0, 100], [-100, 100], [100, 0]];
+      else if (_r < 0.7) grilla = [[0, 0], [100, 100], [0, 100], [-100, 100], [-100, 0], [-100, -100], [0, -100], [100, -100], [100, 0]];
+      else if (_r < 0.8) grilla = [[0, 0], [100, -100], [0, -100], [-100, -100], [-100, 0], [-100, 100], [0, 100], [100, 100], [100, 0]];
+      else if (_r < 0.9) grilla = [[0, 0], [100, 100], [-100, 100], [0, 0], [100, -100], [-100, -100]];
+      else grilla = [[0, 0], [100, -100], [0, -100], [-100, -100], [0, 0], [0, 100]];
+      const _zo = constrain(0.5 + randomM3(), 0, 1);
+      for (let i = 0; i < grilla.length; i++) { grilla[i][0] *= _zo; grilla[i][1] *= _zo; }
+
+      const _g = [0.05, 0.1, 0.2, 0.25, 0.5, 1];
+      const _g2 = int(map(mi_m[3], 0.65, 1, 0, _g.length));
+      grilla_sub = _g[_g2];
+      _da = cont_modo + grilla_sub;
+
+      b_grillaJu = false, _ti = 1.75; //new
+    }
+    for (let i = 0; i < 5; i++) cont_ini_memo[i] = int(cont_ini_memo[i] * _ti); // new
   }
   // rotation speed (clock)
-  ini_rotZ = 16 + int(randomM3() * 16) * 5;
+  ini_rotZ = 16 + int(randomM3() * 4) * 5;
   if (randomM3() < 0.5) cam_rotSe = 1; else cam_rotSe = -1;
   let _vG, _vG1;
   if (cont_modo == "spins") {
@@ -336,21 +356,27 @@ function prepara_sketch() {
     _vG = [0.01, 0.01, 0.01, 0.0075, 0.005, 0.004, 0.002];
     _vG1 = int(map(mi_m[0], 0, 1, _vG.length - 1, 0))
   }
-  cam_rotZn = _vG[_vG1];
+  cam_rotZn = _vG[_vG1] * 2; //new * 2
 
   // object position/movement from camera
   let _ca = [0, 6]; if (cont_modo == "jumps") _ca = [3, 8];
-  cam_posIni = 20 + int(randomM3() * 60);
+  cam_posIni = 20 + int(randomM3() * 30); // * 60 new
   cam_oscSe[2] = abs(cam_oscSe[2]);
   cam_oscSe = cam_data[int(map(randomM3(), 0, 1, _ca[0], _ca[1]))];
+  //cam_oscSe[2] = int(cam_oscSe[2] * 2); // new
   if (mi_m[3] < 0.35 || mi_m[3] > 0.85) cam_oscSe[2] *= -1;
-  //if (randomM3() < 0.5) cam_oscSe[2] *= -1; bug
+
+  if (b_grillaJu) {
+    cam_oscSe[3] = 0;// bug!!
+    cam_rotZn *= 0.5; // new
+  } else {
+    let _r = randomM3();
+    if (_r < 0.17) { cam_oscSe[3] = 0; }
+    else if (_r < 0.34) { cam_oscSe[3] = 100; } else { cam_oscSe[3] = 50; }
+  }
   let _r = randomM3();
-  if (_r < 0.17) { cam_oscSe[3] = 0; }
-  else if (_r < 0.34) { cam_oscSe[3] = 100; } else { cam_oscSe[3] = 50; }
-  _r = randomM3();
-  if (_r < 0.22) cam_oscSe[4] = 0.1; else if (_r < 0.55) cam_oscSe[4] = 0.05; else cam_oscSe[4] = 0.01;
-  const _cr = int(map(cam_rotZn, 0.01, 0.00001, 100, 1));
+  if (_r < 0.22) cam_oscSe[4] = 0.3; else if (_r < 0.5) cam_oscSe[4] = 0.2; else cam_oscSe[4] = 0.1;//0.1, 0.05,0.01 // new
+  const _cr = int(constrain(map(cam_rotZn, 0.01, 0.00001, 100, 1), 1, 100));
   console.log("[4] sliders movement: " + _da + ", rotation: ", _cr * cam_rotSe + "%, data: " + cam_oscSe);
 
   // slider5
@@ -370,7 +396,7 @@ function prepara_sketch() {
   // reset
   intervalN = 0, notas_cont = 0, cont_cant = 0, cont_cE_n = 14, bCont_ini = true;
   cont_mute = [false, false, false, false, false], b_reset = false, cam_rotZ = 0;
-  sinte_par = 0, subdiv = 0;
+  sinte_par = 0, subdiv = 0, grillaSp = 0;
   cam.setPosition(0, 0, 300);
   clearInterval(interval_sin); interval_sin = null;
   if (seccion == "jugando") Rep_sinte(tiempo_ms);
@@ -380,64 +406,49 @@ function prepara_sketch() {
 
 
 function draw() {
-  //if (b_trigger) noLoop(); //bug
-   // Asegura que WebGL tenga permiso para escribir en el buffer de profundidad
-   gl.depthMask(true); 
-   gl.clearDepth(1.0);
-   gl.clear(gl.DEPTH_BUFFER_BIT);//gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-
- 
+  gl.depthMask(true);
+  gl.clearDepth(1.0);
+  gl.clear(gl.DEPTH_BUFFER_BIT);
 
   if (resetAnimation) {
     prepara_sketch();
     resetAnimation = false;
   }
-
-  ////fbo.begin();
-  ////clear(); //bug fbo
-
-
+  ////fbo.begin(); clear(); //bug fbo
   if (seccion == "cargando") {
+    background(col_data[1]);
+    //gl.flush(); // new
+    //gl.finish(); // new
+    intro();
     for (let i = 0; i < controles.length; i++) controles[i].dibuja();
-    estela(0.05);
-    muestra_titulo();
   }
   else {
     renderScene();
   }
 
- ////fbo.end();
+  ////fbo.end();
   // Muestra el contenido en el canvas principal
   ////image(fbo, 0,0, width, height)//-width/2, -height/2);
-
-
-  if (intervalN >= 5000 && !b_trigger) { //14300
-    b_trigger = true;
-    triggerPreview();
-    //grabaImagen(); // bug
-    noLoop(); //bug
-  }
-
-  /* if (window.capturePreview && !b_trigger2) {
-    // forzar redraw para asegurar que el frame esté completo
-    b_trigger2 = true;
-    renderScene();
-    grabaImagen(); // bug
-    console.log("Frame listo para preview, flag capturePreview activo");
+  /* if (frameCount % 150 === 0) {
+    gl.flush();
+    gl.finish();
   } */
 
-  
+  // anda a intervalN 2300. a 3600 (32) 4000->no
+  // anda a frameCount >= 2113 
+  if (intervalN >= 3800 && !b_trigger) { //14300  
+    b_trigger = true;
+    gl.finish();
+
+    if (typeof triggerPreview === "function") {
+      triggerPreview();
+    }
+    grabaImagen();//bug
+    //{ clearInterval(interval_sin); interval_sin = null; noLoop(); }//bug
+  }
 }
 
-// Escuchar cuando EditArt dispara el mensaje de "sketch-loaded"
-/* window.addEventListener("message", (e) => {
-  console.log("Mensaje recibido:", e.data);
-  if (e.data?.type === "sketch-loaded") {
-    renderScene();
-    console.log("Frame listo para capture, justo antes del preview");
-  }
-}); */
 
 function renderScene() {
   if (cam_rotZ != 0) {
@@ -463,18 +474,28 @@ function renderScene() {
 
   if (cont_modo == "spins") {
     const _oscX = cam_oscSe[2] * sin(_int * cam_oscSe[4]);
-    cam.lookAt(_oscX, 0, 0);
-  } else {
-    const _i = int(notas_cont * grilla_sub) % grilla.length;
-    cam.lookAt(grilla[_i][0], grilla[_i][1], 0);
-    if (_i != grilla_memo) {
-      let _m = 0;
-      if (grilla[_i][1] > 0) _m = modulN; else if (grilla[_i][1] < 0) _m = -modulN;
-      for (let i = 0; i < notas.length; i++) {
-        notas[i] = notas_memo[i] + _m;
-      }
+    if (tiempo_ms < 14 && frameCount % tiempo_ms == 0) {
+      grillaSp -= 20;
+      if (grillaSp < -100) grillaSp = 100;
     }
-    grilla_memo = _i;
+    cam.lookAt(_oscX, grillaSp, 0);
+  } else {
+    if (b_grillaJu) {
+      let _n = ((60 + notas_cont) % 110)
+      cam.lookAt(grillaJu[_n].x, grillaJu[_n].y, 0);
+    }
+    else {
+      const _i = int(notas_cont * grilla_sub) % grilla.length;
+      cam.lookAt(grilla[_i][0], grilla[_i][1], 0);
+      if (_i != grilla_memo) {
+        let _m = 0;
+        if (grilla[_i][1] > 0) _m = modulN; else if (grilla[_i][1] < 0) _m = -modulN;
+        for (let i = 0; i < notas.length; i++) {
+          notas[i] = notas_memo[i] + _m;
+        }
+      }
+      grilla_memo = _i;
+    }
   }
 
   // controls: drawing, reset, etc.
@@ -494,9 +515,12 @@ function renderScene() {
 
   // trail
   let _e, _a;
-  if (notas_cont > 200) _e = 200; else if (notas_cont > 160) _e = 60;
-  else if (notas_cont > 80) _e = 20; else _e = 2;
-  if (frameCount % _e == 0) estela(0.05); else { estela(0); }
+  //if (notas_cont > 200) _e = 200; else if (notas_cont > 160) _e = 60;
+  //else if (notas_cont > 80) _e = 20; else _e = 2;
+  if (notas_cont > 30) { int(_e = 200 / fRateN); _a = 0.05 }
+  else if (notas_cont > 10) { _e = 1; _a = 0.1 }
+  else { _e = 1; _a = 0.2 };
+  if (frameCount % _e == 0) estela(_a); else { estela(0); }
 }
 
 // sound --------------------------------
@@ -595,12 +619,6 @@ function Rep_sinte(_r) {
     subdiv++;
     if (subdiv == 100) subdiv = 0;
     intervalN++;
-    /* if (intervalN >= 14300 && !b_trigger) {
-      b_trigger = true;
-      triggerPreview();
-      print(intervalN)
-     // grabaImagen(); // bug
-    } */
   }, _r)
 }
 
@@ -621,18 +639,46 @@ function estela(_a) {
   if (_a != 0) {
     fill((cont_co + 30) % 360, 2, col_data[2], _a);
     plane(160, 160);
-    if (seccion == "cargando") {
+    /* if (seccion == "cargando") {
       rotateY(PI);
       texture(pg);
       plane(160, 160);
-    }
+    } */
   }
-  if (frameCount % 4 == 0) {
+  if (frameCount % int(4 / fRateN) == 0) {
     const _f = int(frameCount * 0.25) % marco.length;
     translate(marco[_f].x, marco[_f].y);
     fill(col_data[1], 0.4);
     plane(10, 10)
   }
+  pop();
+}
+
+function intro() {
+
+  push();
+  /* rotateZ(-cam_rotZ);
+  translate(cam.eyeX, cam.eyeY, cam.eyeZ);
+  const dx = cam.centerX - cam.eyeX;
+  const dy = cam.centerY - cam.eyeY;
+  const dz = cam.centerZ - cam.eyeZ;
+  const yaw = atan2(dx, dz);
+  const pitch = -atan2(dy, sqrt(dx * dx + dz * dz));
+  rotateY(yaw);
+  rotateX(pitch); */
+  //translate(0, 0, 95);
+  noStroke();
+  // if (_a != 0) {
+  fill((cont_co + 30) % 360, 2, col_data[2], 1);
+  plane(160 * 3.15, 160 * 3.15);
+  //if (seccion == "cargando") {
+  // rotateY(PI);
+  //translate(0, 0, 30);
+  muestra_titulo();
+  texture(pg);
+  plane(320, 320); //160,160
+  //}
+  // }
   pop();
 }
 
@@ -652,7 +698,7 @@ function crea_controles() {
   let i = cont_cant % 5;
   const _tx = -50 + cont_s[i] * abs(-50 * 2);
   const _ty = [-40, -20, 0, 20, 40];
-  const _tz = [50, 100, 150, 200, 250];
+  const _tz = [100, 150, 200, 250, 290] // [60, 120, 180, 240, 290];// new[50, 100, 150, 200, 250];
   cont_cant++;
   let _zPlus = controles[0].get_z();
   const _rot = cont_ro[int(randomFull() * cont_ro.length)];
@@ -664,22 +710,25 @@ function crea_controles() {
 
 function muestra_titulo() {
 
-  pg.clear();
-  pg.fill(col_data[0]);
-  pg.stroke((cont_co + 30) % 360, 2, col_data[2], 0.5);
-  pg.rect(pg.width / 2 - 135, pg.height / 2 + 340, 270, 60);
-  pg.rect(pg.width / 2 + 135, pg.height / 2 + 340, 270, 60);
-  pg.rect(pg.width / 2 - 135, pg.height / 2 + 400, 270, 60);
-  pg.rect(pg.width / 2 + 135, pg.height / 2 + 400, 270, 60);
-  pg.fill((cont_co + 30) % 360, 2, col_data[2], 0.5)
-  pg.text("PARACHUTE WALTZ", pg.width / 2 - 135, pg.height / 2 + 340);
-  pg.text("by yamil burguener", pg.width / 2 + 135, pg.height / 2 + 340);
   const _t = int((titInicio - millis()) * 0.001);
-  pg.text("click to start", pg.width / 2 - 135, pg.height / 2 + 400);
-  pg.text("or wait (" + _t + ") seconds", pg.width / 2 + 135, pg.height / 2 + 400);
   if (_t <= 0) {
     seccion = "jugando"; Rep_sinte(tiempo_ms);
-    pg.clear(); pg.remove();
+    //pg.clear();// pg.remove(); new
+    frameRate(30);
+  } else {
+    pg.clear();
+    pg.fill(col_data[0]);
+    pg.stroke((cont_co + 30) % 360, 2, col_data[2], 0.5);
+    pg.rect(pg.width / 2 - 135, pg.height / 2 + 340, 270, 60);
+    pg.rect(pg.width / 2 + 135, pg.height / 2 + 340, 270, 60);
+    pg.rect(pg.width / 2 - 135, pg.height / 2 + 400, 270, 60);
+    pg.rect(pg.width / 2 + 135, pg.height / 2 + 400, 270, 60);
+    pg.fill((cont_co + 30) % 360, 2, col_data[2], 0.5)
+    pg.text("PARACHUTE WALTZ", pg.width / 2 - 135, pg.height / 2 + 340);
+    pg.text("by yamil burguener", pg.width / 2 + 135, pg.height / 2 + 340);
+
+    pg.text("click to start", pg.width / 2 - 135, pg.height / 2 + 400);
+    pg.text("or wait (" + _t + ") seconds", pg.width / 2 + 135, pg.height / 2 + 400);
   }
 }
 
@@ -702,7 +751,8 @@ function mouseClicked() {
 
   if (seccion == "cargando") {
     seccion = "jugando"; Rep_sinte(tiempo_ms);
-    pg.clear(); pg.remove();
+    pg.clear(); //pg.remove();
+    frameRate(30); // poner 60 bug
   }
   b_sound = !b_sound;
   if (b_sound) { vol_final.gain.rampTo(1.1, 0.05); }
@@ -711,6 +761,15 @@ function mouseClicked() {
 
 function keyReleased() {
 
+  if (key == "q") { // bug!!!
+    let mi_seed = Math.floor(9999999999 * random());
+    print("seed: " + mi_seed);
+    randomSeed(mi_seed);
+    m0 = random(), m1 = random(), m2 = random(), m3 = random(), m4 = random();
+    //5757609933 lindos colores
+    seedRandomness();
+    prepara_sketch();
+  }
   if (key == "s" || key == "S") {
     grabaImagen();
   }
@@ -723,10 +782,20 @@ function keyReleased() {
     let fs = fullscreen();
     fullscreen(!fs);
   }
+  if (key == "1") {
+    fRateN = 2;
+    console.log("set frameRate(30)");
+    frameRate(30);
+  }
+  else if (key == "2") {
+    fRateN = 1;
+    console.log("set frameRate(60)");
+    frameRate(60);
+  }
 }
 
 function windowResizedUser() {
-  // Handle resizing if needed, but since canvas is fixed at 1620x1620, maybe nothing
+  // Handle resizing if needed, but since canvas is fixed at 1080x1080, maybe nothing
   // resizeCanvas(canvasWidth, canvasHeight); // If dynamic, but here fixed
 }
 
@@ -783,7 +852,7 @@ class Control {
     if (notas_cont % 32 < 30) stroke(this.co[0], this.alfa[0] * this.al); else stroke(col_data[3], 0.25)
     if (controles.indexOf(this) != 0) {
       let _z1 = 0;
-      if (this.vida < 100) _z1 = map(this.vida, 0, 100, -this.tz, 0);
+      if (this.vida < 75) _z1 = map(this.vida, 0, 75, -this.tz, 0); //new
       line(0, 0, _z1, 0, 0, -this.tz + controles[0].get_z())
     }
     // lines
@@ -792,9 +861,9 @@ class Control {
       else stroke(this.co[i], this.s[i], this.b[i], this.alfa[i] * this.al);
       if (controles.indexOf(this) != 0) {
         let _x = 0;
-        if (this.vida < 100) { } else
-          if (this.vida < 200) {
-            _x = map(this.vida, 100, 200, 50, 0);
+        if (this.vida < 75) { } else //new
+          if (this.vida < 150) { //new
+            _x = map(this.vida, 75, 150, 50, 0);
             line(this.x[i] + _x, this.y[i], this.x[i] + 100 - _x, this.y[i])
           }
           else { this.pinta_linea(i); }
@@ -840,7 +909,7 @@ class Control {
   pinta_linea(i) {
     line(this.x[i], this.y[i], this.x[i] + 100, this.y[i]);
     stroke(this.co[i], 0.4);
-    point(this.x[i], this.y[i]), point(this.x[i] + 100, this.y[i]);
+    point(this.x[i], this.y[i]); point(this.x[i] + 100, this.y[i]);
   }
 
   set_luz(i) {
