@@ -34,7 +34,7 @@ const altura_var = [0.08, 0.16, 0.24, 0.3, 0.4];
 let altura_modo;
 let notas = [], notas_memo = [], notas_cont = 0, modulN = 0;
 let tiempo_ms, tiempo_modo, tiempo_delay = 0;
-let soundR = [], sound_cont = 0, delayTimeLFO;
+let soundR = [], sound_cont = 0, delayTimeLFO, b_dLFO = false;
 
 let myShader, sh;
 const vert = `
@@ -229,7 +229,7 @@ function prepara_sketch() {
   let _plus = 0;
   if (mi_m[1] > 0.8) {
     tiempo_modo = "free", altura_modo = 0.4;
-    if (tiempo_ms < 8) _plus = 0.4;
+    _plus = 0.6;
   } else if (mi_m[1] > 0.35) {
     const _nn = [0, 0.13, 0.25, 0.37, 0.5, 0.63, 0.75, 0.87];
     for (let i = 0; i < 5; i++) cont_s[i] = _nn[int(mi_m[i] * 8)]
@@ -243,16 +243,20 @@ function prepara_sketch() {
   let _de;
   if (randomM1() + _plus < 0.75) {
     const _td = [0.087, 0.075, 0.0667, 0.05, 0.0334, 0.025];
-    let _m = int(randomM1() * _td.length);
+    let _m = int(randomFull() * _td.length);
     tiempo_delay = tiempo_ms * _td[_m];
     if (tiempo_delay > 1) tiempo_delay *= 0.5;
     delay.set({ delayTime: tiempo_delay });
-
     _de = _m + 1;
+    if (b_dLFO) delayTimeLFO.disconnect(delay.delayTime);
+    b_dLFO = false;
   } else {
-    delayTimeLFO = new Tone.LFO(0.002, 0.0001, 0.99).start();
+    let _frec = 0.002;
+    if (tiempo_modo == "free") _frec = constrain(map(tiempo_ms, 5, 12, 0.08, 0.002), 0.002, 0.08);
+    delayTimeLFO = new Tone.LFO(_frec, 0.0001, 0.99).start(); //0.002
     delayTimeLFO.type = "triangle";
     delayTimeLFO.connect(delay.delayTime);
+    b_dLFO = true;
     _de = "LFO";
   }
   del_cont = int(randomM1() * 6000);
@@ -409,7 +413,7 @@ function draw() {
     renderScene();
   }
 
-  if (frameCount % 1000 === 0) { gl.flush(); gl.finish(); print("WWW") }
+  if (frameCount % 1000 === 0) { gl.flush(); gl.finish(); print("gl.flush()") } //bug
 
   if (intervalP >= 7000 && !b_trigger) {
     clearInterval(interval_prev); interval_prev = null;
@@ -736,12 +740,11 @@ function menos_definicion() {
 
 function keyReleased() {
 
-  if (key == "q") { // bug!!!
+  if (key == "q") { // DELETE THIS SECTION bug!!!
     let mi_seed = Math.floor(9999999999 * random());
     print("seed: " + mi_seed);
     randomSeed(mi_seed);
     m0 = random(), m1 = random(), m2 = random(), m3 = random(), m4 = random();
-    m0 = 0.515, m1 = 0.130, m2 = 0.760, m3 = 0.428, m4 = 0.500
     //5757609933 lindos colores
     seedRandomness();
     prepara_sketch();
