@@ -102,7 +102,7 @@ function preload() {
   const lp = new Tone.Filter(600, "lowpass");
   const reverb2 = new Tone.Reverb({ decay: 0.5, wet: 0.5 });
   delay = new Tone.FeedbackDelay({ wet: 0 });
-  delayTimeLFO = new Tone.LFO(0.002, 0.0001, 0.99);//.start(); //0.002
+  delayTimeLFO = new Tone.LFO(0.002, 0.0001, 0.99).start();
   const comp = new Tone.Compressor({
     ratio: 12, threshold: -20, release: 0.25, attack: 0.003, knee: 3
   });
@@ -255,7 +255,7 @@ function prepara_sketch() {
     let _frec = 0.002;
     if (tiempo_modo == "free") _frec = constrain(map(tiempo_ms, 5, 12, 0.08, 0.002), 0.002, 0.08);
     delayTimeLFO.set({ frequency: _frec });// = new Tone.LFO(_frec, 0.0001, 0.99).start(); //0.002
-    delayTimeLFO.start();
+    //delayTimeLFO.start();
     delayTimeLFO.type = "triangle";
     delayTimeLFO.connect(delay.delayTime);
     b_dLFO = true;
