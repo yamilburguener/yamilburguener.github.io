@@ -249,8 +249,7 @@ function prepara_sketch() {
     if (tiempo_delay > 1) tiempo_delay *= 0.5;
     delay.set({ delayTime: tiempo_delay });
     _de = _m + 1;
-    if (b_dLFO) delayTimeLFO.stop();// delayTimeLFO.disconnect(delay.delayTime);
-    
+    if (b_dLFO) { delayTimeLFO.stop(); delayTimeLFO.disconnect(delay.delayTime); }
     b_dLFO = false;
   } else {
     let _frec = 0.002;
@@ -744,11 +743,11 @@ function menos_definicion() {
 function keyReleased() {
 
   if (key == "q") { // DELETE THIS SECTION bug!!!
-    let mi_seed = Math.floor(9999999999 * random());
+    let mi_seed = 5757609933//Math.floor(9999999999 * random());
     print("seed: " + mi_seed);
     randomSeed(mi_seed);
     m0 = random(), m1 = random(), m2 = random(), m3 = random(), m4 = random();
-    m0 = 0.284, m1 = random(), m2 = 0.071, m3 = 0.737, m4 = 0.524
+    // m0 = 0.284, m1 = random(), m2 = 0.071, m3 = 0.737, m4 = 0.524
     //5757609933 lindos colores
     seedRandomness();
     prepara_sketch();
