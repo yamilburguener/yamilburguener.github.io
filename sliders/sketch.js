@@ -102,6 +102,7 @@ function preload() {
   const lp = new Tone.Filter(600, "lowpass");
   const reverb2 = new Tone.Reverb({ decay: 0.5, wet: 0.5 });
   delay = new Tone.FeedbackDelay({ wet: 0 });
+  delayTimeLFO = new Tone.LFO(0.002, 0.0001, 0.99);//.start(); //0.002
   const comp = new Tone.Compressor({
     ratio: 12, threshold: -20, release: 0.25, attack: 0.003, knee: 3
   });
@@ -253,7 +254,8 @@ function prepara_sketch() {
   } else {
     let _frec = 0.002;
     if (tiempo_modo == "free") _frec = constrain(map(tiempo_ms, 5, 12, 0.08, 0.002), 0.002, 0.08);
-    delayTimeLFO = new Tone.LFO(_frec, 0.0001, 0.99).start(); //0.002
+    delayTimeLFO.set({ frequency: _frec });// = new Tone.LFO(_frec, 0.0001, 0.99).start(); //0.002
+    delayTimeLFO.start();
     delayTimeLFO.type = "triangle";
     delayTimeLFO.connect(delay.delayTime);
     b_dLFO = true;
@@ -508,7 +510,6 @@ function suena_sinte(_no) {
   let _we = 0.75;
   if (notas_cont <= cam_posIni) _we = constrain(map(notas_cont, 10, cam_posIni - 1, 0, 0.75), 0, 0.75);
   let _d = 0.5 + sin(del_cont * 0.01) * 0.5;
-  print(_we)
   del_cont++;
   const _f = map(_d, 0, 1, del_var[0], del_var[1]);
   delay.set({ feedback: _f, wet: _we });
@@ -746,6 +747,7 @@ function keyReleased() {
     print("seed: " + mi_seed);
     randomSeed(mi_seed);
     m0 = random(), m1 = random(), m2 = random(), m3 = random(), m4 = random();
+    m0 = 0.284, m1 = random(), m2 = 0.071, m3 = 0.737, m4 = 0.524
     //5757609933 lindos colores
     seedRandomness();
     prepara_sketch();
