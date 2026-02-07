@@ -102,7 +102,7 @@ function preload() {
   const lp = new Tone.Filter(600, "lowpass");
   const reverb2 = new Tone.Reverb({ decay: 0.5, wet: 0.5 });
   delay = new Tone.FeedbackDelay({ wet: 0 });
-  delayTimeLFO = new Tone.LFO(0.002, 0.0001, 0.99);///.start();
+  delayTimeLFO = new Tone.LFO(0.002, 0.0001, 0.99);
   const comp = new Tone.Compressor({
     ratio: 12, threshold: -20, release: 0.25, attack: 0.003, knee: 3
   });
@@ -244,7 +244,7 @@ function prepara_sketch() {
   let _de;
   if (randomM1() + _plus < 0.75) {
     const _td = [0.087, 0.075, 0.0667, 0.05, 0.0334, 0.025];
-    let _m = int(randomFull() * _td.length);
+    let _m = int(randomM1() * _td.length);
     tiempo_delay = tiempo_ms * _td[_m];
     if (tiempo_delay > 1) tiempo_delay *= 0.5;
     delay.set({ delayTime: tiempo_delay });
@@ -254,7 +254,7 @@ function prepara_sketch() {
   } else {
     let _frec = 0.002;
     if (tiempo_modo == "free") _frec = constrain(map(tiempo_ms, 5, 12, 0.08, 0.002), 0.002, 0.08);
-    delayTimeLFO.set({ frequency: _frec });// = new Tone.LFO(_frec, 0.0001, 0.99).start(); //0.002
+    delayTimeLFO.set({ frequency: _frec });// = new Tone.LFO(_frec, 0.0001, 0.99).start();
     delayTimeLFO.start();
     delayTimeLFO.type = "triangle";
     delayTimeLFO.connect(delay.delayTime);
@@ -415,7 +415,7 @@ function draw() {
     renderScene();
   }
 
-  if (frameCount % 1000 === 0) { gl.flush(); gl.finish(); print("gl.flush()") } //bug
+  if (frameCount % 2000 === 0) { gl.flush(); gl.finish(); print("gl.flush()") }
 
   if (intervalP >= 7000 && !b_trigger) {
     clearInterval(interval_prev); interval_prev = null;
@@ -495,8 +495,6 @@ function renderScene() {
 
   // trail
   let _e, _a;
-  //if (notas_cont > 200) _e = 200; else if (notas_cont > 160) _e = 60;
-  //else if (notas_cont > 80) _e = 20; else _e = 2;
   if (notas_cont > 30) { int(_e = 200 * fRateN); _a = 0.05 }
   else if (notas_cont > 10) { _e = 1; _a = 0.1 }
   else { _e = 1; _a = 0.2 };
@@ -716,8 +714,8 @@ function mouseClicked() {
 
   if (seccion == "cargando") {
     seccion = "jugando"; Rep_sinte(tiempo_ms); Para_preview();
-    pg.clear(); //pg.remove();
-    mas_definicion(); //frameRate(30);
+    pg.clear();
+    mas_definicion();
   }
   b_sound = !b_sound;
   if (b_sound) { vol_final.gain.rampTo(1.1, 0.05); }
@@ -740,10 +738,12 @@ function menos_definicion() {
   estela(1);
 }
 
+/*************  ✨ Windsurf Command ⭐  *************/
+/*******  26dfbf4b-096b-48a2-b327-10150cf3ea00  *******/
 function keyReleased() {
 
   if (key == "q") { // DELETE THIS SECTION bug!!!
-    let mi_seed = 5757609933//Math.floor(9999999999 * random());
+    let mi_seed = Math.floor(9999999999 * random());
     print("seed: " + mi_seed);
     randomSeed(mi_seed);
     m0 = random(), m1 = random(), m2 = random(), m3 = random(), m4 = random();
