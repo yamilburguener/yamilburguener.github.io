@@ -508,6 +508,7 @@ function suena_sinte(_no) {
   let _we = 0.75;
   if (notas_cont <= cam_posIni) _we = constrain(map(notas_cont, 10, cam_posIni - 1, 0, 0.75), 0, 0.75);
   let _d = 0.5 + sin(del_cont * 0.01) * 0.5;
+  print(_we)
   del_cont++;
   const _f = map(_d, 0, 1, del_var[0], del_var[1]);
   delay.set({ feedback: _f, wet: _we });
