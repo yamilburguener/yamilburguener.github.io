@@ -322,6 +322,7 @@ function prepara_sketch() {
       _da += "10x10"; b_grillaJu = true, _ti = 4;
     }
     else {
+      grilla = [];
       if (_r < 0.52) grilla = [[0, 0], [-100, 0], [100, -100], [0, -100], [-100, -100], [100, 100], [0, 100], [-100, 100], [100, 0]];
       else if (_r < 0.64) grilla = [[0, 0], [100, 100], [0, 100], [-100, 100], [-100, 0], [-100, -100], [0, -100], [100, -100], [100, 0]];
       else if (_r < 0.76) grilla = [[0, 0], [100, -100], [0, -100], [-100, -100], [-100, 0], [-100, 100], [0, 100], [100, 100], [100, 0]];
@@ -332,7 +333,6 @@ function prepara_sketch() {
 
       const _g = [0.05, 0.1, 0.2, 0.25, 0.5, 1];
       const _g2 = int(map(mi_m[3], 0.65, 1, 0, _g.length));
-      print(_g2)
       grilla_sub = _g[_g2];
       _da = cont_modo + grilla_sub; b_grillaJu = false, _ti = 1.75;
     }
@@ -467,6 +467,7 @@ function renderScene() {
     }
     else {
       const _i = int(notas_cont * grilla_sub) % grilla.length;
+      print(grilla.length)
       cam.lookAt(grilla[_i][0], grilla[_i][1], 0);
       if (_i != grilla_memo) {
         let _m = 0;
@@ -746,7 +747,7 @@ function keyReleased() {
     print("seed: " + mi_seed);
     randomSeed(mi_seed);
     m0 = random(), m1 = random(), m2 = random(), m3 = random(), m4 = random();
-    //m3 = 0.76
+    m3 = random(0.76,0.99)
     //5757609933 lindos colores
     seedRandomness();
     prepara_sketch();
