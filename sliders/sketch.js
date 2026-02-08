@@ -332,6 +332,7 @@ function prepara_sketch() {
 
       const _g = [0.05, 0.1, 0.2, 0.25, 0.5, 1];
       const _g2 = int(map(mi_m[3], 0.65, 1, 0, _g.length));
+      print(_g2)
       grilla_sub = _g[_g2];
       _da = cont_modo + grilla_sub; b_grillaJu = false, _ti = 1.75;
     }
@@ -366,7 +367,7 @@ function prepara_sketch() {
   }
   let _r = randomM3();
   if (_r < 0.22) cam_oscSe[4] = 0.2; else if (_r < 0.5) cam_oscSe[4] = 0.1; else cam_oscSe[4] = 0.05;
-  const _cr = int(map(cam_rotZn, 0.01, 0.00001, 100, 1));
+  const _cr = int(map(cam_rotZn, 0.01, 0.0005, 100, 1));
   console.log("[4] sliders movement: " + _da + ", rotation: ", _cr * cam_rotSe + "%, data: " + cam_oscSe);
 
   // slider5
@@ -415,7 +416,7 @@ function draw() {
     renderScene();
   }
 
-  if (frameCount % 2000 === 0) { gl.flush(); gl.finish(); print("gl.flush()") }
+  if (frameCount % 3000 === 0) { gl.flush(); gl.finish(); }
 
   if (intervalP >= 7000 && !b_trigger) {
     clearInterval(interval_prev); interval_prev = null;
@@ -738,8 +739,6 @@ function menos_definicion() {
   estela(1);
 }
 
-/*************  ✨ Windsurf Command ⭐  *************/
-/*******  26dfbf4b-096b-48a2-b327-10150cf3ea00  *******/
 function keyReleased() {
 
   if (key == "q") { // DELETE THIS SECTION bug!!!
@@ -747,7 +746,7 @@ function keyReleased() {
     print("seed: " + mi_seed);
     randomSeed(mi_seed);
     m0 = random(), m1 = random(), m2 = random(), m3 = random(), m4 = random();
-    // m0 = 0.284, m1 = random(), m2 = 0.071, m3 = 0.737, m4 = 0.524
+    //m3 = 0.76
     //5757609933 lindos colores
     seedRandomness();
     prepara_sketch();
