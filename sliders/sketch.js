@@ -254,6 +254,7 @@ function prepara_sketch() {
   } else {
     let _frec = 0.002;
     if (tiempo_modo == "free") _frec = constrain(map(tiempo_ms, 5, 12, 0.08, 0.002), 0.002, 0.08);
+    delayTimeLFO.stop();
     delayTimeLFO.set({ frequency: _frec });// = new Tone.LFO(_frec, 0.0001, 0.99).start();
     delayTimeLFO.start();
     delayTimeLFO.type = "triangle";
@@ -426,7 +427,7 @@ function draw() {
     if (typeof triggerPreview === "function") {
       triggerPreview();
     }
-    grabaImagen();//bug
+   // grabaImagen();//bug
   }
 }
 
@@ -744,9 +745,10 @@ function keyReleased() {
   if (key == "q") { // DELETE THIS SECTION bug!!!
     let mi_seed = Math.floor(9999999999 * random());
     print("seed: " + mi_seed);
-    randomSeed(mi_seed);
+   // randomSeed(mi_seed);
     m0 = random(), m1 = random(), m2 = random(), m3 = random(), m4 = random();
-    m3 = random(0.76,0.99)
+   //  m0 = 0.488,m1 = 0.582,m2 = 0.891,m3 = 0,m4 = 0.183 promo
+    //m3 = random(0.76,0.99)
     //5757609933 lindos colores
     seedRandomness();
     prepara_sketch();
