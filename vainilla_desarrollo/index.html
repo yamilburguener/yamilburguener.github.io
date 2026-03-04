@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>memotest</title>
+    <link rel="stylesheet" href="./src/assets/css/index.css">
+    <script type="module" src="./src/main.js"></script>
+</head>
+
+<body>
+    <div class="app" id="app">
+        <!-- Pantalla de Inicio -->
+        <div id="start-screen" class="screen">
+            <h2>Memotest</h2>
+            <p class="subtitle">Encuentra los 6 pares antes de que se agote el tiempo</p>
+            <button id="btn-start" class="btn-primary">Comenzar Juego</button>
+        </div>
+
+        <!-- Pantalla de Juego (Oculta al inicio) -->
+        <div id="game-screen" class="screen hidden">
+            <div id="timer">Tiempo: 20</div>
+            <div class="grid" id="grid"></div>
+        </div>
+
+        <!-- Pantalla Ganaste -->
+        <div id="win-screen" class="screen hidden">
+            <div class="icon">🏆</div>
+            <h2>¡Ganaste!</h2>
+            <p class="subtitle">Increíble, encontraste todos los pares a tiempo.</p>
+            <button class="btn-primary btn-reset">Jugar de nuevo</button>
+        </div>
+
+        <!-- Pantalla Perdiste -->
+        <div id="lose-screen" class="screen hidden">
+            <div class="icon">⏰</div>
+            <h2>¡Tiempo agotado!</h2>
+            <p class="subtitle">No te preocupes, puedes intentarlo otra vez.</p>
+            <button class="btn-primary btn-reset">Reintentar</button>
+        </div>
+    </div>
+</body>
+
+</html>
