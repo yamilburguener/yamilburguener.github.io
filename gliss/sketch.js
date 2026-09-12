@@ -1,19 +1,3 @@
-/*
------ Coding Tutorial by Patt Vira ----- 
-Name: Differential Line Growth //Crecimiento de línea diferencial
-Video Tutorial: https://youtu.be/1viK2qKuP-Y
-
-Connect with Patt: @pattvira
-https://www.pattvira.com/
-----------------------------------------
-//Quadtree  #DifferentialGrowth
-https://en.wikipedia.org/wiki/Quadtree
-
-Quadtree and Differential Growth by Daniel Shiffman & Patt Vira
-
-
-https://tonejs.github.io/docs/15.1.3/modules.html
-*/
 let bFrame = false // bug
 let seccion = "cargando";
 let mi_seed;
@@ -825,8 +809,8 @@ function mouseClicked() {
 }
 
 function grabaImagen() {
-  console.log("saving!")
-  saveCanvas("nnn" + mi_seed + ".png")
+ // console.log("saving!")
+ // saveCanvas("nnn" + mi_seed + ".png")
 }
 
 // personas ----------------------------
