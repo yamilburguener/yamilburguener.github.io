@@ -1227,7 +1227,7 @@ class Caja {
 
         // simbolos -------------------------------------------
         if (this.bTexto) {
-          if (txt_random() < 0.97) { // 0.95
+          if (txt_random() < 0.5) { // 0.95
             cod_cad[cod_n] = cod_cad[cod_n] + cod_sel[int(txt_random() * cod_sel.length)]
           } else {
             let _rn = int(txt_random() * 4)
@@ -1235,7 +1235,7 @@ class Caja {
           }
           blendMode(DIFFERENCE)
           textFont(fuente[0])
-          fill(50, 0.5), noStroke() //stroke(255), 
+          fill(50), noStroke() //stroke(255), 
           textSize(30) // orig:15 
           //  if (te_tipo == "dibujo") 
           text(cod_cad[cod_n], 0, 14, this.w, this.h)
