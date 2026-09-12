@@ -9,7 +9,7 @@ body {
 		Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
 }
 
-#cv {
+#canvas {
 	position: relative;
 	display: flex;
 	align-items: center;
@@ -18,7 +18,7 @@ body {
 	height: 100vh;
 }
 
-#cv canvas {
+#canvas canvas {
 	margin: auto;
 	overflow: hidden;
 	top: 0;

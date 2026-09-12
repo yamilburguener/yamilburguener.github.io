@@ -1,60 +1,72 @@
-//let finished = false; // bug
+let finished = false; // bug
 let captureScheduled = false; // bug
-let mi_seed;
+let DURACION // bug
 let mi_width, mi_height
 //let bVer = false // bug
-let seccion = "cargando"; // "jugando";
+let seccion = "cargando"; // bug "cargando" //"jugando"
 //let b_preview = true
 let modelo
 let titInicio
 let b_play = true
-let pixel = 1
-let cajas = [], cajas_mo = [0, 1, 0, 1]//, cajas_fC = 40 // quien se mueve
+const pixel = 1
+let cajas = []
+let cajas_mo = [0, 1, 0, 1]//, cajas_fC = 40 // quien se mueve
 let c_years
-let pos_x = [[], [], [], []], pos_y = [[], [], [], []]
+let pos_x = [[], [], [], []]
+let pos_y = [[], [], [], []]
 let pos_n = -1
-let pos_dist = [1, 0.5, 0.25, 0.125]
-let pos_red = 0.5
-let pos_toX = [40, 40, 40, 40], pos_toY = [40, 40, 40, 40]
-let pos_toXm = [20, 20, 20, 20], pos_toYm = [20, 20, 20, 20]
-let pos_fX = [], pos_fY = []
-let pos_desX = [], pos_desY = []
-let p_dX_inc
-let p_dCant
-const p_ta = 140
-const p_dir = [[-p_ta, 0], [0, -p_ta], [p_ta, 0], [0, p_ta]]
-let p_dir_pa = 0, p_dir_fo = [[1, 3], [1, 3, 3, 3, 3], [3, 1, 1, 1, 1]]
-let pos_sin, pos_sL, pos_sA = 2, pos_dN, pos_dNR, pos_ini, pos_gralP, pos_rot = [[], []]
+let pos_dist = [1, 0.5, 0.25, 0.125] // para que se muevan menos cuanovayan par atras
+let pos_red = 0.5 // porcentaje q reduce la caja
+let pos_toX = [40, 40, 40, 40], pos_toY = [40, 40, 40, 40] // para mover las cajas , orig: 40
+let pos_toXm = [20, 20, 20, 20], pos_toYm = [20, 20, 20, 20] // mitad orig: 20
+let pos_fX = [], pos_fY = []// posicion final en X
+let pos_desX = [], pos_desY = [] //para donde se desintegra
+let p_dX_inc // inclinacion
+let p_dCant // 15 para torres, 25 para boom
+const p_ta = 140 // tamaño, puede ser 100 a 170
+const p_dir = [[-p_ta, 0], [0, -p_ta], [p_ta, 0], [0, p_ta]] // direccion de las torres
+let p_dir_pa = 0, p_dir_fo = [[1, 3], [1, 3, 3, 3, 3], [3, 1, 1, 1, 1]] //patron yforma
+let pos_sin // cambiar para que las  sinusoides/mantañas se ubiquen en otro lugar
+let pos_sL // 0.001 cambiar para la onda mas estirada
+let pos_sA = 2 // amplitud del sin()
+let pos_dN, pos_dNR, pos_ini, pos_gralP, pos_rot = [[], []]
 let dias, dias_memo
-let b_rect = true
+let b_rect = true // para version sin cuadrados
 let gralR = [], gral_cont = 0, txtR = [], txt_cont = 0, repAR = [], repA_cont = 0
-const cod_car = ["■", "─", "┐ ", "└", "┴", "┬", "├", "─", "┼", "│",
-  "─", "─", "■", "│", "□", "─"]// ⚂
-let cod_sel = [], cod_cad = [], cod_n = 0
-let col_gral = []
+const cod_car = ["×", "■", "─", "┐ ", "└", "┴", "┬", "├", "─", "┼", "│",
+  "─", "─", "■", "│", "■", "─", "■",] // caracteres //"o""o"
+let cod_sel = [] // se selecciona solo algunos caracteres de cod_car
+let cod_cad = [] // se arma una cadena de codigos con cod_sel
+let cod_n = 0 // contador
+let col_gral = [] // para colores de cajas
 let col_H = [10, 20, 20, 30, 30, 40, 40, 50, 180, 200, 330], col_Hn, col_sat = 0.2, col_Hsec = []
-let col_ra = 20
-let lin_opc = ["izq", "der", "arr", "aba"]
-let col_tipo = "", col_back = [], col_tit
-let inicioVel = 0.2, lim_fC = [800, 400, 500, 600, 700]
-let fuente = [];
+let col_ra = 20 //rango
+let lin_opc = ["izq", "der", "arr", "aba"] // donde hacer la linea
+let col_tipo = "", col_back = [], col_tit //dark //light
+let inicioVel = 0.2, lim_fC = [800, 400, 500, 600, 700]// [400, 200, 250, 300, 350]
+let fuente = [] // bug
 let pg_fondo, pg_delete, pg_titulo
 let color_get = []
 let frame_cont = 0, mi_frameCount = 0;
 let mov_vel
 let solX, solY
-let activo_c
+let activo_c // cantidad de _ac     
 
 let soundR = [], sound_cont = 0, repe_cont = -1, b_sound = false
 let poly, panPo, reverb
 let poly_cont = 0, poly_set = []
-let sampler = [], sampler_set = [], feedbackDelay, panSa
-const escala = [36, 38, 39, 41, 43, 46, 48, 50]
-let melodia = [], melo_cont = -1, intervalo_ar, melo_sig = -1, intervalo_A
+let sampler = [], sampler_set = [], sampler_loaded = [[false], [false]], feedbackDelay, panSa
+const escala = [36, 38, 39, 41, 43, 46, 48, 50]// [36, 36, 38, 40, 43, 45, 47, 48]// 
+let melodia = [], melo_cont = -1, intervalo_ar, melo_sig = -1
 let subdivision
 let pluck, panPl, intervalo_pl
-let pluck_set = [[], [], [-3, -12, -6, -12]], pluck_res
-let membrana, memb_set = [[], [], [], []]
+let pluck_set = [
+  [], // ritmo cantidad -0.02 0 -0.04 //_cnC  cantidad de notas pluck
+  [], // resonancia
+  [-3, -12, -6, -12]] // volumen [0, -6, -3, -6]]
+let pluck_res // para resonancia
+let membrana, memb_set = [[], [], [], []]//   bMemb_walk = false, let repe_cont5 = 0
+let intervalo_A
 let vol_final
 const notas_c = [
   "C0", "C#0", "D0", "D#0", "E0", "F0", "F#0", "G0", "G#0", "A0", "A#0", "B0",
@@ -67,15 +79,17 @@ const notas_c = [
   "C7", "C#7", "D7", "D#7", "E7", "F7", "F#7", "G7", "G#7", "A7", "A#7", "B7",
   "C8", "C#8", "D8", "D#8", "E8", "F8", "F#8", "G8", "G#8", "A8", "A#8", "B8",
   "C9", "C#9", "D9", "D#9", "E9", "F9", "F#9", "G9", "G#9", "A9", "A#9", "B9"]
-let BPM, bpmN, seccionM = ""
-let ritmo = [[], [], []], ritmo_oct = [-24, 0, 0, 24, 36];
-let desaf;
-let audioListo = false;
+let BPM, bpmN, seccionM = "" // seccion musica
+let ritmo = [[], [], []] // ritmo,nota
+let desaf
+////let b_bajo = true, b_tenido = true, b_grano = true
 
-function preCarga() {
+////p5.disableFriendlyErrors = false // bug: cambiar a true
+
+function preload() {
 
   const channel = new Tone.Channel({ volume: 0, channelCount: 2 })
-
+  const limiter = new Tone.Limiter(-0.5);  // new
   // poly synth & pluck synth
   panPo = new Tone.Panner(0)
   reverb = new Tone.Reverb({ decay: 0.7, wet: 0.89 })
@@ -99,15 +113,20 @@ function preCarga() {
   sampler[0] = new Tone.Sampler({
     C3: 'dirtyp_c1.mp3', C4: 'dirtyp_c2.mp3', C5: 'dirtyp_c3.mp3', C6: 'dirtyp_c4.mp3'
   }, {
-    baseUrl: './assets/'
+    baseUrl: './assets/',
+    onload: () => { sampler_loaded[0] = true; }
   })
+  sampler[0].volume.value = -6; //new
   sampler[0].chain(panSa, feedbackDelay, channel)
 
   sampler[1] = new Tone.Sampler({
     C3: 'purep_c1.mp3', C4: 'purep_c2.mp3', C5: 'purep_c3.mp3', C6: 'purep_c4.mp3'
+
   }, {
-    baseUrl: './assets/'
+    baseUrl: './assets/',
+    onload: () => { sampler_loaded[1] = true; }
   })
+  sampler[1].volume.value = -6; // new
   sampler[1].chain(panSa, feedbackDelay, channel)
 
   // membrane synth
@@ -122,50 +141,59 @@ function preCarga() {
   })
   membrana.chain(filter, channel)
 
-  vol_final = new Tone.Volume(2)
+  vol_final = new Tone.Volume(6) // bug new old: (2)
   const comp = new Tone.Compressor({
     ratio: 12, threshold: -20, release: 0.25, attack: 0.003, knee: 3
   })
-  channel.chain(comp, vol_final, Tone.Destination)
+  channel.chain(comp, vol_final, limiter, Tone.Destination)
+
 
   // seed ----------------------
-  mi_seed = Math.floor(9999999999 * $bootloader.rnd());
+  mi_seed = Math.floor(9999999999 * $bootloader.rnd()) //7989353906 rain
+  // 2712027462 vacio boom
   randomSeed(mi_seed)
   noiseSeed(mi_seed)
 
   // visual setting ------------------
+  fuente[0] = '-apple-system' // loadFont('./assets/font/712_serif.ttf')//
+  fuente[1] = loadFont('./assets/font/Ubuntu-L.ttf')// Ubuntu-L.ttf') //futura //Ubuntu-L.ttf
   let _rS = random()
-  if (_rS < 0.5) { mi_width = 2160, mi_height = 2160 }
-  else if (_rS < 0.85) { mi_width = 2160, mi_height = 2700 }
+  _rS = 0.6 // bug
+  if (_rS < 0.5) { mi_width = 2160, mi_height = 2160 } //4x3 = 2160x2880  (1080x864)
+  else if (_rS < 0.85) { mi_width = 2160, mi_height = 2700 } // 3840}// muy lenta la maquina
   else { mi_width = 2700, mi_height = 2160 }
 
   modelo = random(["boom", "towers", "rain"])
+  //modelo = "boom" // bug
   let _rY = random()
   if (_rY < 0.05) c_years = int(random(12, 20))
   else if (_rY < 0.25) c_years = int(random(20, 41))
   else if (_rY < 0.65) c_years = int(random(41, 61))
   else c_years = int(random(61, 81))
-
+c_years = constrain(c_years + 15, 0, 80) // bug
+//c_years = 14; // bug 14 ok a veces, 9 siempre ok
   col_Hn = int(random(col_H.length))
+  //col_Hn = 10; // bug
   if (random() < 0.6) { col_tipo = "light", col_back = [5, 90], col_tit = 0 }
   else { col_tipo = "dark", col_back = [5, 10], col_tit = 100 }
-  if (random() < 0.08) b_rect = false
-  pos_ini = int(random(80))
+  if (random() < 0.05) b_rect = false
+  pos_ini = int(random(80)) // en que lugar comienza la primera torre
   p_dX_inc = random([-40, -30, -15, -7, 7, 15, 30, 40])
   if (modelo == "boom") p_dX_inc *= 0.3 //
   let _pX, _pY = random(30, 60)
   let _pX_m = [200, 460]
   if (c_years > 69) _pX_m = [330, 490]
+  print("_pY " + _pY) // amplitud en Y del infinito
   let _redX = 1; if (c_years < 30 && random() < 0.4) {
     if (modelo != "boom" && random() < 0.8) _redX = 0.25; else _redX = 2
   } //reduce
   if (modelo == "boom") {
     _pX = random(_pX_m[0], _pX_m[1] - 110)
-    for (let i = 0; i < 80; i++) {
-      pos_fX[i] = _pX * cos((i + pos_ini) * 0.31 * _redX) + mi_width * 0.25;
-      pos_fY[i] = (_pY * 2) * sin((i + pos_ini) * 0.62) + mi_height * 0.25;
+    for (let i = 0; i < 80; i++) { // 40
+      pos_fX[i] = _pX * cos((i + pos_ini) * 0.31 * _redX) + mi_width * 0.25; //cos((i + pos_ini) * 0.31)
+      pos_fY[i] = (_pY * 2) * sin((i + pos_ini) * 0.62) + mi_height * 0.25 // 60 *
     }
-    col_ra = 80
+    col_ra = 80 //60
     pos_dNR = 0.6
     p_dCant = 25
     col_gral[2] = 50
@@ -184,9 +212,9 @@ function preCarga() {
     else { const _m = map(_pX, 200, 460, 180, 80); _yy = mi_height / 2 - _m }
     ////print("espiral " + _y2)
     for (let i = 0; i < 80; i++) {
-      if (modelo == "rain") _y1 += i * _y2; else _y1 -= i * _y2;
-      pos_fX[i] = _pX * cos((i + pos_ini) * 0.2 * _redX) + mi_width * 0.25;
-      pos_fY[i] = _pY * sin((i + pos_ini) * 0.4) + _yy + _y1;
+      if (modelo == "rain") _y1 += i * _y2; else _y1 -= i * _y2 // . para que se corra el circuito
+      pos_fX[i] = _pX * cos((i + pos_ini) * 0.2 * _redX) + mi_width * 0.25 //cos((i + pos_ini) * 0.2)
+      pos_fY[i] = _pY * sin((i + pos_ini) * 0.4) + _yy + _y1 // 30 *
     }
     col_ra = 20
     pos_dNR = 0.85
@@ -203,17 +231,16 @@ function preCarga() {
   dias = random([5, 7, 7, 9, 10, 10, 15])
   if (c_years > 50 && dias == 15) c_years = int(c_years * 0.5)
   dias_memo = dias
-  if (dias == 15) { pos_gralP = 0.9995 } else {
-    if (modelo == "boom") pos_gralP = 0.999; else pos_gralP = 0.998
-  } // new
-  activo_c = 0.07;// if (random() < 0.5) activo_c = 0.07 // bug: cuidado, ambos 0.07
+  if (dias != 15) pos_gralP = 0.9999; else pos_gralP = 0.9995 // puse 1 o 0.9999. bug: inclinacion de antes 0.9998
+  activo_c = 0.07; if (random() < 0.5) activo_c = 0.07 // bug: cuidado, ambos 0.07
 
   // sound setting -------------------
-  bpmN = int(random(27, 33)); if (random() < 0.7) bpmN += 10 //  < 0.75
+  bpmN = int(random(27, 33)); if (random() < 0.65) bpmN += 10 //  < 0.75
   Tone.Transport.bpm.value = bpmN * 2
 
   subdivision = random(["8n", "8n", "8t", "16n", "16n.", "16t", "32n", "32n."])
-  if (modelo != "boom") subdivision = "8n"
+  if (modelo != "boom" ) subdivision = "8n" //bug
+  print("subdivision " + subdivision)
   const _m = map(bpmN, 30, 40, 0.4, 0.2) //0.3, 0.2
   if (modelo != "boom") {
     pluck_res = 8, desaf = 0.5, pluck_set[0] = -0.02,
@@ -234,11 +261,12 @@ function preCarga() {
   for (let i = 0; i < 16; i++) {
     memb_set[0][i] = random([0.01, 0.2, 0.2])
 
-    if (_r == 0) if (i % 4 == 0 && random() < 0.8) memb_set[1][i] = 1; else memb_set[1][i] = 0 
-    else if (_r == 1) if (i % 8 == 0 && random() < 0.9) memb_set[1][i] = 1; else memb_set[1][i] = 0 
+    if (_r == 0) if (i % 4 == 0 && random() < 0.8) memb_set[1][i] = 1; else memb_set[1][i] = 0 // walk completo
+    else if (_r == 1) if (i % 8 == 0 && random() < 0.9) memb_set[1][i] = 1; else memb_set[1][i] = 0 // walk 1/2
   }
   memb_set[2] = [0.01, 0.2]
   memb_set[3] = random([0, 4, 8])
+  ////print("memb_set[3] " + memb_set[3])
   poly_set[0] = 128
   poly_set[1] = [0, 0, 12, 24, 24]
   poly_set[2] = [12, 11, 12, 13, 12]
@@ -247,47 +275,62 @@ function preCarga() {
   for (let i = 0; i < escala.length; i++) { // modular la melodia
     escala[i] = escala[i] + _mp
   }
+  /* if (modelo != "boom") {
+    sampler.disconnect()
+    sampler.chain(channel) 
+  } */
 
-  // features ---------------------
+
+  // saque los creategrapphic de aca
+
+  // fxhash features ---------------------
   let _cH = (col_H[col_Hn] + col_ra / 2) % 360; if (modelo == "boom") _cH += 40
   let _mc = int(_cH) + "s°"; if (!b_rect) _mc = "---"
+
   let _te = "fast"; if (bpmN < 35) _te = "slow"
   let _mf = "more stable"; if (modelo == "boom") _mf = "more chaotic"
 
+  // Set features for metadata
+  $bootloader.setFeatures({
+    "size": mi_width + "x" + mi_height,
+    "model": modelo,
+    "background": col_tipo,
+    "main color hue": _mc,
+    "years": c_years,
+    "calendar": dias + "x" + dias,
+    "tempo": _te,
+    "musical form": _mf
+  });
+
   console.log("Almanac. Yamil Burguener. 2026")
   console.log("seed number: " + mi_seed)
-  console.log('size:', mi_width + 'x' + mi_height, '\nmodel:', modelo, '\nbackground:', col_tipo,
-    '\nmain color hue:', _mc, '\nyears:', c_years, '\ncalendar:', dias + 'x' + dias,
-    '\ntempo:', _te, '\nmusical form:', _mf);
-
-  $bootloader.setFeatures({
-    'size': mi_width + 'x' + mi_height, 'model': modelo, 'background': col_tipo,
-    'main color hue': _mc, 'years': c_years, 'calendar': dias + 'x' + dias,
-    'tempo:': _te, 'musical form': _mf
-  });
+  //console.log(JSON.stringify($fx.getFeatures()))
+  console.log("size:", mi_width + "x" + mi_height);
+  console.log("model:", modelo);
+  console.log("background:", col_tipo);
+  console.log("main color hue:", _mc);
+  console.log("years:", c_years);
+  console.log("calendar:", dias + "x" + dias);
+  console.log("tempo:", _te);
+  console.log("musical form:", _mf);
 }
 
 
 
-async function setup() {
-
-  await preCarga();
+function setup() {
 
   const canvas = createCanvas(mi_width, mi_height)
   canvas.parent("canvas")
-  // canvas.id("gc")
-  // canvas.class("gc")
-  if ($bootloader.isCapture) pixel = 0.5;
+  canvas.id("gc")
+  canvas.class("gc")
   pixelDensity(pixel)
   colorMode(HSB)
   strokeCap(SQUARE)
   // textos --------------
-  fuente[0] = await loadFont('./assets/font/Ubuntu-L.ttf')//'futura'
-  fuente[1] = await loadFont('./assets/font/Ubuntu-L.ttf')
-
   textWrap(CHAR)
   noSmooth()
   cod_cad[0] = "" // estaba bien arriba esta linea al inicio de visual setting
+  // saque de aca y lleve a preload()
 
   for (let i = 0; i < 1000; i++) {
     soundR[i] = random(), gralR[i] = random(), txtR[i] = random(), repAR[i] = random()
@@ -299,33 +342,65 @@ async function setup() {
   pg_fondo.drawingContext.shadowOffsetY = random([-3, -2, 2, 3])
   if (col_tipo == "dark") pg_fondo.drawingContext.shadowColor = color("#eeeeee22")
   else pg_fondo.drawingContext.shadowColor = color("#22222233")
-
   pg_delete = createGraphics(mi_width, mi_height)
   arma_delete()
 
-  pg_titulo = createGraphics(mi_width * 0.25, mi_height * 0.25)
-  //hacia_jugando();
 
-  if (!$bootloader.isCapture) { // modo live (!) 
-    pg_titulo.colorMode(HSB)
-    pg_titulo.textFont(fuente[1]), pg_titulo.textAlign(RIGHT)
-    dias = 4
-    genera_cajas()
-    titInicio = millis() + 4999;
-  } else {
-    hacia_jugando();
-  }
+ pg_titulo = createGraphics(mi_width * 0.25, mi_height * 0.25)
+ //hacia_jugando(); bug para nft
 
-  let loadingDiv = document.getElementById('p5_loading');
-  if (loadingDiv) {
-    loadingDiv.remove();
-  }
+// activar este sector
+ if (!$bootloader.isCapture) { // modo live (!) 
+  pg_titulo.colorMode(HSB)
+  pg_titulo.textFont(fuente[1]), pg_titulo.textAlign(RIGHT)
+  titInicio = millis() + 9999
+  // -----------------------------------
+  dias = 4
+  genera_cajas() 
+} else {
+  hacia_jugando();
+} 
+  
 }
 
 // ------------------------------------------------
 function draw() {
-  if (sampler[0].loaded && sampler[1].loaded) audioListo = true;
-  if (!audioListo) return;
+  noCursor();
+// 🔴 MODO CAPTURA: Renderiza TODO visualmente rápido, sin sonido
+if ($bootloader.isCapture && !captureScheduled) { // modo captura
+  console.log("🎬 MODO CAPTURA - Renderizando visuals (sin sonido)...");
+  captureScheduled = true;
+  finished = true;
+  
+  // Detén TODO el sonido PRIMERO
+  try {
+    Tone.Transport.stop();
+    clearInterval(intervalo_A);
+    clearInterval(intervalo_pl);
+    clearInterval(intervalo_ar);
+  } catch(e) {}
+  
+  // Ahora renderiza SOLO los visuals rápido
+  while (pos_n < c_years) {
+    image(pg_fondo, 0, 0)
+    
+    // ... tu código visual normal (SIN sonido) ...
+    
+    if (seccion == "jugando") {
+      jugando();
+      // ... dibuja cajas, movimientos, etc ...
+    }
+  }
+  
+  noLoop();
+  captura_final(); 
+  return;
+}
+
+// 🟢 MODO NORMAL: Rendering lento CON SONIDO
+if (finished) return;
+
+// ... tu código normal completo ...
 
   image(pg_fondo, 0, 0)
   //if (bVer) image(pg_delete, 0, 0) // bug
@@ -338,23 +413,22 @@ function draw() {
   }
   else if (seccion == "jugando") {
     jugando();
-    animacion();
   }
 
-  if (frameRate() < 45) {
+  if (frameRate() < 40) { // bug < 50
     for (let i = 0; i < cajas.length; i++) {
       if (cajas[i].caja_bTexto()) cajas[i].saca_texto()
     }
   }
-
-
 }
 
-function animacion() {
-  if ($bootloader.isCapture && !captureScheduled) {
+function captura_final() {
+  console.log("Capturando en pos_n =", pos_n, "c_years =", c_years);
+  $bootloader.capture();
+
+  /* setTimeout(() => {
     $bootloader.capture();
-    captureScheduled = true;
-  }
+  }, 2000); */
 }
 
 function jugando() {
@@ -398,7 +472,7 @@ function jugando() {
     }
   }
 
-  if (!$bootloader.isCapture && pos_n < c_years - 5) click();
+  if (!$bootloader.isCapture && pos_n < c_years) click() // bug
 
   // sound ------------------------------
   control_sound();
@@ -409,51 +483,61 @@ function jugando() {
 // sound --------------------------------
 function control_sound() {
   let _c = map(poly_cont, 500, 0, 2, 6) // 3,9
-  _c = int(_c + sound_random() * _c) //int(random(_c, _c * 2)
-  if (seccionM == "A") {
-    if (poly_cont > 0 && poly_cont < 500) {
-      poly_cont += 2
+    _c = int(_c + sound_random() * _c) //int(random(_c, _c * 2)
+    if (seccionM == "A") {
+      if (poly_cont > 0 && poly_cont < 500) {
+        poly_cont += 2
+      }
+      else if (poly_cont > 499) seccionB()
+      //let _c = map(poly_cont, 500, 0, 2, 6) // 3,9
+      //_c = int(_c + sound_random() * _c) //int(random(_c, _c * 2)
+      if (mi_frameCount % _c == 0) { //_c + 10
+        if (pos_n % 12 != 11 || modelo == "boom") suena_poly() // sinte Poly 12 != 0
+      }
     }
-    else if (poly_cont > 499) seccionB()
-    //let _c = map(poly_cont, 500, 0, 2, 6) // 3,9
-    //_c = int(_c + sound_random() * _c) //int(random(_c, _c * 2)
-    if (mi_frameCount % _c == 0) { //_c + 10
-      if (pos_n % 12 != 11 || modelo == "boom") suena_poly() // sinte Poly 12 != 0
+    else if (seccionM == "B") {
+      if (poly_cont > 0) {
+        //const _c = map(poly_cont, 500, 0, 2, 6)
+        if (mi_frameCount % _c == 0) {
+          suena_poly() // sinte Poly
+        }
+        else poly_cont -= 1
+        if (poly_cont == 400) {
+          inicioVel = 0.3
+          ////print("vel " + inicioVel)
+        }
+        else if (poly_cont == 0) poly_cont = 2
+      }
     }
-  }
-  else if (seccionM == "B") {
-    if (poly_cont > 0) {
-      if (mi_frameCount % _c == 0) suena_poly() // sinte Poly
-      else poly_cont -= 1
-      if (poly_cont == 400) inicioVel = 0.3
-      else if (poly_cont == 0) poly_cont = 2
-    }
-  }
 }
 
 function suena_poly() { // sinte Poly
 
-  panPo.set({ pan: -1 + sound_random() * 2 })
+  panPo.set({ pan: -1 + sound_random() * 2 })//random(-1, 1) })
   const _re = 0.3 + sound_random() * 0.6
-  reverb.set({ wet: _re })
+  reverb.set({ wet: _re })//random(0.5, 0.9) })
 
   let _n
-  let _r = poly_set[1][int(sound_random() * 5)]
+  let _r = poly_set[1][int(sound_random() * 5)] //random([0, 0, 12, 24, 24]), _n //0, 2, 2, 2, 2
   if (_r == 0) {
+
     const _a1 = (cos(pos_n * poly_set[3]) + 1) * 0.5; // 01 a 025
     const _a2 = map(_a1, 0, 1, 520, 5820)
+    ////print(poly_set[3], _a2)
     _n = 80 + sound_random() * _a2;
-  }
+  } //520, 6000
   else { _n = notas_c[melodia[melo_cont % melodia.length] + _r] }
-  let _v = map(_re, 0.3, 0.9, 0.2, 0.004)
-  poly.triggerAttackRelease(_n, 0.001, Tone.now(), _v)
+
+  let _v = map(_re, 0.3, 0.9, 0.2, 0.004) // 0.3, 0.9, 0.2, 0.008
+  poly.triggerAttackRelease(_n, 0.001, Tone.now(), _v) // dur: 0.01  bug ACTIVAR!!
 }
 
 function suena_armo(_d) { // sampler + poly
 
   if (melo_sig % 4 == 0) melo_cont++
   const _m = melodia[abs(melo_cont) % melodia.length]
-  if ((pos_n % 8 == 7 && repe_cont % 128 == 0) || (pos_n == c_years && repe_cont % 32 == 0)) {
+  ///print("melo cont "+melo_cont, _m)
+  if ((pos_n % 8 == 7 && repe_cont % 128 == 0) || (pos_n == c_years && repe_cont % 32 == 0)) { // agudo
     let _n = notas_c[_m + 60]
     if (sound_random() < desaf) _n = desafina(_m + 60)
     let _d1 = sound_random() + 0.3
@@ -462,26 +546,29 @@ function suena_armo(_d) { // sampler + poly
   // contramelo
   if (repe_cont % poly_set[0] == 0 && sound_random() < 0.95 && pos_n % 4 == 3) {
     const _r = poly_set[2][int(sound_random() * 5)]
+    //const _n1 = notas_c[_m + _r]// random([12, 11, 12, 13, 12])] // 12, 24
     let _d = 0.01; if (repe_cont % 3 == 0) _d = 0.03
     poly.triggerAttackRelease(notas_c[_m + _r], _d, "+0.01", 0.07)
     if (sound_random() < 0.9) poly_set[0] = 2; else poly_set[0] = 32
   }
 
   if (repe_cont % sampler_set[0] == 0 && pos_n < (c_years - 3)) {
-    panSa.set({ pan: -0.8 + sound_random() * 1.6 });
+    panSa.set({ pan: -0.8 + sound_random() * 1.6 }) // random(-0.75, 0.75) })
+    //let _r = "16t"//(1  + cos(repe_cont * 0.001)) * 0.5// * sampler_set[3])
+    //_r = constrain(_r, sampler_set[2], 1)
     let _r
     if (modelo != "boom") _r = subdivision;
     else _r = sampler_set[2] + sound_random() * (sampler_set[3] - sampler_set[2])
-    if (pos_n > (c_years - 8)) _r = 0.7 + sound_random() * 0.3;
+    if (pos_n > (c_years - 8)) _r = 0.7 + sound_random() * 0.3//, _r = constrain(_r, 0.1, 1)}//, print("sampler * 1.75 " + _r) }
 
-    let _r1 = sampler_set[4]; if (seccionM == "B") _r1 = 0.35;
+    let _r1 = sampler_set[4]; if (seccionM == "B") _r1 = 0.35  // 0.8 -.... 0.4
     if (sound_random() < _r1) feedbackDelay.set({ delayTime: _r, feedback: 0.99 })//
     else {
-      // rallentando
+      ////print("-frena")
       let _r2 = 0.1; if (modelo == "boom") _r2 = 0.06
       feedbackDelay.set({ delayTime: _r2, feedback: 0.9 })
       let _n = notas_c[melodia[1] - 19]
-      poly.triggerAttackRelease(_n, 5, "+0.89", 0.032)
+      poly.triggerAttackRelease(_n, 5, "+0.89", 0.032) // 0.02
       _d = 3
     }
     if (b_rect) {
@@ -496,7 +583,7 @@ function suena_armo(_d) { // sampler + poly
   }
 }
 
-function desafina(_nA) {
+function desafina(_nA) { // nota afinada
 
   const _hertz = Tone.Frequency(_nA, "midi").toFrequency()
   _nD = _hertz * (0.975 + sound_random() * 0.05)
@@ -505,8 +592,8 @@ function desafina(_nA) {
 
 function suena_pluck(_ri, _fr) {
 
-  if (seccionM == "B") repe_cont++
-  panPl.set({ pan: -1 + sound_random() * 2 })
+  if (seccionM == "B") repe_cont++ //orig
+  panPl.set({ pan: -1 + sound_random() * 2 }) // random(-1, 1) })
   let _re, _vo
   if (sound_random() > pos_n * 0.004) {
     _re = pluck_set[1][repe_cont % pluck_res]; _vo = pluck_set[2][repe_cont % 4]
@@ -518,10 +605,12 @@ function suena_pluck(_ri, _fr) {
   pluck.set({ volume: _vo })
 
   if (poly_cont == 0) {
+    ////if (b_grano) 
     pluck.triggerAttack(notas_c[(_ri + 24) % 120], Tone.now())
-  }
+  } //_ri + 12
   else {
     const _f = 80 + sound_random() * (_fr - 80)
+    ////if (b_grano) 
     pluck.triggerAttack(_f, Tone.now())
   }
 }
@@ -531,6 +620,7 @@ function suena_memb(_d, _v, _bool) { // sinte membrana
   if (_bool && frame_cont % 4 != 0) {
     let _t2 = "+0"; if (sound_random() < 0.5) _t2 = "+" + str(BPM / 93.75) //187.5
     sampler[(sampler_set[5] + 1) % 2].triggerAttackRelease(notas_c[melodia[melo_cont % melodia.length]], 1.5, _t2, _v * 0.38)
+    ////print(notas_c[melodia[melo_cont % melodia.length]], _v, _t2)
   }
   let _su = 0.15; if (sound_random() < 0.5) _su = 0.001  //if (repe_cont % 64 == 32) _su = 0.001
   membrana.set({ envelope: { sustain: _su, release: 0.3 } })
@@ -554,7 +644,7 @@ function Rep_armo(_r) { //sampler
   intervalo_ar = setInterval(() => {
     clearInterval(intervalo_ar)
     if (BPM > bpmN) { Rep_armo(60000 / BPM) }
-    suena_armo(2);
+    suena_armo(2)
   }, _r)
 }
 
@@ -578,24 +668,23 @@ function Rep_A(_r) { // loop asimetrico // bug cuidado no para con key "p"
     const _nn = int(map(poly_cont, 0, 500, 1, 8))
     let _lo = ritmo[0].length
     if (poly_cont != 0) _lo = 16
-    const _i = repe_cont % _lo
+    const _i = repe_cont % _lo// ritmo[0].length// - (_nn - 1)
 
 
     if (ritmo[2][_i] == 1) {
-      let _d = map(pos_n % 30, 0, 30, 0.01, 0.5)
+      let _d = map(pos_n % 30, 0, 30, 0.01, 0.5)//0.001, 0.4
       suena_armo(_d)//
     }
     let bPluck = true
-    if (_i == 0 || (_i == (_lo - memb_set[3]) && repA_random() > 0.4)) {
+    if (_i == 0 || (_i == (_lo - memb_set[3]) && repA_random() > 0.4)) { //gral_random() > 0.4
       if (pos_n > 2 && pos_n < (c_years - 4) && (pos_n % 8 != 7 || modelo == "boom")) {
         suena_memb(0.08, 0.15, (_i == 0))
         suena_pluck(ritmo[1][_i], 400); bPluck = false
       }
       if (_i == 0) melo_sig++
     }
-    else if (modelo != "boom" && pos_n > 39 && pos_n < (c_years - 5)) {
-      // walking bass
-      if (memb_set[1][repe_cont % 16] && pos_n % 2 == 0) suena_memb2(0.05, 0.05)
+    else if (modelo != "boom" && pos_n > 39 && pos_n < (c_years - 5)) { // bajo caminado walk
+      if (memb_set[1][repe_cont % 16] && pos_n % 2 == 0) suena_memb2(0.05, 0.05) // 
     }
 
     if (bPluck && ritmo[0][_i % _lo] == 1 && pos_n % 20 != 0 && pos_n < (c_years - 1)) suena_pluck(ritmo[1][_i], _nn * 500)
@@ -604,14 +693,23 @@ function Rep_A(_r) { // loop asimetrico // bug cuidado no para con key "p"
 
 function arma_melo(_v) {
 
+  ////let _r = 9 //int(random(6, 12)) // bug
   for (let i = 0; i < 9; i++) {
+    //melodia[i] = escala[int(0.5 * escala.length)] + _v //bug
     melodia[i] = escala[int(gral_random() * escala.length)] + _v //gral_random() * esc.....
   }
+  ////print("melodia " + sound_cont)
+  /* else { // modula
+    for (let i = 0; i < melodia.length; i++) {
+      melodia[i] = melodia[i] + _v
+    }
+  } */
 }
 
 function arma_ritmo() { // cambiar todo a gral_sound?
 
   let _co = 32 // compas
+  let _ri = [-24, 0, 0, 24, 36] // ver si lo paso a var global
   if (modelo == "boom") _co = 33 + int(gral_random() * 17) //33, 50)) // 24 a 36
   ////print("compas " + _co)
   //let _dirR = "desc"
@@ -636,7 +734,7 @@ function arma_ritmo() { // cambiar todo a gral_sound?
     ////print("cn " + _cn)
     if (i > 6 && i % 2 == 1) ritmo[0][i] = 0
     else if (gral_random() < _cn) ritmo[0][i] = 1; else ritmo[0][i] = 0
-    ritmo[1][i] = melodia[i % melodia.length] + ritmo_oct[int(gral_random() * ritmo_oct.length)]// random([-24, 0, 0, 24, 36])
+    ritmo[1][i] = melodia[i % melodia.length] + _ri[int(gral_random() * _ri.length)]// random([-24, 0, 0, 24, 36])
     //if (i % 2 == 1) ritmo[2][i] = 0
     //else if (sound_random() < 0.2) ritmo[2][i] = 1; else ritmo[2][i] = 0 // ritmo melo
     if (i % 8 != 0 && gral_random() < 0.4) ritmo[2][i] = 0; else ritmo[2][i] = 1
@@ -648,7 +746,7 @@ function seccionA() {
   seccionM = "A"
   clearInterval(intervalo_A) // frena seccion loop asimetrico
   clearInterval(intervalo_pl) // bug
-  if (pluck != undefined) pluck.triggerRelease(Tone.now()) // bug   p5.js 2.3
+  pluck.triggerRelease(Tone.now()) // bug
   repe_cont = -1 // bug?
   poly_cont = 0
   let _t = int(-1 + gral_random() * 2); if (pos_n == -1) _t = 0 ////random([-1, 1])
@@ -690,15 +788,16 @@ function genera_cajas() {
   }
   if (modelo != "boom") {
     gral_cont = 0 // reset
-    frame_cont = 0
+    frame_cont = 0// reset
   }
-  cajas_mo = [0, 1, 0, 1]
+  cajas_mo = [0, 1, 0, 1]//, cajas_fC = 40 // reset bug
 
   // cajas -----------------------------
   if (random() < pos_dNR) pos_dN = 0.0625; else pos_dN = 0.125
-  if (pos_n < c_years) pos_n++;
-  
-
+  if (pos_n < c_years) {
+    pos_n++;
+    ////print("pos_n: " + pos_n)
+  }
   pos_sin = int(random(20)) * 100, pos_sL = random(0.001, 0.003)
 
   if (pos_n < 40) { ///pos_n == 0{
@@ -722,12 +821,12 @@ function genera_cajas() {
   pos_x[_n][0] = 1, pos_y[_n][0] = 1
   const _cX = width / dias, _cY = height / dias
   for (let i = 1; i <= dias; i++) {
-    pos_x[_n][i] = i * _cX
-    pos_y[_n][i] = i * _cY
+    pos_x[_n][i] = i * _cX //random(2160)
+    pos_y[_n][i] = i * _cY //random(2160)
   }
-
-  pos_x[_n].sort((a, b) => a - b)//pos_x[_n] = sort(pos_x[_n], pos_x[_n].length)  p5js 2.3
-  pos_y[_n].sort((a, b) => a - b)// pos_y[_n] = sort(pos_y[_n], pos_y[_n].length)
+  //pos_x[_n][10] = 2160, pos_y[_n][10] = 2160 // como es < 11, no hace falta este
+  pos_x[_n] = sort(pos_x[_n], pos_x[_n].length)
+  pos_y[_n] = sort(pos_y[_n], pos_y[_n].length)
   pos_dist[_n] = 1
   pos_toX[_n] = 40, pos_toY[_n] = 40, pos_toXm[_n] = 20, pos_toYm[_n] = 20
   if (pos_n < c_years) {
@@ -791,10 +890,10 @@ function genera_cajas() {
      } */ // bug: modificar random
     //}
   }
-
-  if (pos_n == c_years && gral_random() < 0.3) {
-    fin_todo();
-  }
+  
+  if (pos_n == c_years && gral_random() < 0.1) { // old: 0.33
+   fin_todo();// antes: prevista()
+  } 
 }
 
 function ajusta_limite() {
@@ -840,14 +939,14 @@ function busca_color(x, y) {
 
 
 function fin_todo() {
-  if (!$bootloader.isCapture) { // modo live
-    const _dT = 0.03 + sound_random() * 0.04
-    feedbackDelay.set({ delayTime: _dT, feedback: 0.8 })// feedbackDelay.set({ delayTime: 0.05, feedback: 0.8 })
-    clearInterval(intervalo_A) // frena seccion loop asimetrico
-    clearInterval(intervalo_pl) // bug
-    clearInterval(intervalo_ar) // bug agudo loco quedó sonando
-    pluck.triggerRelease(Tone.now()) // bug
-  }
+   if (!$bootloader.isCapture){ // modo live
+  const _dT = 0.03 + sound_random() * 0.04
+  feedbackDelay.set({ delayTime: _dT, feedback: 0.8 })// feedbackDelay.set({ delayTime: 0.05, feedback: 0.8 })
+  clearInterval(intervalo_A) // frena seccion loop asimetrico
+  clearInterval(intervalo_pl) // bug
+  clearInterval(intervalo_ar) // bug agudo loco quedó sonando
+  pluck.triggerRelease(Tone.now()) // bug
+  } 
 
   /* poly.dispose() // ⭐ Detén el synth
   pluck.dispose() // ⭐ Detén el pluck
@@ -857,11 +956,27 @@ function fin_todo() {
   Tone.Transport.stop()
   Tone.Transport.cancel() */
 
-  //prevista()
-  noLoop();
-  return; // IMPORTANTE: detén la ejecución aquí bug lo agregue
+  prevista()
+  //noLoop()
 }
 
+function prevista() {
+  if (!captureScheduled) {
+    finished = true;
+    captureScheduled = true;
+    
+    // PRIMERO: detén TODO
+    noLoop();
+    ////captura_final(); bug
+    
+    // SEGUNDO: espera a que el canvas se pinte
+    /* setTimeout(() => {
+      $bootloader.capture();
+    }, 2000); */
+    
+    return; // IMPORTANTE: detén la ejecución aquí
+  }
+}
 
 function arma_delete() {
 
@@ -904,7 +1019,7 @@ function arma_delete() {
     }
   }
 
-  if (random() < 0.35) {
+  if (random() < 0.35) { // < 0.2
     pg_delete.imageMode(CENTER)
     pg_delete.push()
     pg_delete.translate(width / 2, height / 2)
@@ -926,13 +1041,14 @@ function arma_delete() {
       }
     }
   }
-
   pg_delete.loadPixels();
   let _d = pixel
   let _total = width * height * 4 * pow(_d, 2)
-
   for (let i = 0; i < _total; i += 4) {
     color_get[i] = pg_delete.pixels[i]
+    //color_get[i + 1] = pg_delete.pixels[i + 1]
+    //color_get[i + 2] = pg_delete.pixels[i + 2]
+    //color_get[i + 3] = pg_delete.pixels[i + 3]
   }
   pg_delete.updatePixels()
 
@@ -1040,11 +1156,13 @@ function arma_fondo() {
 
 function click() {
 
-  if (!b_sound && seccion == "jugando" && (millis() % 3000) < 1000) {
+  if (!b_sound && seccion == "jugando" && (millis() % 3000) < 1500) {
     push()
     fill(col_tit), noStroke()
+    // fill(100, 0.7), stroke(20, 0.2), strokeWeight(10),
     textAlign(CENTER)
-    textSize(35), textFont(fuente[1])
+    //textFont('Ubuntu')
+    textSize(40), textFont(fuente[1])
     text("(( CLICK TO TURN ON SOUND ))", width / 2, height - 55)
     pop()
   }
@@ -1053,20 +1171,25 @@ function click() {
 function arma_titulo() {
 
   pg_titulo.clear()
+  // pg_titulo.blendMode(DIFFERENCE)
   pg_titulo.fill(col_H[col_Hn] + col_ra / 2, 100, 100, 0.3), pg_titulo.noStroke()
   pg_titulo.rect(0, 0, pg_titulo.width, pg_titulo.height)
 
-  pg_titulo.textSize(60) // 70
+  pg_titulo.textSize(80) // 60
+  //if (col_tipo == "light") 
   pg_titulo.fill(col_tit), pg_titulo.noStroke()// pg_titulo.stroke(100), pg_titulo.strokeWeight(1)
-  pg_titulo.text("ALMANAC\n ·",
+  pg_titulo.text("ALMANAC\n ·", //GUM CALENDAR
     pg_titulo.width / 2 + 540 / 2 - 50, pg_titulo.height - 200)
   pg_titulo.textSize(40)
+  //pg_titulo.fill(100, 0.7), pg_titulo.stroke(20, 0.6), pg_titulo.strokeWeight(5)
   const _t = int((titInicio - millis()) * 0.001);
   pg_titulo.text("CLICK TO START\nor wait (" + _t + ") seconds", pg_titulo.width / 2 + 540 / 2 - 50, pg_titulo.height - 100)
+  // pg_titulo.blendMode(BLEND)
   image(pg_titulo, width / 2 + (width * 0.25), height / 2 + (height * 0.25))
   if (_t <= 0) {
     vol_final.mute = true;
     hacia_jugando()
+    //pg_titulo.remove()
   }
 }
 
@@ -1101,6 +1224,9 @@ function repA_random() {
 
 function keyReleased() {
 
+  /*if (key == "v") { // bug
+    bVer = !bVer
+  }*/
   if (key == "s" || key == "S") {
     grabaImagen()
   }
@@ -1133,11 +1259,12 @@ function hacia_jugando() {
   gral_cont = 0, frame_cont = 0// reset
   seccionA()
   genera_cajas()
+  DURACION = millis() // bug provisorio
 }
 
 function mouseClicked() {
 
-  if (sampler[0].loaded && sampler[1].loaded && b_play) {
+  if (sampler_loaded[0] && sampler_loaded[1] && b_play) {
     if (seccion == "cargando") hacia_jugando()
     b_sound = !b_sound
     if (b_sound) vol_final.mute = false; else vol_final.mute = true;
@@ -1147,8 +1274,14 @@ function mouseClicked() {
 function grabaImagen() {
 
   console.log("saving!")
-  saveCanvas("Almanac_" + mi_seed + ".png")
+  saveCanvas("almanac" + mi_seed + ".png") //Gum_calendar
 }
+
+
+
+
+
+
 
 
 ///////////////////////////////////////////////////////
@@ -1175,11 +1308,23 @@ class Caja {
     this.backH = (col_H[col_Hn] + (gral_random() * col_ra)) % 360, this.backS = 0, this.backB = 0
     if (modelo != "boom") { if (gral_random() < 0.95) this.col_princ(); else this.col_secs() } // bug: fijarse porque son iguales para boom u otros
     else { if (gral_random() < 0.95) this.col_princ(); else this.col_secs() }
+    /*  if (gral_random() < 0.95) { // bug gral_random????? 
+       if (gral_random() < col_sat) col_gral[0] = 0; else col_gral[0] = col_gral[2] // 70
+       if (gral_random() < 0.5) col_gral[1] = 0; else col_gral[1] = col_gral[3] //70   
+       this.backS = abs(random() * 25 + col_gral[2])
+       this.backB = random() * 30 + col_gral[1]
+     } else {
+       // colores secundarios
+       if (random() < 0.5) this.backH = (this.backH + col_Hsec[0]) % 360
+       else this.backH = (this.backH + col_Hsec[1]) % 360
+       this.backS = random(25) + 70// random(30) + 70
+       this.backB = random(30) + 40 //random(30) + 70
+     } */
     if (this.posX == int(dias / 2) && this.posY == int(dias / 2) && seccionM != "B") {
       this.bTexto = true
     } else this.bTexto = false
     this.rot = -pos_rot[0] + gral_random() * pos_rot[1] //-0.025 + gral_random() * 0.05// random(-0.05, 0.05) //-0.025, 0.025
-    this.desN = 0  
+    this.desN = 0 //numero de desintegracion    
     this.mueve = true
   }
 
@@ -1193,8 +1338,8 @@ class Caja {
     // colores secundarios
     if (random() < 0.5) this.backH = (this.backH + col_Hsec[0]) % 360
     else this.backH = (this.backH + col_Hsec[1]) % 360
-    this.backS = random(25) + 70
-    this.backB = random(30) + 40
+    this.backS = random(25) + 70// random(30) + 70
+    this.backB = random(30) + 40 //random(30) + 70
   }
 
   dibuja() {
@@ -1211,7 +1356,7 @@ class Caja {
             else if (pos_dist[this.pos_n] == 0.5) _a = 0.6
             else if (pos_dist[this.pos_n] == 0.25) _a = 0.8
             fill(this.backH, this.backS, this.backB, _a)
-            noStroke()
+            noStroke()//(0, 11, 134)
             rect(0, 0, this.w, this.h)
           }
         }
@@ -1225,22 +1370,23 @@ class Caja {
           }
         }
 
-        // simbolos -------------------------------------------
+        // text -------------------------------------------
         if (this.bTexto) {
-          if (txt_random() < 0.97) { // 0.95
+          if (txt_random() < 1) { // bug 0.95 para que aparezcan numeros
             cod_cad[cod_n] = cod_cad[cod_n] + cod_sel[int(txt_random() * cod_sel.length)]
           } else {
-            let _rn = int(txt_random() * 4)
+            let _rn = int(txt_random() * 5)
             for (let i = 0; i < _rn; i++) { cod_cad[cod_n] += " " + (pos_n + 1) + " " }
           }
           blendMode(DIFFERENCE)
           textFont(fuente[0])
-          fill(50, 0.5), noStroke() //stroke(255), 
-          textSize(30) // orig:15 
+          stroke(255), textSize(25) // orig:15 
           //  if (te_tipo == "dibujo") 
           text(cod_cad[cod_n], 0, 14, this.w, this.h)
+          //  else text(cod_cad[cod_n], 50, 64, this.w - 50, this.h - 60)
 
           blendMode(BLEND)
+          //colorMode(HSB)
 
           const _ta = textWidth(cod_cad[cod_n])
 
@@ -1254,8 +1400,9 @@ class Caja {
         pop()
 
         if (!this.mueve) this.vida = 0;// print(this.mueve, this.pos_n) bug ojo!!!!
+
       }
-      else if (mi_frameCount % 3 == 0) {
+      else if (mi_frameCount % 3 == 0) {//% 3
         if (this.desN <= p_dCant) {
           this.mueve = false
           let _rC = map(this.desN, 0, p_dCant, 0, 1) // 15
@@ -1300,7 +1447,7 @@ class Caja {
         }
         else {
           if (pos_n == c_years) this.vida -= 40//this.vida = 10 // bug parpadea 1º cuadro
-          if (cajas.length < 20) fin_todo() 
+          if (cajas.length < 20) fin_todo() // < 20 bug   
         }
       }
     }
@@ -1315,29 +1462,29 @@ class Caja {
 
   agrega_linea(_i) {
     this.linea.push([0, 0, 0, 0, 0, 0, 0, 0])
-    const _r = mi_frameCount % 4 // bug no sale 3??
+    const _r = mi_frameCount % 4// int(this.loop_random() * 4)//random(lin_opc) // bug no sale 3??
     if (lin_opc[_r] == "izq") {
-      this.linea[_i][4] = 0
+      this.linea[_i][4] = 0//- 0.1 + this.loop_random() * 0.2 //cajas[cajas.indexOf(this)].loop_random()
       this.linea[_i][5] = this.linea[_i][4]
-      this.linea[_i][6] = 0
-      this.linea[_i][7] = 1
+      this.linea[_i][6] = 0//- 0.1 + this.loop_random() * 0.2
+      this.linea[_i][7] = 1//1.1 - this.loop_random() * 0.2
     }
     else if (lin_opc[_r] == "der") {
-      this.linea[_i][4] = 1
+      this.linea[_i][4] = 1//1.1 - this.loop_random() * 0.2
       this.linea[_i][5] = this.linea[_i][4]
-      this.linea[_i][6] = 0
-      this.linea[_i][7] = 1
+      this.linea[_i][6] = 0//- 0.1 + this.loop_random() * 0.2
+      this.linea[_i][7] = 1//1.1 - this.loop_random() * 0.2
     }
     else if (lin_opc[_r] == "arr") {
-      this.linea[_i][4] = 0
-      this.linea[_i][5] = 1
-      this.linea[_i][6] = 0
+      this.linea[_i][4] = 0//- 0.1 + this.loop_random() * 0.2
+      this.linea[_i][5] = 1//1.1 - this.loop_random() * 0.2
+      this.linea[_i][6] = 0//- 0.1 + this.loop_random() * 0.2
       this.linea[_i][7] = this.linea[_i][6]
     }
     else {
-      this.linea[_i][4] = 0
-      this.linea[_i][5] = 1
-      this.linea[_i][6] = 1
+      this.linea[_i][4] = 0//- 0.1 + this.loop_random() * 0.2
+      this.linea[_i][5] = 1//1.1 - this.loop_random() * 0.2
+      this.linea[_i][6] = 1//1.1 - this.loop_random() * 0.2
       this.linea[_i][7] = this.linea[_i][6]
     }
 
@@ -1395,6 +1542,12 @@ class Caja {
   caja_bTexto() {
     return this.bTexto
   }
+
+  /*  loop_random() {
+     this.loop_cont++
+     if (this.loop_cont == 1000) this.loop_cont = 0
+     return loopR[this.loop_cont]
+   } */
 
   final() {
     if (this.vida <= 0) {
