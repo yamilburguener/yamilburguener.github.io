@@ -5,9 +5,8 @@ let bFrame = false // bug
 let seccion = "cargando", sec_n = 0, sec_n_rall = 100, sec_name = "avanza", sec_cap;
 let mi_seed;
 let b_clic = false;
-let nodos = [];
+let nodos = [], nodos_color = [], nodos_n = -1
 let n_ubicX = [], n_ubicY = []
-let nodos_esp = []; // "big o small";
 let n_num = [8, 8, 22, 30]// [5, 5, 11, 15]; //[6, 6, 20, 28]; //[8, 8, 22, 30]// [14, 14, 19, 25]; // ojos, boca, cara
 let n_numP = [];
 let fuente;
@@ -18,22 +17,16 @@ let caras_in//, caras_music = [];
 let separacion = [] //10 * 4// insertDistance * 4; // separationDistance: mas grande menos atraccion // * 2
 let sep_min, sep_max;
 let margin//, marginB;
-//let maxPoints = 1000;
-//let nodos_total = 80, 
-let nodos_n = -1
 
 let quadtree;
 let boundary;
 let capacity = 10; // 10, cantidad de puntos por rectangulo. a menor numero subdivide más los cuadrados (mas proceso)
 
-let nodos_color = []
-
 let pg_fondo, pg_clic, pg_titulo;
 let titInicio;
 let col_tipo = "", col_back = [], col_line = []
-let col_caraB = [], colB = [40, 40, 40, 40, 90, 90, 90, 90];
-let vel_fC;  // velocidad del frameCount 
-
+let col_caraH, col_caraB = [], colB = [40, 40, 40, 40, 90, 90, 90, 90];
+let vel_fC = 40;  // velocidad del frameCount  //antes int(random(30, 50)); //bug anchos 45 a finos 35
 
 let pg_pers, col_pers = []
 let personas = [], pers_vivo = [], pers_cant = 0
@@ -41,21 +34,26 @@ let personas = [], pers_vivo = [], pers_cant = 0
 //let _ctx, cv
 let esc_tam = 70 // escalones 60
 let camaraX = -0.2, camaraY = -200;  // borrar
-let grilla = [], grilla_n = 0//, grilla_cantante = [];// {x:[], y:[]}
+let grilla = [], grilla_n = 0;
 let grilla_cant_n = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
 let ancho;
-let salto_n = 0, salto_y;
+let salto_n = 0, salto_y, salto_x;
 let punta = [];
 let nube = [], _bN = [false, false, false];//, nube_y = [];
-let nube_dir = [-1, 1, 0];
+//let nube_dir = [-1, 1, 0];
 let relleno;
+let bPiso = false;
 
 let soundR = [], sound_cont = 0
 let b_play = true, b_sound = false
 let seq = // notas del acorde
-  [[35, 39, 43, 50], [36, 39, 43, 45], [34, 36, 45, 53], [36, 40, 47, 48], // primeros
-  [36, 38, 40, 41], [35, 37, 38, 42], [36, 37, 40, 42], // cerrados
-  [36, 38, 40, 45], [36, 40, 44, 47], [36, 38, 39, 47], [38, 41, 45, 49], [36, 40, 42, 45], [40, 42, 43, 50], [37, 41, 43, 48]]
+  //[[35, 39, 43, 50], [36, 39, 43, 45], [34, 36, 45, 53], [36, 40, 47, 48], // primeros
+  //[36, 38, 40, 41], [35, 37, 38, 42], [36, 37, 40, 42], // cerrados
+  //[36, 38, 40, 45], [36, 40, 44, 47], [36, 38, 39, 47], [38, 41, 45, 49], [36, 40, 42, 45], [40, 42, 43, 50], [37, 41, 43, 48]]
+  [[47, 51, 55, 62], [48, 51, 55, 57], [46, 48, 57, 65], [48, 52, 59, 60], // primeros
+  [48, 50, 52, 53], [47, 49, 50, 54], [48, 49, 52, 54], // cerrados
+  [48, 50, 52, 57], [48, 52, 56, 59], [48, 50, 51, 59], [50, 53, 57, 61], [48, 52, 54, 57], [52, 54, 55, 62], [49, 53, 55, 60]]
+
 //[24, 38, 40, 45], [28, 36, 44, 47], [24, 38, 39, 47], [26, 41, 45, 49], [24, 40, 42, 45], [28, 42, 43, 50], [25, 41, 43, 48]]
 
 let seq_n = 0;
@@ -70,7 +68,8 @@ let sampler = [], sampler_loaded = []//, sampler_tipo; // si suena el 0 e el 1
 let sampler_fade = [[0, 0, 0, 0, 0, 0, 0, 1], [0, 0, 0, 0, 0, 1, 1, 1], [0, 0, 0, 1, 1, 1, 1, 1], [0, 1, 1, 1, 1, 1, 1, 1]]
 //let sampler_fN = -1, sampler_fDir = 1
 let vol_final
-let BPM, BPM_rall;
+let BPM = 100; //int(map(ancho, 500, 900, 80, 120)); //100; //oj! variarlo finos -> 120 a anchos -> 80
+let BPM_rall = 0.25 // 0.3;
 let intervalo_n0, intervalo_n1, intervalo_n2, intervalo_n3
 let b_newTempo = false
 
@@ -81,8 +80,8 @@ function preCarga() {// preload() {
   //const reverb2 = new Tone.JCReverb({ roomSize: 1, wet: 1 })
   const reverb2 = new Tone.Reverb({ decay: 3, preDecay: 0.5, wet: 0.6 }) // decay: 2, wet: 1
   sampler[0] = new Tone.Sampler({
-    C0: 'piano_c1-p.mp3', C1: 'piano_c2-p.mp3', C2: 'piano_c3-p.mp3',
-    C3: 'piano_c4-p.mp3', C4: 'piano_c5-p.mp3', C5: 'piano_c6-p.mp3'
+    // C0: 'piano_c1-p.mp3', C1: 'piano_c2-p.mp3', C2: 'piano_c3-p.mp3', C3: 'piano_c4-p.mp3', C4: 'piano_c5-p.mp3', C5: 'piano_c6-p.mp3'
+    C1: 'piano_c1-p.mp3', C2: 'piano_c2-p.mp3', C3: 'piano_c3-p.mp3', C4: 'piano_c4-p.mp3', C5: 'piano_c5-p.mp3', C6: 'piano_c6-p.mp3'
   }, {
     baseUrl: './assets/',
     onload: () => { sampler_loaded[2] = true; }
@@ -91,14 +90,9 @@ function preCarga() {// preload() {
   sampler[0].chain(reverb, channel)
 
   sampler[1] = new Tone.Sampler({
-    //C1: 'piano_c1-p.mp3',C2: 'piano_c2-p.mp3', C3: 'piano_c3-p.mp3',
-    //C4: 'piano_c4-p.mp3',C5: 'piano_c5-p.mp3',C6: 'piano_c6-p.mp3'
 
-    //C1: 'piano_c1-p.mp3',//C2: 'piano_c2-p.mp3',
-    // G2: 'violin_G2.mp3',C3: 'violin_C3.mp3', G3: 'violin_G3.mp3', G4: 'violin_G4.mp3',G5: 'violin_G5.mp3',
-
-    C1: 'ma_c2.mp3',
-    C2: 'ma_c3.mp3', C3: 'ma_c4.mp3', C4: 'ma_c5.mp3', C5: 'ma_c6.mp3'
+    // C1: 'ma_c2.mp3', C2: 'ma_c3.mp3', C3: 'ma_c4.mp3', C4: 'ma_c5.mp3', C5: 'ma_c6.mp3'
+    C2: 'ma_c2.mp3', C3: 'ma_c3.mp3', C4: 'ma_c4.mp3', C5: 'ma_c5.mp3', C6: 'ma_c6.mp3'
     //G1: 'violin_G2.mp3', C2: 'violin_C3.mp3', G2: 'violin_G3.mp3', G3: 'violin_G4.mp3', G4: 'violin_G5.mp3',
   }, {
     baseUrl: './assets/'
@@ -107,8 +101,8 @@ function preCarga() {// preload() {
   sampler[1].chain(channel);
 
   sampler[2] = new Tone.Sampler({
-    A0: 'choir_A1.mp3', A1: 'choir_A2.mp3', A2: 'choir_A3.mp3', A3: 'choir_A4.mp3', C4: 'choir_C5.mp3', C5: 'ma_c6.mp3'
-    // 'A#0': 'vozFade_Bb1.mp3', A1: 'vozFade_A2.mp3', G2: 'voz_G3.mp3', C3: 'ma_c4.mp3', C4: 'ma_c5.mp3', C5: 'ma_c6.mp3'
+    // A0: 'choir_A1.mp3', A1: 'choir_A2.mp3', A2: 'choir_A3.mp3', A3: 'choir_A4.mp3', C4: 'choir_C5.mp3', C5: 'ma_c6.mp3'
+    A1: 'choir_A1.mp3', A2: 'choir_A2.mp3', A3: 'choir_A3.mp3', A4: 'choir_A4.mp3', C5: 'choir_C5.mp3', C6: 'ma_c6.mp3'
   }, {
     baseUrl: './assets/'
   })
@@ -116,18 +110,12 @@ function preCarga() {// preload() {
   sampler[2].chain(reverb2, channel2);
 
   channel2.chain(channel);
-
-  vol_final = new Tone.Gain(1.3);//new Tone.Volume(2)
   const comp = new Tone.Compressor({
     ratio: 12, threshold: -20, release: 0.25, attack: 0.003, knee: 3
-  })
+  });
+  vol_final = new Tone.Gain(1.3);
   const limiter = new Tone.Limiter(-0.5);
-
   channel.chain(comp, vol_final, limiter, Tone.Destination)
-  // vol_final.mute = true;
-
-
-  //updatePixels();
 }
 
 
@@ -138,52 +126,53 @@ async function setup() {
   //const cv = createCanvas(2160, 2160)
   let cv = createCanvas(2160, 2160);
   cv.parent("cv");
-  //cv.id("nnn");
-  //cv.class("nnn");
 
   ////// ->>>  cv.drawingContext.getContextAttributes().willReadFrequently = true; // por la advertencia de Canvas2D ¿?
   //cv.drawingContext.willReadFrequently = true;
   //cv.elt.getContext('2d', { willReadFrequently: true });
   frameRate(30);
-  pixel = 0.5 // bug
+  //pixel = 0.5 // bug
   if ($bootloader.isCapture) pixel = 0.25;//0.3 para 720px;
   pixelDensity(pixel);
   colorMode(HSB);
-
   fuente = await loadFont('./assets/Ubuntu-Regular.ttf')
 
-  mi_seed = Math.floor(9999999999 * $bootloader.rnd());
+  mi_seed = Math.floor(9999999999 * $bootloader.rnd()); //1269979099//
   randomSeed(mi_seed);
   noiseSeed(mi_seed);
 
-
   // visual config -----------------------------
+  let _r = random();
+  if (_r < 0.55) nodos_color[0] = random(20, 75);
+  else if (_r < 0.9) nodos_color[0] = random(130, 170); else nodos_color[0] = random(320, 340); //= random(160, 200)
+  nodos_color[1] = (nodos_color[0] + 60) % 360, nodos_color[2] = (nodos_color[0] + 300) % 360;
+
+  col_caraH = int(random(35, 55)); //40,55
+  nodos_color[4] = 0.04;
+
   if (random() < 0.6) { //0.6
-    col_tipo = "light", col_back = [3, 85], col_line = [10, 90, 99], col_pers = [20]
-    nodos_color[3] = 0.6; nodos_esp[1] = 1;
-    relleno = random([0.7, 0.8, 0.8, 0.95, 0.95, 0.95, 0.95, , 0.95]);
-    // relleno = 0.95; //bug
+    col_tipo = "light", col_back = [3, 85], col_line = [10, 90, 99, 10], col_pers = [20];
+    nodos_color[3] = 0.6;
+    relleno = random([0.6, 0.8, 0.8, 0.95, 0.95, 0.95, 0.95]);
+    //  relleno = 0.6; //bug
+    if (relleno == 0.6) { nodos_color[4] = 0.08; col_line[3] = 90; }
   } else {
-    col_tipo = "dark", col_back = [5, 20], col_line = [80, 20, 66], col_pers = [230]
-    nodos_color[3] = 0.8; nodos_esp[1] = 0.5;
+    col_tipo = "dark", col_back = [5, 20], col_line = [80, 20, 66, random([80, 80, 80, 20])], col_pers = [230]
+    nodos_color[3] = 0.8;
     relleno = random([0.55, 0.8, 0.8, 0.8, 0.8, 0.95, 0.95, 0.95]);
   }
 
-
-
-  //ancho = random([500, 600, 600, 700, 700, 700, 800, 800, 900]); //600  saque 400
-  ancho = random([525, 600, 675, 675, 675, 750, 750, 750, 750, 825, 825, 825, 900, 900]); // saque 525, 
-  // ancho = 600 // bug
+  ancho = random([525, 600, 675, 675, 750, 750, 750, 825, 825, 900]);
+  // ancho = 525 // bug
   if (ancho > 800) { sep_min = 10, sep_max = 30 }
   else if (ancho > 601) { sep_min = 9, sep_max = 29 }
   else { sep_min = 8, sep_max = 28 }
 
-  print("ancho: " + ancho)
   let _g = 0, _desfY = 0, _lado = "izq";
   if (random() < 0.5) _lado = "der";
   for (let y = height - 200; y > 150; y -= 200) { // -180
     if (_lado == "izq") {
-      for (let x = ancho; x < width - ancho; x += 75) { //100      
+      for (let x = ancho; x < width - ancho; x += 75) {
         if (_desfY % 2 == 0) grilla[_g] = { x: x, y: y };
         else {
           grilla[_g] = { x: width - x, y: y };
@@ -191,7 +180,7 @@ async function setup() {
         _g++;
       }
     } else {
-      for (let x = width - ancho; x > ancho; x -= 75) { //100
+      for (let x = width - ancho; x > ancho; x -= 75) {
         if (_desfY % 2 == 0) grilla[_g] = { x: x, y: y };
         else {
           grilla[_g] = { x: width - x, y: y };
@@ -202,51 +191,39 @@ async function setup() {
     _desfY++;
   }
 
+  salto_x = 220 + ((ancho - 525) * -155) / 375;// const _w = map(ancho, 525, 900, 220, 65)
+  //print("salto_X: " + salto_x)
   let _rP = random([0, 0, 1, 1, 2]);
-  if (ancho < 550) _rP = 2;
-  let _pu = int(random(5)) * 10;
+  if (ancho < 550) { _rP = 2 }//, nube_dir = [1, random([1, -1]), -1] } //1, random([1, -1]), -1
+  let _pu = int(random(6)) * 10;
   if (_rP == 0) { punta = [-350 + _pu, 700 + ancho], salto_y = 900, nube_dir = [-1, -1, 1] } //-200, 1200
   else if (_rP == 1) { punta = [700 + ancho, -350 + _pu], salto_y = 900, nube_dir = [1, 1, -1] } //1200, -200
   else { punta = [350, 350], salto_y = 600 }
-  print("punta: " + punta)
+  // print("punta: " + punta)
 
-  //let _sX = [0, 1, 2, 3];// _sX = shuffle(_sX)//_s = [0, 1, 2, 3, 4, 5]; 
-  //let _sY = [0, 1, 2];// _sY = shuffle(_sY)
-  //let _g = []
-  // for (let g = 0; g < grilla.length; g++) {grilla_cantante.push(g) };// grilla_cantante = shuffle(grilla_cantante)
-  //let _n = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]//; _n = shuffle(_n);
+  // left eye, right eye, mouth, and face
   for (let i = 0; i < 12; i++) {
-    const _uX = grilla[i].x;//grilla[grilla_cantante[i]].x;
-    const _uY = grilla[i].y;//grilla[grilla_cantante[i]].y
+    const _uX = grilla[i].x;
+    const _uY = grilla[i].y;
     for (let j = 0; j < 4; j++) {
-      if (j == 0) { // ojo izq
+      if (j == 0) {
         n_ubicX[i * 4 + j] = _uX - 25; n_ubicY[i * 4 + j] = _uY - 20; // -100
-      } else if (j == 1) { // ojo der
+      } else if (j == 1) {
         n_ubicX[i * 4 + j] = _uX + 25; n_ubicY[i * 4 + j] = _uY - 20; // + 100
-      } else if (j == 2) { // boca
+      } else if (j == 2) {
         n_ubicX[i * 4 + j] = _uX; n_ubicY[i * 4 + j] = _uY + 20; //+ 33 orig: + 150
-      } else if (j == 3) { // cara
+      } else if (j == 3) {
         n_ubicX[i * 4 + j] = _uX; n_ubicY[i * 4 + j] = _uY;// + 300;
       }
     }
   }
 
-  for (let i = 0; i < 48; i++) { separacion[i] = 10; }
-
-  _r = random();
-  if (_r < 0.55) nodos_color[0] = random(20, 75);
-  else if (_r < 0.9) nodos_color[0] = random(130, 170); else nodos_color[0] = random(320, 340); //= random(160, 200)
-  nodos_color[1] = (nodos_color[0] + 30) % 360, nodos_color[2] = (nodos_color[0] + 330) % 360;
-  let _c = random([90, 120, 121]); print("color cara: " + _c)
-  nodos_color[4] = int(nodos_color[0] + _c) % 360, nodos_color[5] = int(random(40, 55));//bug int(random(40, 65));// int(nodos_color[0] + 360 - _c) % 360;
-
-  for (let i = 0; i < 49; i++) {
+  for (let i = 0; i < 48; i++) {
+    separacion[i] = 10;
     if (i % 4 <= 1 && random() < 0.8) { pers_vivo[i] = true; pers_cant++ } else { pers_vivo[i] = false } //i > 20  && 
   }
-  vel_fC = 40 //int(random(30, 50)); //bug anchos 45 a finos 35
-
   let _nu = [0, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44]; _nu = shuffle(_nu); //
-  for (let i = 0; i < nube_dir.length; i++) {
+  for (let i = 0; i < 3; i++) { // bug podria haber mas nubes si es mas ancho
     nube[i] = _nu[i]//, nube_y[i] = int(random(150, 250));
   }
   console.log(nube)//, nube_y)
@@ -256,11 +233,6 @@ async function setup() {
 
   boundary = new Rect(width / 2, height / 2, width / 2, height / 2);
   quadtree = new QuadTree(boundary, capacity);
-  /* for (let i = 0; i < 4; i++) { 
-    nodos_n = i
-    nodos[i] = [];
-    ordena(i);
-  } */
   caras_in = random([1, 1, 1, 2, 3])
   nueva_cara(caras_in);
 
@@ -270,26 +242,38 @@ async function setup() {
   pg_pers.noStroke();
   // ---------------------------
   arma_fondo();
-
   arma_pg_clic();
 
   // music config -------------------------------
   for (let i = 0; i < 1000; i++) { soundR[i] = random(); }
 
-  seq = shuffle(seq)
-  let _tr = random([0, 1, 2, -1]) // transpone 1st arriba, un acorde: el 1º, 2º o 3º. -1 no transpone
-  if (_tr != -1) {
-    for (let i = 0; i < 4; i++) { seq[_tr][i]++; }
+  // create chords 
+  if (relleno == 0.6) {
+    // seq = [[48, 52, 55, 59], [50, 52, 55, 57], [50, 52, 57, 60], [48, 52, 59, 62], [52, 53, 55, 59]];
+    seq = [[50, 54, 57, 59], [49, 53, 56, 57], [48, 52, 57, 59], [47, 51, 55, 58], [49, 52, 56, 59]]
+    seq = shuffle(seq);
+  } else {
+    seq = shuffle(seq);
+    let _tr = random([0, 1, 2, -1]); // transpone 1st arriba, un acorde: el 1º, 2º o 3º. -1 no transpone
+    if (_tr != -1) {
+      for (let i = 0; i < 4; i++) { seq[_tr][i] += 1; }
+    }
   }
-
   let _t = random([0, 1, 2, 3, 4]) // 'tonalidad' de toda la secuencia //-2, -1, 0, 1, 2
   if (col_tipo == "light") _t += 12; else _t += 2;
+  if (relleno == 0.6) _t -= 7; // soul bug
+
   for (let n = 0; n < seq.length; n++) {
     for (let i = 0; i < 4; i++) { seq[n][i] = seq[n][i] + _t; }
   }
-  ///console.log("tono:" + _t, "transpone acorde:" + _tr + "º")
+  for (let a = 0; a < 4; a++) {
+    for (let n = 0; n < 4; n++) {
+      const nota = Tone.Frequency(seq[a][n], "midi").toNote();
+      acorde[a][n] = nota;
+    }
+  }
 
-  // arma glissandos
+  // create glissandos
   g_total = int(map(ancho, 525, 900, 140, 100));// orig g_total = 525, 900, 120, 80
   g_in = 20, g_out = g_total - 20;
   console.log("g_total: " + g_total)
@@ -299,30 +283,22 @@ async function setup() {
     }
   }
 
-  // arma string de acordes
-  for (let a = 0; a < 4; a++) {
-    for (let n = 0; n < 4; n++) {
-      const nota = Tone.Frequency(seq[a][n], "midi").toNote();
-      acorde[a][n] = nota;
-    }
-  }
-  print(acorde)
-  BPM = 100//int(map(ancho, 500, 900, 80, 120)); //100; //oj! variarlo finos -> 120 a anchos -> 80
-  BPM_rall = 0.25 // 0.3
+
 
   // features ---------------------
-  console.log("coro. Yamil Burguener. 2026")
+  console.log("Wax choir. Yamil Burguener. 2026")
   console.log("seed number: " + mi_seed);
-  let _nD = [], _nD1 = [0, 4, 5];
-  for (let i = 0; i < 3; i++) { _nD[i] = int(int(nodos_color[_nD1[i]]) * 0.1) * 10; }
-  let _re = "normal"; if (relleno == 0.95) _re = "skeleton"; // esqueleto skeleton/ a little
-  else if (relleno == 0.55) _re = "invisible"//{ if (col_tipo == "light") _re = "a lot"; else _re = "invisible" }
-  console.log('background:', col_tipo, '\nmain color hue:', _nD[0] + "s°, " + _nD[1] + "s°, " + _nD[2] + "s°",
+  const _nC0 = int(int(nodos_color[0]) * 0.1) * 10;
+  let _re = "wax"; if (relleno == 0.95) _re = "skeleton"; // esqueleto skeleton/ a little
+  else if (relleno == 0.55) _re = "invisible"; else if (relleno == 0.6) _re = "soul";
+  console.log('background:', col_tipo, '\nmain color hue:', _nC0 + "s°, " + col_caraH + "s°",
     '\nsize:', width - (ancho * 2), '\nfill:', _re);
+
+  console.log('harmony: ' + '\n' + acorde[0] + '\n' + acorde[1] + '\n' + acorde[2] + '\n' + acorde[3]);
 
   $bootloader.setFeatures({
     'background': col_tipo,
-    'main color hue': _nD[0] + "s°, " + _nD[1] + "s°, " + _nD[2] + "s°",
+    'main color hue': _nC0 + "s°, " + col_caraH + "s°",
     'size': width - (ancho * 2), //360 a 1360 
     'fill': _re
   });
@@ -338,7 +314,6 @@ async function setup() {
 
   let loadingDiv = document.getElementById('p5_loading');
   if (loadingDiv) loadingDiv.remove();
-
 }
 
 function draw() {
@@ -427,22 +402,22 @@ function jugando() {
 
     let _s = nodos[n][0].getSentido();
     if (_s == "arriba") pg_fondo.stroke(col_line[0], 0.25);
-    else pg_fondo.stroke(col_line[0], 0.04)//; 0.05 antes 0.1
+    else pg_fondo.stroke(col_line[0], nodos_color[4])//; 0.04  ... 0.05 antes 0.1
 
     if (random() < relleno || (_s == "abajo" && random() < 0.7)) { // 0.8, 0.95
       pg_fondo.noFill();
     } else {
       //pg_fondo.stroke(col_line[0], 0.25)//; 0.1
       if (random() < nodos_color[3]) {
-        pg_fondo.fill(col_line[1], 0.15)
+        pg_fondo.fill(col_line[1], 0.15);
       }
       else {
         if (random() < 0.5) {
-          pg_fondo.fill(nodos_color[0], random([9, 99]), col_line[2], 0.02) // , 0.05
-        }//nodos_n >= 20 || 0.8 -> 99, 99, 0.05
+          pg_fondo.fill(nodos_color[0], random([9, 99]), col_line[2], 0.02); // , 0.05
+        }
         else {
-          const _r = random([nodos_color[1], nodos_color[2]])//[(nodos_color + 120) % 360, (nodos_color + 240) % 360])
-          pg_fondo.fill(_r, random([9, 99]), col_line[2], 0.03) //99, 99, 0.05
+          const _r = random([nodos_color[1], nodos_color[2]]);
+          pg_fondo.fill(_r, random([9, 99]), col_line[2], 0.03);
         }
       }
     }
@@ -452,17 +427,19 @@ function jugando() {
         if (random() < 0.95) {
           pg_fondo.noStroke();
           if ((sec_n == 12 || sec_n > 14) && separacion[n] < 12 && random() < 0.5)
-            pg_fondo.fill(nodos_color[5], random([col_line[0], 90, 90]), col_caraB[n], 0.05) // 0.1, 0.08)// col_line[2], 0.2)
+            pg_fondo.fill(col_caraH, random([col_line[0], 90, 90]), col_caraB[n], 0.05) // 0.1, 0.08)// col_line[2], 0.2)
         }
-        // if (nodos[n][i].getSentido() != "arriba" && ((n >= nube[0] && n < nube[0]+3)||(n >= nube[1]&& n < nube[1]+3))) 
-        // pg_fondo.fill(0, 90, 90) // bug test nube
       }
       else if (sec_n < 4 && n % 4 == 2) {
         pg_fondo.noFill(), pg_fondo.noStroke();// no boca al inicio
       }
     }
-    else if (_s == "abajo" && n % 4 < 2 && nodos[n][i].getOjo()) pg_fondo.fill(col_line[0], 0.5); // ojo 
-    // else if (nodos[n][0].position.y > 1920 && n% 4 >= 2) pg_fondo.noStroke(); // no boca al inicio
+    else if (_s == "abajo" && n % 4 < 2 && nodos[n][i].getOjo()) pg_fondo.fill(col_line[3], 0.5); // ojo 
+
+    /*       if (nodos[n][i].getSentido() == "abajo" &&
+          ((n >= nube[0] && n < nube[0] + 3) || (n >= nube[1] && n < nube[1] + 3) || (n >= nube[2] && n < nube[2] + 3)))
+          pg_fondo.stroke(0, 90, 90, 0.5) // bug test nube    */
+
 
     let _end = nodos[n].length;
     if (n % 4 < 2 && sec_n % 3 > 0) _end = int(nodos[n].length / 2) + 1
@@ -483,7 +460,7 @@ function jugando() {
 
     salto_n = (salto_n + 1) % 12// = int(random(12))
     _a = grilla[grilla_cant_n[salto_n]];
-    grilla_cant_n[salto_n] = (grilla_cant_n[salto_n] + 11) % grilla.length;//grilla_cantante.length;
+    grilla_cant_n[salto_n] = (grilla_cant_n[salto_n] + 11) % grilla.length;
     _b = grilla[grilla_cant_n[salto_n]];
 
     /* _a = grilla[salto_n % grilla.length];
@@ -492,16 +469,45 @@ function jugando() {
 
   }
 
-  //let saltando = false; //no se debe usar
+
   for (let n = 0; n <= nodos_n; n++) {
+
+    // nube
+    if (nodos[n][0].getSentido() == "abajo") {
+      for (let iii = 0; iii < nube.length; iii++) {
+        // let _plus = salto_x * nube_dir[iii]; //new
+        if (n >= nube[iii] && n < nube[iii] + 4) {
+          if (nodos[n][0].getPosY() > height - 155) {
+            if (sec_name == "avanza") { sec_name = "rall"; bPiso = true; print(sec_name) }
+
+            let _di = 1; if (n % 2 == 1) _di = -1;
+            for (let ii = 0; ii < nodos[n].length; ii++) {
+              const _y = nodos[n][ii].getPosY() - sec_n * 3;
+              const _x = nodos[n][ii].getPosX() + sec_n * 0.25 * _di;
+              // let _x2 = _x + _plus;
+              // if (_x2 < ancho) { _x2 = _x2 + (width - ancho * 2), sec_fin++; }
+              // else if (_x2 > width - ancho) { _x2 = _x2 - (width - ancho * 2), sec_fin++; }
+
+              nodos[n][ii].salto(_x, _y);
+
+              separacion[n] = sep_min;
+              nodos[n][ii].setSeparacion(separacion[n]);
+              // nodos[n][ii].setSentido("---");
+            }
+
+          }
+        }
+      }
+    }
+
     for (let i = 0; i < nodos[n].length; i++) {
 
       if (bMi_fC) {
         const _sep = int(map(sin((mi_frameCount * (1 + int(n / 4) * 4)) * 0.75 / vel_fC), -1, 1, sep_min, sep_max)); //* 0.75 //floor()
         separacion[n] = _sep; //if (n == 0) print(_sep)
-        if (sec_name != "avanza" && n % 4 != 3) separacion[n] += 10; // bug
+        //if (sec_name != "avanza" && n % 4 != 3) separacion[n] += 10;
         //print("sep: " + _sep + " " + n)
-        nodos[n][i].setSeparacion(_sep);
+        nodos[n][i].setSeparacion(separacion[n]);
 
         if (nodos_n >= 47) {
           const _y = nodos[n][i].getPosY();
@@ -511,7 +517,7 @@ function jugando() {
           if (_y < _limY) {//&& !saltando) {// < 350
             ////print("cambia sentido " + n)
             for (let ii = 0; ii < nodos[n].length; ii++) {
-              nodos[n][ii].cambia_sentido();
+              nodos[n][ii].setSentido("abajo");
             }
           }
           // salto -------------
@@ -528,45 +534,11 @@ function jugando() {
             } */
             nodos[n][i].salto(_x2, _y2);
           }
-
-          // nube
-          if (nodos[n][i].getSentido() == "abajo") {
-            for (let iii = 0; iii < nube.length; iii++) {
-             
-              if (n >= nube[iii] && n < nube[iii] + 4) {
-                let _yN = nodos[n][i].getPosY();
-                if (_yN > height - 155) {// && _yN < height*0.6) {
-                  if (sec_name == "avanza") { sec_name = "rall"; print(sec_name) }
-
-                  const _w = 200 + ((ancho - 525) * -135) / 375;// const _w = map(ancho, 525, 900, 200, 65)
-
-                  let _plus = _w * nube_dir[iii];// random(-_w, _w);
-                  // let _x2 //bug
-                  //// for (let nn = nube[iii]; nn < nube[iii] + 4; nn++) {
-                  for (let ii = 0; ii < nodos[n].length; ii++) {
-                    const _y2 = nodos[n][ii].getPosY() - sec_n * 6;
-                    let _x = nodos[n][ii].getPosX();
-                    let _x2 = _x + _plus;
-                    if (_x2 < ancho - 100) {_x2 = _x + width - ancho * 2, _bN[iii] = true;}
-                    else if (_x2 > width - ancho + 100) {_x2 = _x - width + ancho * 2, _bN[iii] = true;}
-                    //  if (_x > ancho -75 && _x < width - ancho + 75) _x2 = _x + _plus;
-                    //  else _x2 = _x;
-                    nodos[n][ii].salto(_x2, _y2);
-                  }
-                  //// }
-                  // print("nube random " + _x2 + " " + nube_dir[iii] + " " + _plus) // bug revisar
-                }
-              }
-             // if (_bN[iii] && nube_dir[iii] != 0) {nube_dir[iii] = 0; print (iii) ;} bug
-            }
-          }
-          //print(nube_dir)
         }
       }
 
-      ////  if (sec_n > 32 && random() < 0.001) nodos[n][i].cambia_marginW(400);//; else marginB = 150; 
       let consulta = true;
-      if (mi_frameCount % 2 == 1 && nodos[n][i].getSentido() == "abajo") consulta = false;;
+      if (mi_frameCount % 2 == 1 && nodos[n][i].getSentido() == "abajo") consulta = false;
       if (consulta) {
         let range = new Circle(nodos[n][i].position.x, nodos[n][i].position.y, separacion[n]);
         let neighbors = [];
@@ -583,7 +555,7 @@ function jugando() {
             let _d = dist(nodos[n][i].position.x, nodos[n][i].position.y,
               nodos[nn][i % nodos[nn].length].position.x, nodos[nn][i % nodos[nn].length].position.y)
             if (_d > 25 && _d < esc_tam) { // 70 a 120 segun separacion
-              pg_fondo.stroke(col_line[0], 0.4); // new bug 0.4
+              pg_fondo.stroke(col_line[0], 0.4);
               pg_fondo.line(nodos[n][i].position.x, nodos[n][i].position.y,
                 nodos[nn][i % nodos[nn].length].position.x, nodos[nn][i % nodos[nn].length].position.y)
             }
@@ -591,6 +563,36 @@ function jugando() {
         }
       }
     }
+    // nube
+    /*  if (nodos[n][0].getSentido() == "abajo") {
+       for (let iii = 0; iii < nube.length; iii++) {
+
+         let _plus = salto_x * nube_dir[iii]; //new
+
+         if (n >= nube[iii] && n < nube[iii] + 4) {
+           let _yN = nodos[n][0].getPosY();
+           let _xN = nodos[n][0].getPosX() + _plus
+           if (_yN > height - 155) {// && _yN < height*0.6) {
+             
+             if (sec_name == "avanza") { sec_name = "rall"; print(sec_name) }
+             
+             
+             let _r = random([1,3,7]);
+             for (let ii = 0; ii < nodos[n].length; ii++) {
+               const _y2 = nodos[n][ii].getPosY() - sec_n * _r;
+               let _x = nodos[n][ii].getPosX();
+               let _x2 = _x + _plus;
+               if (_xN < ancho) { _x2 = _x + (width - ancho * 2), sec_fin++;}
+               else if (_xN > width - ancho) { _x2 = _x - (width - ancho * 2), sec_fin++;}
+ 
+
+               nodos[n][ii].salto(_x2, _y2);
+             }
+
+           }
+         }
+       }
+     } */
   }
   //bSentido = true;
   ////if (margin < 600) {margin += 0.5; marginB += 0.5 } 
@@ -611,7 +613,7 @@ function jugando() {
     // ingreso caras
     if (nodos_n < 44) {
       nueva_cara(caras_in);
-      /* for (let ii = 0; ii < 4; ii++) { // new bug  
+      /* for (let ii = 0; ii < 4; ii++) {
         nodos_n++
         nodos[nodos_n] = [];
         ordena(nodos_n);
@@ -623,12 +625,14 @@ function jugando() {
       for (let n = 0; n < nodos_n; n++) {
         let _yN = nodos[n][0].getPosY();
         if (_yN < height * 0.5) _fin_n++;
+        // print ("------ "+_yN +" "+ _fin_n)
       }
-      if (_fin_n < 10) {
-        print("todos abajo " + _fin_n);
+      if (_fin_n < 10) { // si faltan solo 10 por pasar la mitad
+       /// print("faltaron por pasar la mitad: " + _fin_n);
         sec_n_rall = sec_n;
         sec_name = "fin";
       }
+
       grave_final();
     }
   }
@@ -643,19 +647,19 @@ function jugando() {
       b_newTempo = true;
       let _m;
       if (sec_n > sec_n_rall + 2) {// fade out. antes 40
-        _m = map(sec_n, sec_n_rall + 2, sec_n_rall + 7, -10, -40);
-        // sampler[1].volume.value = _m;
+        _m = map(sec_n, sec_n_rall + 2, sec_n_rall + 7, -10, -50);
         sampler[2].volume.value = _m;
       }
     }
-
-    //  sep_min += 0.05, sep_max += 0.05; print(sep_min) ??
-    if (sec_n > sec_n_rall + 8) fin_todo()//(BPM <= 50) fin_todo() // antes 44
+    //// print("llegar a " + (sec_n_rall + 13))
+    if (sec_n > sec_n_rall + 10) fin_todo()// antes sec_n > sec_n_rall + 8   bSec_fin /////
   }
 
-  // music control new
-  //let _y0 = nodos[0][0].getPosY();
-  //let _ma = map(_y0, 2000)
+  // piso
+  if (bPiso) {
+    pg_fondo.fill(col_line[3], 0.1);
+    pg_fondo.ellipse(random(ancho - 50, width - ancho + 50), height - margin - random(7), 7, 3)
+  }
 
   mi_frameCount++;
 
@@ -702,7 +706,7 @@ function ordena(_n) {
 
 // music -----------------------------------------------
 function Rep_nota0(_r) {
-  // print("0")
+
   intervalo_n0 = setInterval(() => {
     if (b_play) {
       const _voz = g_line[seq_n][0][g_cont]
@@ -727,7 +731,7 @@ function Rep_nota0(_r) {
 }
 
 function Rep_nota1(_r) {
-  //print("1")
+
   intervalo_n1 = setInterval(() => {
     if (b_play) {
       const _voz = g_line[seq_n][1][g_cont]
@@ -745,13 +749,12 @@ function Rep_nota1(_r) {
 }
 
 function Rep_nota2(_r) {
-  //  print("2")
+
   intervalo_n2 = setInterval(() => {
     if (b_play) {
       const _voz = g_line[seq_n][2][g_cont]
       const _v = g_vol[seq_n][2][g_cont]
       const _t = "+" + str(0.5 * cos(mi_frameCount * 0.035) + 0.5);
-      //let _i = 0; if (sec_name != "avanza")
       let _i = int(sound_random() * 2);
       sampler[_i].triggerAttackRelease(_voz, 1, _t, _v);
       if (g_cont % 3 == 2) sampler[2].triggerAttackRelease(_voz, 2, _t, _v);
@@ -764,7 +767,7 @@ function Rep_nota2(_r) {
 }
 
 function Rep_nota3(_r) {
-  //  print("3")
+
   intervalo_n3 = setInterval(() => {
     if (b_play) {
       const _voz = g_line[seq_n][3][g_cont]
@@ -783,8 +786,9 @@ function Rep_nota3(_r) {
 
 function grave_final() {
   if (!$bootloader.isCapture && b_play) {
-    print("Bang " + sec_n % 2) // * 0.25, 0.125 3 octavas
+
     const _voz = g_line[3][0][0] * 0.0625; // * 0.25
+   //// print("Bang " + sec_n % 2 + " " + _voz) // * 0.25, 0.125 3 octavas
     sampler[sec_n % 2].triggerAttack(_voz, Tone.now(), 0.6); //sampler[mi_frameCount % 2]
   }
 }
@@ -798,7 +802,7 @@ function glissando(_a, _n, _nA1, _nA2) { // nota afinada
   const _desde = g_in + int(sound_random() * 20) //int(random(20, 70)) // 60 + int(sound_random() * 50)
   const _hasta = g_out + int(sound_random() * 20)//int(random(120, 170)) // 120
   let _m, b_griss = true;
-  if (abs(_nA1 - _nA2) > 5) b_griss = false // 4
+  if (abs(_nA1 - _nA2) > 4) b_griss = false; // 4
   for (let i = 0; i < g_total; i++) { //190
     let _v = 1
     if (b_griss) {
@@ -827,21 +831,20 @@ function fin_todo() {
 
 function muestra_titulo() {
 
-  pg_titulo.clear()
-  pg_titulo.textSize(60)
-  pg_titulo.fill(col_line[0], 0.8), pg_titulo.noStroke()//20, 0.6), pg_titulo.strokeWeight(5)
-  pg_titulo.text("WAX CHOIR", pg_titulo.width / 2, pg_titulo.height - 470)
-  pg_titulo.textSize(30)
-  //pg_titulo.fill(100, 0.7), pg_titulo.stroke(20, 0.6), pg_titulo.strokeWeight(5)
+  pg_titulo.clear();
+  pg_titulo.textSize(60);
+  pg_titulo.fill(col_line[0], 0.8), pg_titulo.noStroke();
+  pg_titulo.text("WAX CHOIR", pg_titulo.width / 2, pg_titulo.height - 470);
+  pg_titulo.textSize(30);
   const _t = int((titInicio - millis()) * 0.001);
-  pg_titulo.text("CLICK TO START\nor wait (" + _t + ") seconds", pg_titulo.width / 2, pg_titulo.height - 400)
-  let _r = random(14)
-  pg_titulo.ellipse(pg_titulo.width / 2 + 118, pg_titulo.height - 518 - _r * 0.5, random(5), _r)
+  pg_titulo.text("CLICK TO START\nor wait (" + _t + ") seconds", pg_titulo.width / 2, pg_titulo.height - 400);
+  let _r = random(14);
+  pg_titulo.ellipse(pg_titulo.width / 2 + 118, pg_titulo.height - 518 - _r * 0.5, random(5), _r);
   if (_t <= 0) {
     vol_final.gain.rampTo(0, 0.05); // vol_final.pmute = true
-    hacia_jugando() //seccion = "jugando"
+    hacia_jugando(); //seccion = "jugando"
   }
-  else image(pg_titulo, 0, 0)
+  else image(pg_titulo, 0, 0);
 }
 
 function arma_fondo() {
@@ -849,31 +852,27 @@ function arma_fondo() {
   pg_fondo = createGraphics(2160, 2160)
   pg_fondo.colorMode(HSB)
   pg_fondo.elt.getContext('2d', { willReadFrequently: true });
-  // pg_fondo.strokeCap(SQUARE); // new bug
-  //let _toB = 0; if (col_tipo == "light") _toB = 70
-  const _cH = (nodos_color[0] + 180) % 360// ((col_H[col_Hn] + col_ra / 2) + 180) % 360
-  let _nL = 60; if (col_tipo == "dark") _nL = 1 // 50 y 5
-  let noiseLevel = 40 // 50
-  let noiseScale = 0.001 //0.002
-  pg_fondo.background(_cH, col_back[0], col_back[1])//0,100,100)//)col_back)//
-  pg_fondo.noStroke()
+  const _cH = (nodos_color[0] + 180) % 360;
+  let _nL = 60; if (col_tipo == "dark") _nL = 1;
+  const noiseLevel = 40;
+  const noiseScale = 0.001;
+  pg_fondo.background(_cH, col_back[0], col_back[1]);
+  pg_fondo.noStroke();
   for (let _y = 0; _y < height + 15; _y += 30) {
     for (let _x = 0; _x < width + 15; _x += 30) {
       const nx = noiseScale * _x;
       const ny = noiseScale * _y;
       const _c = _nL + noiseLevel * noise(nx, ny);
-
-      pg_fondo.fill(_cH, col_back[0], _c, 0.4)//(_c, 0.2)//, 0.1
-
+      pg_fondo.fill(_cH, col_back[0], _c, 0.4);
       for (i = 0; i < 4; i++) { // 6
         pg_fondo.push()
         pg_fondo.translate(_x + random(-15, 15), _y + random(-15, 15))
         pg_fondo.rotate(random(PI))
         pg_fondo.beginShape()
         for (_ii = 0; _ii < TWO_PI; _ii += 1) {
-          const _r = random(10, 40) // no 20 50
-          const _x = cos(_ii) * _r
-          const _y = sin(_ii) * _r
+          const _r = random(10, 40);
+          const _x = cos(_ii) * _r;
+          const _y = sin(_ii) * _r;
           pg_fondo.vertex(_x, _y)
         }
         pg_fondo.endShape(CLOSE);
