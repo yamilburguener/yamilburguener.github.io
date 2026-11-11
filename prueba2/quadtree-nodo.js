@@ -194,9 +194,8 @@ class Nodo {
     //this.sepVel = 0.05
 
     this.sentido = "arriba";
-    const _a = map(ancho, 525, 900, 0.28, 0.1); // menos cascadas en angostos 11 ojosN a 31, a 43 
+    const _a = map(ancho, 525, 900, 0.25, 0.1); // menos cascadas en angostos 11 ojosN a 31, a 43  ...... 0.28, 0.1
     this.ojoNegro = false; if (_n_num == 8 && random() < _a) { this.ojoNegro = true; } // < 0.2
-    //// this.marginW = 150;
   }
 
   cohesion(_nodos) {
@@ -266,8 +265,8 @@ class Nodo {
     this.position.y = _y;
   }
 
-  cambia_sentido() {
-    this.sentido = "abajo";
+  setSentido(_se) {
+    this.sentido = _se;
     // if (random()< 0.7)  this.sentido = "abajo";
     // else this.sentido = "nube";
     //
