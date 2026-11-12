@@ -131,7 +131,7 @@ async function setup() {
   //cv.drawingContext.willReadFrequently = true;
   //cv.elt.getContext('2d', { willReadFrequently: true });
   frameRate(30);
-  //pixel = 0.5 // bug
+  // pixel = 0.5 // bug
   if ($bootloader.isCapture) pixel = 0.25;//0.3 para 720px;
   pixelDensity(pixel);
   colorMode(HSB);
@@ -145,7 +145,8 @@ async function setup() {
   let _r = random();
   if (_r < 0.55) nodos_color[0] = random(20, 75);
   else if (_r < 0.9) nodos_color[0] = random(130, 170); else nodos_color[0] = random(320, 340); //= random(160, 200)
-  nodos_color[1] = (nodos_color[0] + 60) % 360, nodos_color[2] = (nodos_color[0] + 300) % 360;
+  let _nc = [60, 300]; if (random() < 0.3) _nc = [120, 240];
+  nodos_color[1] = (nodos_color[0] + _nc[0]) % 360, nodos_color[2] = (nodos_color[0] + _nc[1]) % 360;
 
   col_caraH = int(random(35, 55)); //40,55
   nodos_color[4] = 0.04;
@@ -192,10 +193,9 @@ async function setup() {
   }
 
   salto_x = 220 + ((ancho - 525) * -155) / 375;// const _w = map(ancho, 525, 900, 220, 65)
-  //print("salto_X: " + salto_x)
   let _rP = random([0, 0, 1, 1, 2]);
-  if (ancho < 550) { _rP = 2 }//, nube_dir = [1, random([1, -1]), -1] } //1, random([1, -1]), -1
-  let _pu = int(random(6)) * 10;
+  //if (ancho < 550) { _rP = 2 }//,bug dejamos puntas en los mas grandes????
+  let _pu = int(random(8)) * 10;
   if (_rP == 0) { punta = [-350 + _pu, 700 + ancho], salto_y = 900, nube_dir = [-1, -1, 1] } //-200, 1200
   else if (_rP == 1) { punta = [700 + ancho, -350 + _pu], salto_y = 900, nube_dir = [1, 1, -1] } //1200, -200
   else { punta = [350, 350], salto_y = 600 }
@@ -226,7 +226,6 @@ async function setup() {
   for (let i = 0; i < 3; i++) { // bug podria haber mas nubes si es mas ancho
     nube[i] = _nu[i]//, nube_y[i] = int(random(150, 250));
   }
-  console.log(nube)//, nube_y)
 
   // ---------------------------
   margin = 150//, marginB = 150
@@ -307,7 +306,7 @@ async function setup() {
   if (!$bootloader.isCapture) { // modo live (!) 
     pg_titulo.colorMode(HSB), pg_titulo.textAlign(CENTER)
     pg_titulo.textFont(fuente)
-    titInicio = millis() + 9999;
+    titInicio = millis() + 2999; //bug 9999
   } else {
     hacia_jugando();
   }
@@ -317,6 +316,7 @@ async function setup() {
 }
 
 function draw() {
+  // print(b_play + " "+b_sound)
 
   if ($bootloader.isCapture) {// && !captureScheduled) { // modo captura
     console.log("🎬 MODO CAPTURA - Renderizando visuals (sin sonido)...");
@@ -412,7 +412,7 @@ function jugando() {
         pg_fondo.fill(col_line[1], 0.15);
       }
       else {
-        if (random() < 0.5) {
+        if (random() < 0.6) {
           pg_fondo.fill(nodos_color[0], random([9, 99]), col_line[2], 0.02); // , 0.05
         }
         else {
@@ -628,7 +628,7 @@ function jugando() {
         // print ("------ "+_yN +" "+ _fin_n)
       }
       if (_fin_n < 10) { // si faltan solo 10 por pasar la mitad
-       /// print("faltaron por pasar la mitad: " + _fin_n);
+        /// print("faltaron por pasar la mitad: " + _fin_n);
         sec_n_rall = sec_n;
         sec_name = "fin";
       }
@@ -657,7 +657,7 @@ function jugando() {
 
   // piso
   if (bPiso) {
-    pg_fondo.fill(col_line[3], 0.1);
+    pg_fondo.fill(col_line[3], 0.1); pg_fondo.noStroke();
     pg_fondo.ellipse(random(ancho - 50, width - ancho + 50), height - margin - random(7), 7, 3)
   }
 
@@ -708,13 +708,24 @@ function ordena(_n) {
 function Rep_nota0(_r) {
 
   intervalo_n0 = setInterval(() => {
-    if (b_play) {
+
+    if (b_play && b_sound) {
+      //    print(b_play + " "+b_sound)  
       const _voz = g_line[seq_n][0][g_cont]
       const _v = g_vol[seq_n][0][g_cont]
       const _t = "+" + str(0.5 * cos(mi_frameCount * 0.027) + 0.5) // fade para espacios //* 0.08
       let _i = 0; if (sec_name != "avanza") _i = mi_frameCount % 2
       sampler[_i].triggerAttackRelease(_voz, 1, _t, _v);
       if (g_cont % 4 == 0) sampler[2].triggerAttackRelease(_voz, 2, _t, _v * 0.7);
+      /* if (g_cont < g_total - 1) { g_cont++ }//189
+       else {
+         if (seq_n < 3) { // el ultimo acorde no debe entar  seq.length - 2
+           seq_n++, g_cont = 0
+           print("acorde: " + acorde[seq_n])
+         }
+       }*/
+    }
+    if (b_play) {
       if (g_cont < g_total - 1) { g_cont++ }//189
       else {
         if (seq_n < 3) { // el ultimo acorde no debe entar  seq.length - 2
@@ -733,7 +744,7 @@ function Rep_nota0(_r) {
 function Rep_nota1(_r) {
 
   intervalo_n1 = setInterval(() => {
-    if (b_play) {
+    if (b_play && b_sound) {
       const _voz = g_line[seq_n][1][g_cont]
       const _v = g_vol[seq_n][1][g_cont]
       const _t = "+" + str(0.5 * cos(mi_frameCount * 0.031) + 0.5); //* 0.065
@@ -751,7 +762,7 @@ function Rep_nota1(_r) {
 function Rep_nota2(_r) {
 
   intervalo_n2 = setInterval(() => {
-    if (b_play) {
+    if (b_play && b_sound) {
       const _voz = g_line[seq_n][2][g_cont]
       const _v = g_vol[seq_n][2][g_cont]
       const _t = "+" + str(0.5 * cos(mi_frameCount * 0.035) + 0.5);
@@ -769,7 +780,7 @@ function Rep_nota2(_r) {
 function Rep_nota3(_r) {
 
   intervalo_n3 = setInterval(() => {
-    if (b_play) {
+    if (b_play && b_sound) {
       const _voz = g_line[seq_n][3][g_cont]
       const _v = g_vol[seq_n][3][g_cont]
       const _t = "+" + str(0.5 * cos(mi_frameCount * 0.042) + 0.5);
@@ -785,10 +796,10 @@ function Rep_nota3(_r) {
 }
 
 function grave_final() {
-  if (!$bootloader.isCapture && b_play) {
 
+  if (!$bootloader.isCapture && b_play && b_sound) {
     const _voz = g_line[3][0][0] * 0.0625; // * 0.25
-   //// print("Bang " + sec_n % 2 + " " + _voz) // * 0.25, 0.125 3 octavas
+    //// print("Bang " + sec_n % 2 + " " + _voz) // * 0.25, 0.125 3 octavas
     sampler[sec_n % 2].triggerAttack(_voz, Tone.now(), 0.6); //sampler[mi_frameCount % 2]
   }
 }
@@ -896,19 +907,10 @@ function arma_pg_clic() {
 
 function sound_random() {
 
-  sound_cont++
-  if (sound_cont == 1000) sound_cont = 0
-  return soundR[sound_cont]
+  sound_cont++;
+  if (sound_cont == 1000) sound_cont = 0;
+  return soundR[sound_cont];
 }
-
-
-
-/* function clic() {
-
-  if (!b_sound && seccion == "jugando" && (millis() % 3000) < 1500) {
-    image(pg_clic, width/2, 0)
-  }
-} */
 
 function hacia_jugando() {
 
@@ -974,7 +976,6 @@ function grabaImagen() {
 class Persona {
   constructor(x, y, _memoNodo) {
     this.pos = createVector(x, y);
-    //this.posIni = createVector(x, y);
     const _v = random(0.5, 1.2) * 0.5
     this.vel = createVector(random([-_v, _v]), random([-_v, _v]))
     this.accel = createVector(1, 1);
@@ -994,12 +995,6 @@ class Persona {
   }
 
   update() {
-    //if (pers_pos != undefined) {
-
-
-    // Get the 2D rendering context
-    //let ctx = pg_fondo.drawingContext; //_ctx = pg_fondo.drawingContext;
-    //let c = _ctx.getImageData(floor(pers_pos.x), floor(pers_pos.y), 1, 1);
 
     if (random() < 0.02) { // vuelve al ojo
       const _v1 = createVector(nodos[this.mN][0].getPosX(), nodos[this.mN][0].getPosY())
@@ -1009,9 +1004,7 @@ class Persona {
       this.pos.y = _medio.y;
     }
 
-
     let c = pg_fondo.get(Math.floor(this.pos.x), Math.floor(this.pos.y));
-
     // activar para rebota
     if (this.pos.x < 0 || this.pos.x > width || this.pos.y < 0 || this.pos.y > height) this.libre = true
 
@@ -1039,14 +1032,9 @@ class Persona {
     pg_pers.noErase()
 
     // Dibujo del punto
-    pg_pers.fill(col_pers[0], random(10, 30)) // 20
+    pg_pers.fill(col_pers[0], random(10, 40)) // 10, 30
     pg_pers.noStroke();
-    pg_pers.ellipse(this.pos.x, this.pos.y, 6, 6);//5, 5);
-
-    //pg_fondo.fill(nodos_color[0], random(0, 0.2))//pg_pers.fill(col_pers[0], random(10, 30)) // 20
-    //pg_fondo.noStroke();
-    //pg_fondo.ellipse(this.pos.x, this.pos.y, 6, 6);//5, 5);
-
+    pg_pers.ellipse(this.pos.x, this.pos.y, 5, 5);//5, 5);
   }
 
   rebota() {
