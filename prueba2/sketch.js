@@ -94,6 +94,9 @@ function preCarga() {
 
 
 async function setup() {
+  
+  let cv = createCanvas(2160, 2160);
+  cv.parent("cv");
 
   preCarga();
 
@@ -104,9 +107,6 @@ async function setup() {
   if (esMovil) densidad = 0.5;
   if ($bootloader.isCapture) densidad = 0.25;
   pixelDensity(densidad);
-
-  let cv = createCanvas(2160, 2160);
-  cv.parent("cv");
 
   frameRate(30);
   colorMode(HSB);
