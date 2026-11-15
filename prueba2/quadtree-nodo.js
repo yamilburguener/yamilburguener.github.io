@@ -16,9 +16,9 @@ class Circle {
   contains(point) {
     let distX = Math.abs(this.x - point.x);
     let distY = Math.abs(this.y - point.y);
-    let distance = Math.sqrt(Math.pow(distX, 2) + Math.pow(distY, 2));
+    let distancia = Math.sqrt(Math.pow(distX, 2) + Math.pow(distY, 2));
 
-    if (distance <= this.r) {
+    if (distancia <= this.r) {
       return true;
     } else {
       return false;
@@ -43,9 +43,9 @@ class Circle {
 
     let distX = Math.abs(this.x - closeX);
     let distY = Math.abs(this.y - closeY);
-    let distance = Math.sqrt(Math.pow(distX, 2) + Math.pow(distY, 2));
+    let distancia = Math.sqrt(Math.pow(distX, 2) + Math.pow(distY, 2));
 
-    if (distance <= this.r) {
+    if (distancia <= this.r) {
       return true;
     } else {
       return false;
@@ -282,10 +282,10 @@ class Nodo {
     let steering = createVector(0, 0); // p5 2.0
     let total = 0;
     for (let i = 0; i < neighbors.length; i++) {
-      let distance = dist(this.position.x, this.position.y, neighbors[i].position.x, neighbors[i].position.y);
-      if (this != neighbors[i] && distance < this.sep) {// bug separacion) {
+      let distancia = dist(this.position.x, this.position.y, neighbors[i].position.x, neighbors[i].position.y);
+      if (this != neighbors[i] && distancia < this.sep) {// bug separacion) {
         let diff = p5.Vector.sub(this.position, neighbors[i].position);
-        if (distance * distance > 0) diff.div(distance * distance);
+        if (distancia * distancia > 0) diff.div(distancia * distancia);
         steering.add(diff);
         total += 1;
       }
