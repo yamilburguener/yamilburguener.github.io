@@ -99,7 +99,7 @@ async function setup() {
 
   const esMovil = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
     || (navigator.maxTouchPoints > 1 && /Macintosh/i.test(navigator.userAgent));
-  if (esMovil) {densidad = 0.5; densidad_trig = 8;}
+  if (esMovil) {densidad = 0.5; densidad_trig = 12;}
   if ($bootloader.isCapture) densidad = 0.25;
   pixelDensity(densidad);
 
