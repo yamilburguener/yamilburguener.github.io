@@ -49,13 +49,12 @@ let sampler_fade = [[0, 0, 0, 0, 0, 0, 0, 1], [0, 0, 0, 0, 0, 1, 1, 1], [0, 0, 0
 let vol_final;
 let BPM = 100;
 let BPM_rall = 0.25;
-let intervalo_n0, intervalo_n1, intervalo_n2, intervalo_n3;
+let intervalo_n0, intervalo_n1, intervalo_n2, intervalo_n3, densidad_trig = 4;
 let b_newTempo = false;
 
 function preCarga() {
 
-  const channel = new Tone.Channel({ volume: 0, channelCount: 2 });
-  const channel2 = new Tone.Channel({ volume: 0, channelCount: 2 });
+  const channel_final = new Tone.Channel({ volume: 0, channelCount: 2 });
   const reverb = new Tone.Reverb({ decay: 1, preDecay: 0.3, wet: 0.3 });
   const reverb2 = new Tone.Reverb({ decay: 3, preDecay: 0.5, wet: 0.6 });
   const panMa = new Tone.Panner(-0.3);
@@ -66,7 +65,7 @@ function preCarga() {
     baseUrl: './assets/'
   })
   sampler[0].volume.value = 6;
-  sampler[0].chain(reverb, channel)
+  sampler[0].chain(reverb, channel_final)
 
   sampler[1] = new Tone.Sampler({
     C2: 'ma_c2.mp3', C3: 'ma_c3.mp3', C4: 'ma_c4.mp3', C5: 'ma_c5.mp3', C6: 'ma_c6.mp3'
@@ -74,7 +73,7 @@ function preCarga() {
     baseUrl: './assets/'
   })
   sampler[1].volume.value = 2;
-  sampler[1].chain(panMa, channel);
+  sampler[1].chain(panMa, channel_final);
 
   sampler[2] = new Tone.Sampler({
     A1: 'choir_A1.mp3', A2: 'choir_A2.mp3', A3: 'choir_A3.mp3', A4: 'choir_A4.mp3', C5: 'choir_C5.mp3', C6: 'ma_c6.mp3'
@@ -82,29 +81,25 @@ function preCarga() {
     baseUrl: './assets/'
   })
   sampler[2].volume.value = -14;
-  sampler[2].chain(reverb2, channel2);
-  channel2.chain(channel);
+  sampler[2].chain(reverb2, channel_final);
   const comp = new Tone.Compressor({
     ratio: 12, threshold: -20, release: 0.25, attack: 0.003, knee: 3
   });
   vol_final = new Tone.Gain(1.3);
   const limiter = new Tone.Limiter(-0.5);
-  channel.chain(comp, vol_final, limiter, Tone.Destination)
+  channel_final.chain(comp, vol_final, limiter, Tone.Destination)
 }
 
-
 async function setup() {
-  
-  let cv = createCanvas(2160, 2160);
-  cv.parent("cv");
 
   preCarga();
 
-  // densidad = 0.5 // bug
+  let cv = createCanvas(2160, 2160);
+  cv.parent("cv");
+
   const esMovil = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
     || (navigator.maxTouchPoints > 1 && /Macintosh/i.test(navigator.userAgent));
-
-  if (esMovil) densidad = 0.5;
+  if (esMovil) {densidad = 0.5; densidad_trig = 8;}
   if ($bootloader.isCapture) densidad = 0.25;
   pixelDensity(densidad);
 
@@ -113,7 +108,6 @@ async function setup() {
   fuente = await loadFont('./assets/Ubuntu-Regular.ttf')
 
   mi_seed = Math.floor(9999999999 * $bootloader.rnd());
-  // music 5636310658, ancho 3100343886//
   randomSeed(mi_seed);
   noiseSeed(mi_seed);
 
@@ -131,17 +125,14 @@ async function setup() {
     col_tipo = "light", col_back = [3, 85], col_line = [10, 90, 99, 10], col_pers = [20];
     nodos_color[3] = 0.6;
     relleno = random([0.6, 0.8, 0.8, 0.95, 0.95, 0.95, 0.95]);
-    // relleno = 0.8; //bug
     if (relleno == 0.6) { nodos_color[4] = 0.08; col_line[3] = 90; }
   } else {
-    col_tipo = "dark", col_back = [5, 20], col_line = [80, 20, 66, random([80, 80, 70, 30])], col_pers = [230]
-    print(col_line[3])
+    col_tipo = "dark", col_back = [5, 20], col_line = [80, 20, 66, random([80, 80, 70, 30])], col_pers = [230];
     nodos_color[3] = 0.8;
     relleno = random([0.55, 0.8, 0.8, 0.8, 0.8, 0.95, 0.95, 0.95]);
   }
 
   ancho = random([525, 600, 675, 675, 750, 750, 750, 825, 825, 900]);
-  // ancho = 900 // bug
   if (ancho > 800) { sep_min = 10, sep_max = 30 }
   else if (ancho > 601) { sep_min = 9, sep_max = 29 }
   else { sep_min = 8, sep_max = 28 }
@@ -171,10 +162,9 @@ async function setup() {
 
   salto_x = 220 + ((ancho - 525) * -155) / 375;
   let _rP = random([0, 0, 1, 1, 2]);
-  //if (ancho < 550) { _rP = 2 }//,bug dejamos puntas en los mas grandes????
   let _pu = int(random(9)) * 10;
-  if (_rP == 0) { punta = [-350 + _pu, 700 + ancho], salto_y = 900, nube_dir = [-1, -1, 1] }
-  else if (_rP == 1) { punta = [700 + ancho, -350 + _pu], salto_y = 900, nube_dir = [1, 1, -1] }
+  if (_rP == 0) { punta = [-350 + _pu, 700 + ancho], salto_y = 900;}
+  else if (_rP == 1) { punta = [700 + ancho, -350 + _pu], salto_y = 900;}
   else { punta = [350, 350], salto_y = 600 }
 
   // left eye, right eye, mouth, and face
@@ -213,14 +203,12 @@ async function setup() {
   arma_pg_clic();
 
   sec_cap = int(random(33, 42));
-  print("seccion capture hasta: " + sec_cap + " - 1") // bug
 
   // music config -------------------------------
   for (let i = 0; i < 1000; i++) { soundR[i] = random(); }
 
   // create chords 
   if (relleno == 0.6) {
-    // seq = [[48, 52, 55, 59], [50, 52, 55, 57], [50, 52, 57, 60], [48, 52, 59, 62], [52, 53, 55, 59]]; bug
     seq = [[50, 54, 57, 59], [49, 53, 56, 57], [48, 52, 57, 59], [47, 51, 55, 58], [49, 52, 56, 59]]
     seq = shuffle(seq);
   } else {
@@ -286,7 +274,6 @@ async function setup() {
 function draw() {
 // capture mode
   if ($bootloader.isCapture) {
-    console.log("🎬 MODO CAPTURA - Renderizando visuals (sin sonido)...");
     try {
       Tone.Transport.stop();
     } catch (e) { }
@@ -369,11 +356,6 @@ function jugando() {
     }
     else if (_s == "abajo" && n % 4 < 2 && nodos[n][i].getOjo()) pg_fondo.fill(col_line[3], 0.5); 
 
-    /*       if (nodos[n][i].getSentido() == "abajo" &&
-          ((n >= nube[0] && n < nube[0] + 3) || (n >= nube[1] && n < nube[1] + 3) || (n >= nube[2] && n < nube[2] + 3)))
-          pg_fondo.stroke(0, 90, 90, 0.5) // bug test nube    */
-
-
     let _end = nodos[n].length;
     if (n % 4 < 2 && sec_n % 3 > 0) _end = int(nodos[n].length / 2) + 1
     for (let i = 0; i < _end; i++) {
@@ -402,7 +384,7 @@ function jugando() {
       for (let iii = 0; iii < nube.length; iii++) {
         if (n >= nube[iii] && n < nube[iii] + 4) {
           if (nodos[n][0].getPosY() > height - 155) {
-            if (sec_name == "avanza") { sec_name = "rall"; bPiso = true; print(sec_name) }
+            if (sec_name == "avanza") { sec_name = "rall"; bPiso = true; }
 
             let _di = 1; if (n % 2 == 1) _di = -1;
             for (let ii = 0; ii < nodos[n].length; ii++) {
@@ -479,7 +461,6 @@ function jugando() {
   // partiture -----------------------------------
   if (bMi_fC) {
     sec_n++;
-    console.log("sec_n: " + sec_n, g_cont) // bug
 
     // voice entry
     if (!$bootloader.isCapture) { 
@@ -582,14 +563,13 @@ function Rep_nota0(_r) {
       const _t = "+" + str(0.5 * cos(mi_frameCount * 0.027) + 0.5);
       let _i = 0; if (sec_name != "avanza") _i = mi_frameCount % 2;
       sampler[_i].triggerAttackRelease(_voz, 1, _t, _v);
-      if (g_cont % 4 == 0) sampler[2].triggerAttackRelease(_voz, 2, _t, _v * 0.7);
+      if (g_cont % densidad_trig == 0) sampler[2].triggerAttackRelease(_voz, 2, _t, _v * 0.7);
     }
     if (b_play) {
       if (g_cont < g_total - 1) { g_cont++ }
       else {
         if (seq_n < 3) {
           seq_n++, g_cont = 0
-          print("acorde: " + acorde[seq_n])
         }
       }
     }
@@ -609,7 +589,7 @@ function Rep_nota1(_r) {
       const _t = "+" + str(0.5 * cos(mi_frameCount * 0.031) + 0.5);
       let _i = 0; if (sec_name != "avanza") _i = mi_frameCount % 2;
       sampler[_i].triggerAttackRelease(_voz, 1, _t, _v);
-      if (g_cont % 4 == 2) sampler[2].triggerAttackRelease(_voz, 2, _t, _v);
+      if (g_cont % densidad_trig == 3) sampler[2].triggerAttackRelease(_voz, 2, _t, _v);
     }
     if (b_newTempo) {
       clearInterval(intervalo_n1);
@@ -627,7 +607,7 @@ function Rep_nota2(_r) {
       const _t = "+" + str(0.5 * cos(mi_frameCount * 0.035) + 0.5);
       let _i = int(sound_random() * 2);
       sampler[_i].triggerAttackRelease(_voz, 1, _t, _v);
-      if (g_cont % 3 == 2) sampler[2].triggerAttackRelease(_voz, 2, _t, _v);
+      if (g_cont % densidad_trig == 2) sampler[2].triggerAttackRelease(_voz, 2, _t, _v);
     }
     if (b_newTempo) {
       clearInterval(intervalo_n2);
@@ -645,7 +625,7 @@ function Rep_nota3(_r) {
       const _t = "+" + str(0.5 * cos(mi_frameCount * 0.042) + 0.5);
       let _i = 0; if (sec_name != "avanza") _i = int(sound_random() * 2);
       sampler[_i].triggerAttackRelease(_voz, 1, Tone.now(), _v);
-      if (g_cont % 3 == 1) sampler[2].triggerAttackRelease(_voz, 2, _t, _v);
+      if (g_cont % densidad_trig == 1) sampler[2].triggerAttackRelease(_voz, 2, _t, _v);
     }
     if (b_newTempo) {
       clearInterval(intervalo_n3);
@@ -688,7 +668,6 @@ function glissando(_a, _n, _nA1, _nA2) {
 
 function fin_todo() {
 
-  grabaImagen();
   if (!$bootloader.isCapture) {
     clearInterval(intervalo_n0), clearInterval(intervalo_n1), clearInterval(intervalo_n2), clearInterval(intervalo_n3);
   }
@@ -820,6 +799,7 @@ function grabaImagen() {
 
 // pupils ----------------------------
 class Persona {
+
   constructor(x, y, _memoNodo) {
     this.pos = createVector(x, y);
     const _v = random(0.5, 1.2) * 0.5;
@@ -861,11 +841,11 @@ class Persona {
     this.pos.add(this.vel);
 
     this.memo[this.cont].x = this.pos.x, this.memo[this.cont].y = this.pos.y;
-    pg_pers.erase()
+    pg_pers.erase();
     pg_pers.ellipse(this.memo[this.azar[this.cont]].x, this.memo[this.azar[this.cont]].y, 6, 6);
-    this.cont++
-    if (this.cont == 90) this.cont = 0
-    pg_pers.noErase()
+    this.cont++;
+    if (this.cont == 90) this.cont = 0;
+    pg_pers.noErase();
 
     pg_pers.fill(col_pers[0], random(10, 40))
     pg_pers.noStroke();
